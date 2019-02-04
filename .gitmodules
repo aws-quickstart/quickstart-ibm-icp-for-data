@@ -1,0 +1,3 @@
+[submodule "submodules/"]
+	path = submodules/
+	url = ssh://git@github.com/aws-quickstart/quickstart-ibm-cloud-private.git
