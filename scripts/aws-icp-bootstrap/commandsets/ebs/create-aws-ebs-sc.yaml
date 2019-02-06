@@ -1,0 +1,26 @@
+%YAML 1.1
+# AWS EBS (Elastic Block Storage) StorageClass
+# 
+# For info on EBS storage types:
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSVolumeTypes.html
+#
+---
+kind: kubectl
+command: apply
+# flags don't take a value
+flags:
+  - overwrite
+# options with a value
+# The -f option value is used as a file name
+options:
+  f: aws-ebs-sc
+...
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: aws-ebs
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+...

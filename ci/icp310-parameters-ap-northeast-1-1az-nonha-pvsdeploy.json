@@ -1,0 +1,106 @@
+[
+  {
+    "ParameterKey": "AdminPassword",
+    "ParameterValue": "icpadmin"
+  },
+  {
+    "ParameterKey": "AdminUser",
+    "ParameterValue": "icpadmin"
+  },
+  {
+    "ParameterKey": "AvailabilityZoneCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "AvailabilityZones",
+    "ParameterValue": "ap-northeast-1a"
+  },
+  {
+    "ParameterKey": "BootNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  },
+  {
+    "ParameterKey": "ExternalSSHLocation",
+    "ParameterValue": "58.123.138.206/32"
+  },
+  {
+    "ParameterKey": "ICPBootNodeScriptPackagePath",
+    "ParameterValue": "scripts/aws-icp-bootstrap.zip"
+  },
+  {
+    "ParameterKey": "ICPClusterNodeScriptPackagePath",
+    "ParameterValue": "scripts/aws-icp-nodeinit.zip"
+  },
+  {
+    "ParameterKey": "ICPDeploymentLogsBucketName",
+    "ParameterValue": "aws-icp-quickstart-logs-ap-northeast-1"
+  },
+  {
+    "ParameterKey": "KeyFilePath",
+    "ParameterValue": "keys/additional-keys"
+  },
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "pvs_key_ap_northeast_1"
+  },
+  {
+    "ParameterKey": "ManagementNodeCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "ManagementNodeInstanceType",
+    "ParameterValue": "m5.2xlarge"
+  },
+  {
+    "ParameterKey": "MasterNodeCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "MasterNodeInstanceType",
+    "ParameterValue": "m5.2xlarge"
+  },
+  {
+    "ParameterKey": "PrivateSubnets",
+    "ParameterValue": "10.10.10.0/24"
+  },
+  {
+    "ParameterKey": "ProxyNodeCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "ProxyNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  },
+  {
+    "ParameterKey": "PublicSubnets",
+    "ParameterValue": "10.10.20.0/24"
+  },
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "aws-icp-quickstart-ap-northeast-1"
+  },
+  {
+    "ParameterKey": "QSS3KeyPrefix",
+    "ParameterValue": "0.9.6"
+  },
+  {
+    "ParameterKey": "ResourceOwner",
+    "ParameterValue": "Peter.VanSickel"
+  },
+  {
+    "ParameterKey": "VPCDomain",
+    "ParameterValue": "icp-test.com"
+  },
+  {
+    "ParameterKey": "VPCName",
+    "ParameterValue": "ICP310-VPC"
+  },
+  {
+    "ParameterKey": "WorkerNodeCount",
+    "ParameterValue": "2"
+  },
+  {
+    "ParameterKey": "WorkerNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  }
+]

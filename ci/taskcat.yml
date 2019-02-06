@@ -1,0 +1,47 @@
+---
+global:
+  marketplace-ami: false
+  owner: quickstart-eng@amazon.com
+  qsname: quickstart-ibm-cloud-private
+  regions:
+    - ap-northeast-1
+    - ap-northeast-2
+    - ap-southeast-1
+    - ap-southeast-2
+    - eu-central-1
+    - eu-north-1
+    - eu-west-1
+    - eu-west-2
+    - eu-west-3
+    - us-east-1
+    - us-east-2
+    - us-west-1
+    - us-west-2
+  reporting: true
+tests:
+  icp-ha:
+    parameter_input: icp310-ha-parameters.json
+    template_file: ibm-cloud-private-root.yaml
+    regions:
+      - ap-northeast-1
+      - ap-southeast-1
+      - eu-central-1
+      - eu-west-1
+  icp-ha-dns:
+    parameter_input: icp310-ha-dns.json
+    template_file: ibm-cloud-private-root.yaml
+    regions:
+      - us-east-1
+      - us-east-2
+      - us-west-2
+  icp-non-ha:
+    parameter_input: icp310-non-ha.json
+    template_file: ibm-cloud-private-root.yaml
+    regions:
+      - ap-northeast-2
+      - us-west-1
+  icp-non-ha-sydney:
+    parameter_input: icp310-non-ha-ap-southeast-2.json
+    template_file: ibm-cloud-private-root.yaml
+    regions:
+      - ap-southeast-2

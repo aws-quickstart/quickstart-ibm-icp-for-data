@@ -1,0 +1,41 @@
+# Helm commands to install the AWS Servicve Broker
+# Required inputs via intrinsic variables:
+#  AWSServiceBrokerChartVersion - provided by deployer
+#  AWSAccessKeyId               - provided by deployer
+#  AWSSecretKey                 - provided by deployer
+#  AWSRegion                    - Implicit in the deployment
+#  VPCId                        - Virtual Private Cloud (VPC) resource ID
+
+---
+kind: helm
+command: repo add
+name: aws-sb
+url: https://awsservicebroker.s3.amazonaws.com/charts
+
+...
+---
+kind: helm
+command: repo update
+...
+---
+kind: helm
+command: install
+chart: aws-sb/aws-servicebroker
+
+# flags have only a name with no associated value
+flags:
+  - tls
+
+# options have a name and a value
+options:
+  name: aws-servicebroker
+  namespace: aws-sb
+  version: ${AWSServiceBrokerChartVersion}
+
+# there can be multiple --set value inputs
+set-values:
+  aws.region: ${AWSRegion}
+  aws.accesskeyid: ${AWSAccessKeyId}
+  aws.secretkey: ${AWSSecretKey}
+  aws.vpcid: ${VPCId}
+...

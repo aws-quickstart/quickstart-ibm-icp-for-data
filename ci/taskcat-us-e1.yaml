@@ -1,0 +1,15 @@
+---
+global:
+  marketplace-ami: false
+  owner: quickstart-eng@amazon.com
+  qsname: quickstart-ibm-cloud-private
+  regions:
+    - us-east-1
+  reporting: true
+
+tests:
+  icp-nonha:
+    regions:
+      - us-east-1
+    parameter_input: icp310-parameters-us-east-1-1az-nonha-pvsdeploy.json
+    template_file: 00-ibm-cloud-private-root.yaml

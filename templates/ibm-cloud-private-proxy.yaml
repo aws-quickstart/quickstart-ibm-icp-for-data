@@ -1,0 +1,347 @@
+#
+# NOTES:
+#  Each ICP node has an ICPRole tag that is used by the bootstrapping
+#  scripts to determine the role of the node.  The following values
+#  for the ICPRole tag and accepted (case insensitive):
+#    Master, Worker, Proxy, Management, VA, etcd
+#
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Proxy node auto-scaling group. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template.
+
+Parameters:
+  # Variables are declared in alphabetical order.
+  AvailabilityZoneCount:
+    Description: >-
+      The number of Availability Zones.
+    Type: Number
+
+  ApplicationSecurityGroup:
+    Description: >-
+      ApplicationSecurityGroup resource ID from the parent stack
+    Type: String
+
+  ExternalSSHSecurityGroup:
+    Description: >-
+      The ExternalSSHSecurityGroup resource ID from the parent template. Used only for debugging when things fail very early in deployment and SSH access from the boot node has not been established.
+    Type: String
+
+  IBMCloudPrivateVPC:
+    Description: >-
+      The VPC resource ID for the IBMCloudPrivateVPC deployed by the root template.
+    Type: String
+
+  ICPClusterNodeScriptPackagePath:
+    Description: >-
+      The path in the ICP bootstrap S3 bucket to the ICP cluster node script package (zip) file.  Cluster nodes are master, proxy, worker, management, vulnerability advisor.
+    Type: String
+
+  ICPDeploymentLogsBucketName:
+    Description: >-
+      The name of the S3 bucket where ICP stack deployment logs are to be exported. The deployment logs provide a record of the boot strap scripting actions and are useful for problem determination if the deployment fails in some way.
+    Type: String
+
+  ICPNodeProfile:
+    Description: >-
+      ICPNodeProfile resource ID from the parent stack
+    Type: String
+
+  ICPNodeRole:
+    Description: >-
+      The IAM role with the permissions to access the various resources of the
+      IBM Cloud Private deployment.
+    Type: String
+
+  ICPS3KeyPrefix:
+    Description: >-
+      The S3 key prefix (context root) for IBM Cloud Private installation artifacts in the ICPScriptBucketName S3 bucket. By convention the value includes a trailing slash. (The ICPScriptBucketName gets assigned the value of the QSS3BucketName.)
+    Type: String
+
+  ICPScriptBucketName:
+    Description: >-
+      The name of the S3 bucket where the ICP boostrap script packages are located.
+    Type: String
+
+  ICPVersion:
+    Description: >-
+      The version of ICP to be deployed. Provided by the parent stack.  Used in the nodeinit script to determine what Docker binary to install.
+    Type: String
+
+  InternalICPSecurityGroup:
+    Description: >-
+      InternalICPSecurityGroup resource ID from the parent stack
+    Type: String
+
+  InternalSSHSecurityGroup:
+    Description: >-
+      InternalSSHSecurityGroup resource ID from the parent stack
+    Type: String
+
+  KeyName:
+    Description: >-
+      Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: Must be the name of an existing EC2 KeyPair.
+
+  PrivateSubnetIds:
+    Description: >-
+      A comma delimted list of private subnet resource IDs passed in from the parent stack. The PrivateSubnetIds are used to configure the proxy node auto-scaling group.
+    Type: String
+
+  PublicSubnetIds:
+    Description: >-
+      A comma delimted list of public subnet resource IDs passed in from the parent stack.  PublicSubnetIds are used to configure the Proxy Node Elastic Load Balancer (ELB).
+    Type: String
+
+  ProxyNodeCount:
+    Description: >-
+      Number of proxy nodes to be deployed in the ICP cluster. For a dev deployment 1 is sufficient. For production deployments, at least 2 and typically 3 are deployed.
+    Type: String
+    Default: 1
+
+  ProxyNodeInstanceType:
+    Description: ICP worker node AWS EC2 instance type
+    Type: String
+    AllowedValues:
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5d.large
+      - m5d.xlarge
+      - m5d.2xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  ResourceOwner:
+    Description: >-
+      Value for the owner tag for the deployed resource associated with the stack.
+    Type: String
+
+  RootStackName:
+    Description: >-
+      The root stack name. The root stack name is used as the common unique name for the Kubernetes tag on all EC2 instances in the cluster.
+    Type: String
+
+Mappings:
+  # See https://cloud-images.ubuntu.com/locator/ec2/
+  # Builds needed that support HVM, Elastic Network Adapter (ENA)
+  # in order to use the MD5 instance types.
+  # Use EBS backed storage as opposed "instance-store", e.g., hvm:ebs-ssd
+  # TODO - Update EU an AP
+  AWSRegionAMIEC2:
+    us-east-1:
+      Ubuntu16: ami-ef151d90
+    us-east-2:
+      Ubuntu16: ami-dad5efbf
+    us-west-1:
+      Ubuntu16: ami-d8b05cbb
+    us-west-2:
+      Ubuntu16: ami-1cc69e64
+    eu-west-1:
+      Ubuntu16: ami-844e0bf7
+    eu-central-1:
+      Ubuntu16: ami-a9a557c6
+    ap-northeast-1:
+      Ubuntu16: ami-032f516e93380b8e6
+    ap-northeast-2:
+      Ubuntu16: ami-0eee4dcc71fced4cf
+    ap-southeast-1:
+      Ubuntu16: ami-d554f1b6
+    ap-southeast-2:
+      Ubuntu16: ami-0bc1f168
+
+Conditions:
+  3AZCondition: !Equals [!Ref AvailabilityZoneCount, 3]
+
+Resources:
+
+  ProxyNodeLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      Type: network
+      Subnets: !Split [',', !Ref PublicSubnetIds]
+      Tags:
+          # Name tag is needed by the scripting to get config parameter
+          # value for the proxy_lb_address
+        - Key: Name
+          Value: ProxyNodeLoadBalancer
+        - Key: Owner
+          Value: !Ref ResourceOwner
+        - Key: !Sub kubernetes.io/cluster/${RootStackName}
+          Value: !Ref RootStackName
+
+  ProxyNode80TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 80
+      Protocol: TCP
+      VpcId: !Ref IBMCloudPrivateVPC
+
+  ProxyNode443TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 443
+      Protocol: TCP
+      VpcId: !Ref IBMCloudPrivateVPC
+
+  ProxyNodeLoadBalancer80Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ProxyNodeLoadBalancer
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ProxyNode80TargetGroup
+      Port: 80
+      Protocol: TCP
+
+  ProxyNodeLoadBalancer443Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref ProxyNodeLoadBalancer
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref ProxyNode443TargetGroup
+      Port: 443
+      Protocol: TCP
+
+  ProxyNodeLaunchConfiguration:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Metadata:
+      AWS::CloudFormation::Authentication:
+        S3AccessCreds:
+          type: S3
+          roleName: !Ref ICPNodeRole
+          buckets:
+            - !Ref ICPScriptBucketName
+
+      AWS::CloudFormation::Init:
+        configSets:
+          ICPBootstrap:
+            - InstallPackages
+            - StackPropertiesFile
+            - ICPNodeInitScripts
+
+        InstallPackages:
+          packages:
+            apt:
+              sysstat: []
+              awscli: []
+              socat: []
+              inetutils-traceroute: []
+              python-yaml: []
+            python:
+              pycryptodome: []
+              boto3: []
+              requests: []
+
+        ICPNodeInitScripts:
+          sources:
+            /root: !Sub
+             - https://${ScriptBucketName}.s3.amazonaws.com/${KeyPrefix}${ScriptPackagePath}
+             - { ScriptBucketName: !Ref ICPScriptBucketName, KeyPrefix: !Ref ICPS3KeyPrefix, ScriptPackagePath: !Ref ICPClusterNodeScriptPackagePath }
+
+        StackPropertiesFile:
+          files:
+            /root/mystack.props:
+              content: !Sub |
+                REGION=${AWS::Region}
+                STACK_NAME=${RootStackName}
+                STACK_ID="${AWS::StackId}"
+                ROLE=proxy
+
+            /root/.aws/config:
+              content: !Sub |
+                [default]
+                region=${AWS::Region}
+
+    Properties:
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: io1
+            DeleteOnTermination: true
+            VolumeSize: 300
+            Iops: 8000
+
+      IamInstanceProfile: !Ref ICPNodeProfile
+      InstanceType: !Ref ProxyNodeInstanceType
+      ImageId: !FindInMap
+          - AWSRegionAMIEC2
+          - !Ref AWS::Region
+          - Ubuntu16
+      KeyName: !Ref KeyName
+
+      # This is only needed when debugging nodeinit.py and the
+      # auto-scaling group is assigned to the public subnet
+      #AssociatePublicIpAddress: true
+
+      SecurityGroups:
+        # All security groups reference the VPC (using the VpcId attribute)
+        # External access to the proxy public ports
+        - !Ref ApplicationSecurityGroup
+        # ICP traffic among cluster nodes
+        - !Ref InternalICPSecurityGroup
+        # SSH from boot node to cluster nodes
+        - !Ref InternalSSHSecurityGroup
+        # For debugging purposes only, we let in the ExternalSSHSecurity group
+        #- !Ref ExternalSSHSecurityGroup
+
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash -xe
+            apt update -y
+            # Intall pip, then use pip to install the aws cfn helpers
+            apt install -y python-pip
+            # Upgrading pip leads to an error. Don't do, pip install --upgrade pip
+            pip install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz
+            # Install the files and packages from the metadata
+            /usr/local/bin/cfn-init -v --stack ${AWS::StackName} --resource ProxyNodeLaunchConfiguration --configsets ICPBootstrap --region ${AWS::Region}
+            # pip install pyopenssl (so far, not needed on cluster nodes)
+            pip install docker
+            chmod +x /root/*.sh
+            chmod +x /root/*.py
+            cd /root
+            /root/nodeinit.sh --os ubuntu
+
+
+  ProxyNodeAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchConfigurationName: !Ref ProxyNodeLaunchConfiguration
+      VPCZoneIdentifier: !Split [',', !Ref PrivateSubnetIds]
+      # When we need to debug nodeinit.py, we put proxies on the public subnet
+      #VPCZoneIdentifier: !Split [',', !Ref PublicSubnetIds]
+      TargetGroupARNs:
+        - !Ref ProxyNode80TargetGroup
+        - !Ref ProxyNode443TargetGroup
+      DesiredCapacity: !Ref ProxyNodeCount
+      MinSize: 1
+      MaxSize: 3
+      Tags:
+        - Key: Owner
+          Value: !Ref ResourceOwner
+          PropagateAtLaunch: true
+        - Key: ICPRole
+          Value: Proxy
+          PropagateAtLaunch: true
+        - Key: !Sub kubernetes.io/cluster/${RootStackName}
+          Value: !Ref RootStackName
+          PropagateAtLaunch: true
+
+Outputs:
+  StackId:
+    Description: >-
+      The Proxy node stack resource ID.  Needed for introspection of the Proxy node stack to pull out the EC2 instance information.
+    Value: !Ref AWS::StackId
+
+  ProxyNodeLoadBalancerDNSName:
+    Description: >-
+      The proxy node Elastic Load Balancer (ELB) DNS name (used in Route53 record set).
+    Value: !GetAtt ProxyNodeLoadBalancer.DNSName
+
+  ProxyNodeLoadBalancerHostedZoneID:
+    Description: >-
+      The proxy node Elastic Load Balancer (ELB) hosted zone ID (used in Route53 record set).
+    Value: !GetAtt ProxyNodeLoadBalancer.CanonicalHostedZoneID

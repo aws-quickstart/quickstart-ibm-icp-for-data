@@ -1,0 +1,134 @@
+[
+  {
+    "ParameterKey": "AdminPassword",
+    "ParameterValue": "icpadmin"
+  },
+  {
+    "ParameterKey": "AdminUser",
+    "ParameterValue": "icpadmin"
+  },
+  {
+    "ParameterKey": "AppSubdomainPrefix",
+    "ParameterValue": "apps"
+  },
+  {
+    "ParameterKey": "AvailabilityZoneCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "AvailabilityZones",
+    "ParameterValue": "ap-northeast-2a"
+  },
+  {
+    "ParameterKey": "BootNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  },
+  {
+    "ParameterKey": "ClusterName",
+    "ParameterValue": "pvscluster"
+  },
+  {
+    "ParameterKey": "ExternalApplicationLocation",
+    "ParameterValue": "108.39.143.97/32"
+  },
+  {
+    "ParameterKey": "ExternalICPAdminLocation",
+    "ParameterValue": "108.39.143.97/32"
+  },
+  {
+    "ParameterKey": "ExternalSSHLocation",
+    "ParameterValue": "108.39.143.97/32"
+  },
+  {
+    "ParameterKey": "ICPBootNodeScriptPackagePath",
+    "ParameterValue": "scripts/aws-icp-bootstrap.zip"
+  },
+  {
+    "ParameterKey": "ICPClusterNodeScriptPackagePath",
+    "ParameterValue": "scripts/aws-icp-nodeinit.zip"
+  },
+  {
+    "ParameterKey": "ICPDeploymentLogsBucketName",
+    "ParameterValue": "aws-icp-quickstart-logs-ap-northeast-2"
+  },
+  {
+    "ParameterKey": "ICPVersion",
+    "ParameterValue": "3.1.0"
+  },
+  {
+    "ParameterKey": "KeyFilePath",
+    "ParameterValue": "keys/solution-engineering-keys"
+  },
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "pvs_key_ap_northeast_2"
+  },
+  {
+    "ParameterKey": "ManagementNodeCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "ManagementNodeInstanceType",
+    "ParameterValue": "m5.2xlarge"
+  },
+  {
+    "ParameterKey": "MasterNodeCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "MasterNodeInstanceType",
+    "ParameterValue": "m5.2xlarge"
+  },
+  {
+    "ParameterKey": "PrivateSubnets",
+    "ParameterValue": "10.10.10.0/24"
+  },
+  {
+    "ParameterKey": "ProxyNodeCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "ProxyNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  },
+  {
+    "ParameterKey": "PublicSubnets",
+    "ParameterValue": "10.10.20.0/24"
+  },
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "aws-icp-quickstart-ap-northeast-1"
+  },
+  {
+    "ParameterKey": "QSS3KeyPrefix",
+    "ParameterValue": "0.9.6"
+  },
+  {
+    "ParameterKey": "ResourceOwner",
+    "ParameterValue": "Peter.VanSickel"
+  },
+  {
+    "ParameterKey": "VPCDomain",
+    "ParameterValue": "apic-demo.com"
+  },
+  {
+    "ParameterKey": "VPCHostedZoneId",
+    "ParameterValue": "Z1TXQISDLGPKT8"
+  },
+  {
+    "ParameterKey": "VPCName",
+    "ParameterValue": "ICP310-VPC"
+  },
+  {
+    "ParameterKey": "VPCSubdomainPrefix",
+    "ParameterValue": "pvs-test"
+  },
+  {
+    "ParameterKey": "WorkerNodeCount",
+    "ParameterValue": "2"
+  },
+  {
+    "ParameterKey": "WorkerNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  }
+]

@@ -1,0 +1,122 @@
+[
+  {
+    "ParameterKey": "AdminPassword",
+    "ParameterValue": "icpadmin"
+  },
+  {
+    "ParameterKey": "AdminUser",
+    "ParameterValue": "icpadmin"
+  },
+  {
+    "ParameterKey": "AvailabilityZoneCount",
+    "ParameterValue": "3"
+  },
+  {
+    "ParameterKey": "AvailabilityZones",
+    "ParameterValue": "us-east-1c,us-east-1d,us-east-1f"
+  },
+  {
+    "ParameterKey": "AppSubdomainPrefix",
+    "ParameterValue": "apps"
+  },
+  {
+    "ParameterKey": "BootNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  },
+  {
+    "ParameterKey": "ClusterName",
+    "ParameterValue": "pvscluster"
+  },
+  {
+    "ParameterKey": "ExternalApplicationLocation",
+    "ParameterValue": "108.39.143.97/32"
+  },
+  {
+    "ParameterKey": "ExternalICPAdminLocation",
+    "ParameterValue": "108.39.143.97/32"
+  },
+  {
+    "ParameterKey": "ExternalSSHLocation",
+    "ParameterValue": "108.39.143.97/32"
+  },
+  {
+    "ParameterKey": "ICPBootNodeScriptPackagePath",
+    "ParameterValue": "scripts/aws-icp-bootstrap.zip"
+  },
+  {
+    "ParameterKey": "ICPClusterNodeScriptPackagePath",
+    "ParameterValue": "scripts/aws-icp-nodeinit.zip"
+  },
+  {
+    "ParameterKey": "ICPDeploymentLogsBucketName",
+    "ParameterValue": "aws-icp-quickstart-logs-us-east-1"
+  },
+  {
+    "ParameterKey": "KeyFilePath",
+    "ParameterValue": "keys/solution-engineering-keys"
+  },
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "pvs_key_us_east_1"
+  },
+  {
+    "ParameterKey": "ManagementNodeCount",
+    "ParameterValue": "3"
+  },
+  {
+    "ParameterKey": "ManagementNodeInstanceType",
+    "ParameterValue": "m5.2xlarge"
+  },
+  {
+    "ParameterKey": "MasterNodeCount",
+    "ParameterValue": "3"
+  },
+  {
+    "ParameterKey": "MasterNodeInstanceType",
+    "ParameterValue": "m5.2xlarge"
+  },
+  {
+    "ParameterKey": "PrivateSubnets",
+    "ParameterValue": "10.10.10.0/24, 10.10.11.0/24, 10.10.12.0/24"
+  },
+  {
+    "ParameterKey": "ProxyNodeCount",
+    "ParameterValue": "3"
+  },
+  {
+    "ParameterKey": "ProxyNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  },
+  {
+    "ParameterKey": "PublicSubnets",
+    "ParameterValue": "10.10.20.0/24, 10.10.21.0/24, 10.10.22.0/24"
+  },
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "aws-icp-quickstart-us-east-1"
+  },
+  {
+    "ParameterKey": "ResourceOwner",
+    "ParameterValue": "Peter.VanSickel"
+  },
+  {
+    "ParameterKey": "VPCDomain",
+    "ParameterValue": "icp-test.com"
+  },
+  {
+    "ParameterKey": "VPCName",
+    "ParameterValue": "ICPTest-VPC"
+  },
+  {
+    "ParameterKey": "VulnerabilityAdvisorNodeCount",
+    "ParameterValue": "3"
+  },
+  {
+    "ParameterKey": "WorkerNodeCount",
+    "ParameterValue": "3"
+  },
+  {
+    "ParameterKey": "WorkerNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  }
+]

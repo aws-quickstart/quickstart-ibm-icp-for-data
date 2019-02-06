@@ -1,0 +1,126 @@
+[
+  {
+    "ParameterKey": "AdminPassword",
+    "ParameterValue": "$[taskcat_genpass_12A]"
+  },
+  {
+    "ParameterKey": "AdminUser",
+    "ParameterValue": "icpadmin"
+  },
+  {
+    "ParameterKey": "AvailabilityZoneCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "AvailabilityZones",
+    "ParameterValue": "ap-southeast-2b"
+  },
+  {
+    "ParameterKey": "AppSubdomainPrefix",
+    "ParameterValue": "apps"
+  },
+  {
+    "ParameterKey": "BootNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  },
+  {
+    "ParameterKey": "ClusterPKIBucketName",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "ClusterPKIRootPath",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "CustomArtifactsPath",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "ExternalApplicationLocation",
+    "ParameterValue": "10.0.0.0/16"
+  },
+  {
+    "ParameterKey": "ExternalICPAdminLocation",
+    "ParameterValue": "10.0.0.0/16"
+  },
+  {
+    "ParameterKey": "ExternalSSHLocation",
+    "ParameterValue": "10.0.0.0/16"
+  },
+  {
+    "ParameterKey": "ICPDeploymentLogsBucketName",
+    "ParameterValue": "overridden"
+  },
+  {
+    "ParameterKey": "KeyFilePath",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "KeyName",
+    "ParameterValue": "cikey"
+  },
+  {
+    "ParameterKey": "ManagementNodeCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "ManagementNodeInstanceType",
+    "ParameterValue": "m5.2xlarge"
+  },
+  {
+    "ParameterKey": "MasterNodeCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "MasterNodeInstanceType",
+    "ParameterValue": "m5.2xlarge"
+  },
+  {
+    "ParameterKey": "PrivateSubnets",
+    "ParameterValue": "10.10.10.0/24"
+  },
+  {
+    "ParameterKey": "ProxyNodeCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "ProxyNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  },
+  {
+    "ParameterKey": "PublicSubnets",
+    "ParameterValue": "10.10.20.0/24"
+  },
+  {
+    "ParameterKey": "QSS3BucketName",
+    "ParameterValue": "$[taskcat_autobucket]"
+  },
+  {
+    "ParameterKey": "ResourceOwner",
+    "ParameterValue": "ICP-Quickstart"
+  },
+  {
+    "ParameterKey": "VPCDomain",
+    "ParameterValue": "$[taskcat_random-string].icp.example.com"
+  },
+  {
+    "ParameterKey": "VPCName",
+    "ParameterValue": "ICP310-VPC"
+  },
+  {
+    "ParameterKey": "VPCSubdomainPrefix",
+    "ParameterValue": ""
+  },
+  {
+    "ParameterKey": "VulnerabilityAdvisorNodeCount",
+    "ParameterValue": "1"
+  },
+  {
+    "ParameterKey": "WorkerNodeCount",
+    "ParameterValue": "2"
+  },
+  {
+    "ParameterKey": "WorkerNodeInstanceType",
+    "ParameterValue": "m5.xlarge"
+  }
+]

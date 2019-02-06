@@ -1,0 +1,262 @@
+
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Private subnets used by the IBM Cloud Private deploment. The number of subnets defined is based on the number of Availability Zones to be used.
+
+Parameters:
+  AvailabilityZoneCount:
+    Description: >-
+      The number of availability zones to be used for the deployment. Keep in mind that some regions may be limited to 2 availability zones.  For a single ICP cluster to be highly available, 3 availability zones are needed to avoid a single point of failure when using 3, 5 or 7 master nodes or etcd nodes.  With less than 3 availability zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority the etcd instances.
+    Type: Number
+
+  AvailabilityZones:
+    Description: >-
+      List of Availability Zones to use for the subnets in the VPC.  To get the names of Availability Zones available to you using the AWS CLI: aws ec2 describe-availability-zones
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+
+  IBMCloudPrivateVPC:
+    Description: >-
+      The IBMCloudePrivateVPC resource ID from the parent template.
+    Type: String
+
+  PublicSubnetIds:
+    Description: >-
+      A comma separated list of resource IDs for the public subnets defined for 1 or 3 Availability Zones.
+    Type: CommaDelimitedList
+
+  PrivateSubnets:
+    Description: >-
+      A list of CIDR blocks to be used for the private subnets defined in 1 or 3 Availability Zones.
+    Type: CommaDelimitedList
+
+  ResourceOwner:
+    Description: >-
+      Value for the owner tag for the deployed resource associated with the stack.
+    Type: String
+
+  RootStackName:
+    Description: >-
+      The name of the root stack.
+    Type: String
+
+Conditions:
+  3AZCondition: !Equals [!Ref AvailabilityZoneCount, 3]
+
+Resources:
+
+#### Private Subnet One Resources
+  NATOneEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  PrivateSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Select [0, !Ref PrivateSubnets]
+      VpcId: !Ref IBMCloudPrivateVPC
+      AvailabilityZone: !Select [0, !Ref AvailabilityZones]
+      Tags:
+        - Key: Name
+          Value: PrivateSubnetOne
+        - Key: Network
+          Value: Private
+        - Key: Owner
+          Value: !Ref ResourceOwner
+        - Key: !Sub kubernetes.io/cluster/${RootStackName}
+          Value: ${RootStackName}
+
+  PrivateSubnetOneRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref IBMCloudPrivateVPC
+      Tags:
+        - Key: Name
+          Value: PrivateSubnetOne
+        - Key: Network
+          Value: Private
+
+  PrivateSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnetOne
+      RouteTableId: !Ref PrivateSubnetOneRouteTable
+
+  # NAT gateway to PublicSubnetOne in AZ 1
+  PrivateNatGatewayOne:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NATOneEIP.AllocationId
+      SubnetId: !Select [0, !Ref PublicSubnetIds]
+      # TBD: Do NatGateway resources need the Kube tag?
+      Tags:
+        - Key: !Sub kubernetes.io/cluster/${RootStackName}
+          Value: ${RootStackName}
+
+  PrivateSubnetOneRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref PrivateSubnetOneRouteTable
+      NatGatewayId: !Ref PrivateNatGatewayOne
+
+
+#### Private Subnet Two Resources
+  NATTwoEIP:
+    Condition: 3AZCondition
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  PrivateSubnetTwo:
+    Condition: 3AZCondition
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Select [1, !Ref PrivateSubnets]
+      VpcId: !Ref IBMCloudPrivateVPC
+      AvailabilityZone: !Select [1, !Ref AvailabilityZones]
+      Tags:
+        - Key: Name
+          Value: PrivateSubnetTwo
+        - Key: Network
+          Value: Private
+        - Key: Owner
+          Value: !Ref ResourceOwner
+        - Key: !Sub kubernetes.io/cluster/${RootStackName}
+          Value: ${RootStackName}
+
+  PrivateSubnetTwoRouteTable:
+    Condition: 3AZCondition
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref IBMCloudPrivateVPC
+      Tags:
+        - Key: Name
+          Value: PrivateSubnetTwo
+        - Key: Network
+          Value: Private
+
+  PrivateSubnetTwoRouteTableAssociation:
+    Condition: 3AZCondition
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnetTwo
+      RouteTableId: !Ref PrivateSubnetTwoRouteTable
+
+  # NAT gatway to PublicSubnetTwo in AZ 2
+  PrivateNatGatewayTwo:
+    Condition: 3AZCondition
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NATTwoEIP.AllocationId
+      SubnetId: !Select [1, !Ref PublicSubnetIds]
+      # TBD: Do NatGateway resources need the Kube tag?
+      Tags:
+        - Key: Name
+          Value: PrivateSubnetTwo
+        - Key: Network
+          Value: Private
+        - Key: Owner
+          Value: !Ref ResourceOwner
+        - Key: !Sub kubernetes.io/cluster/${RootStackName}
+          Value: ${RootStackName}
+
+  PrivateSubnetTwoRoute:
+    Condition: 3AZCondition
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref PrivateSubnetTwoRouteTable
+      NatGatewayId: !Ref PrivateNatGatewayTwo
+
+#### Private Subnet Three Resources
+  NATThreeEIP:
+    Condition: 3AZCondition
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  PrivateSubnetThree:
+    Condition: 3AZCondition
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: !Select [2, !Ref PrivateSubnets]
+      VpcId: !Ref IBMCloudPrivateVPC
+      AvailabilityZone: !Select [2, !Ref AvailabilityZones]
+      Tags:
+        - Key: Name
+          Value: PrivateSubnetThree
+        - Key: Network
+          Value: Private
+        - Key: Owner
+          Value: !Ref ResourceOwner
+        - Key: !Sub kubernetes.io/cluster/${RootStackName}
+          Value: ${RootStackName}
+
+  PrivateSubnetThreeRouteTable:
+    Condition: 3AZCondition
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref IBMCloudPrivateVPC
+      Tags:
+        - Key: Name
+          Value: PrivateSubnetThree
+        - Key: Network
+          Value: Private
+
+  PrivateSubnetThreeRouteTableAssociation:
+    Condition: 3AZCondition
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref PrivateSubnetThree
+      RouteTableId: !Ref PrivateSubnetThreeRouteTable
+
+  # NAT gatway to PublicSubnetThree in AZ 3
+  PrivateNatGatewayThree:
+    Condition: 3AZCondition
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NATThreeEIP.AllocationId
+      SubnetId: !Select [2, !Ref PublicSubnetIds]
+      # TBD: Do NatGateway resources need the Kube tag?
+      Tags:
+        - Key: Name
+          Value: PrivateSubnetThree
+        - Key: Network
+          Value: Private
+        - Key: Owner
+          Value: !Ref ResourceOwner
+        - Key: !Sub kubernetes.io/cluster/${RootStackName}
+          Value: ${RootStackName}
+
+  PrivateSubnetThreeRoute:
+    Condition: 3AZCondition
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref PrivateSubnetThreeRouteTable
+      NatGatewayId: !Ref PrivateNatGatewayThree
+
+
+Outputs:
+  # Passed back explicitly because !Select cannot handle getting PrivateSubnetIds list
+  # TBD: Commenting this out because I'm pretty sure it isn't needed.
+#  PrivateSubnetOneId:
+#    Description: The primary private subnet resource ID. Used to get master and proxy VIPs.
+#    Value: !Ref PrivateSubnetOne
+
+  NATGatewayPublicIPs:
+    Description: >-
+      Comma separated list of public IPs associated with the NAT gateways. The NAT gateway IPs are added to the MasterICPSecurityGroup ingress rules for the various ports. Particularly for an HA deployment, the NAT gateway IPs must be permitted to access the master nodes via the Master node ElasticLoadBalancers.  The cluster nodes on the private subnets access Master node services via the Master node ELBs.
+    Value: !If
+      - 3AZCondition
+      - !Join [',', [!Ref NATOneEIP, !Ref NATTwoEIP, !Ref NATThreeEIP]]
+      - !Ref NATOneEIP
+
+  PrivateSubnetIds:
+    Description: Comma separated list of private subnet resource IDs
+    Value: !If
+      - 3AZCondition
+      - !Join [',',[!Ref PrivateSubnetOne, !Ref PrivateSubnetTwo, !Ref PrivateSubnetThree]]
+      - !Ref PrivateSubnetOne

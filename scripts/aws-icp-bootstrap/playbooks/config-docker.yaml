@@ -1,0 +1,22 @@
+---
+#
+# Add MountFlags=shared to /lib/systemd/system/docker.service
+#
+
+- hosts: "{{ target_nodes }}"
+  tasks:
+    - name: "Use overlay2 storage driver"
+      lineinfile:
+        dest: /lib/systemd/system/docker.service
+        regexp: '^(ExecStart=/usr/bin/dockerd(?!.*[ \t]--storage-driver=overlay2[ \t\n]).*)$'
+        line: '\1 --storage-driver=overlay2'
+        state: present
+      become: True
+        
+    - name: "Set MountFlags=shared"
+      lineinfile:
+        dest: /lib/systemd/system/docker.service
+        line: MountFlags=shared
+        insertafter: StartLimitInterval=*
+        state: present
+      become: True

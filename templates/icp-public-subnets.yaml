@@ -1,0 +1,152 @@
+
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Public subnets used by the IBM Cloud Private deploment. The number of subnets defined is based on the number of Availability Zones to be used.
+
+Parameters:
+  AvailabilityZoneCount:
+    Description: >-
+      The number of availability zones to be used for the deployment. Keep in mind that some regions may be limited to 2 availability zones.  For a single ICP cluster to be highly available, 3 availability zones are needed to avoid a single point of failure when using 3, 5 or 7 master nodes or etcd nodes.  With less than 3 availability zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority the etcd instances.
+    Type: Number
+
+  AvailabilityZones:
+    Description: >-
+      List of Availability Zones to use for the subnets in the VPC.  To get the names of Availability Zones available to you using the AWS CLI: aws ec2 describe-availability-zones
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+
+  IBMCloudPrivateVPC:
+    Description: >-
+      The IBMCloudePrivateVPC resource ID from the parent template.
+    Type: String
+
+  InternetGateway:
+    Description: >-
+      Internet gateway resource ID from the parent template.
+    Type: String
+
+  PublicSubnets:
+    Description: >-
+      List of CIDRs to be used for 1 or more public subnets of the VPC. The number of CIDRs provided must equal the number of Availability Zones (AvailabilityZoneCount). The public subnets must be within the network defined by the PublicSubnetCIDR.
+    Type: CommaDelimitedList
+
+  ResourceOwner:
+    Description: >-
+      Value for the owner tag for the deployed resource associated with the stack.
+    Type: String
+
+  # RootStackName is used for the kubernetes key for the subnets.
+  # TBD - Do the subnets need a kubernetes key?  Need to investigate.
+  RootStackName:
+    Description: >-
+      The name of the root stack.
+    Type: String
+
+
+Conditions:
+  3AZCondition: !Equals [!Ref AvailabilityZoneCount, 3]
+  1AZCondition: !Equals [!Ref AvailabilityZoneCount, 1]
+
+Resources:
+
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref IBMCloudPrivateVPC
+
+  PublicSubnetRoute:
+    # This Route allows outbound traffic to the Internet
+    # from various subnets.
+    # InternetGatewayAttachment is created in root stack.
+    # This stack invocation has DependsOn InternetGatewayAttachment
+    Type: AWS::EC2::Route
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref PublicSubnetRouteTable
+      GatewayId: !Ref InternetGateway
+
+#### Public Subnet One Resources
+  PublicSubnetOne:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref IBMCloudPrivateVPC
+      AvailabilityZone: !Select [0, !Ref AvailabilityZones]
+      CidrBlock: !Select [0, !Ref PublicSubnets]
+      Tags:
+        - Key: Name
+          Value: PublicSubnetOne
+        - Key: Network
+          Value: Public
+        - Key: Owner
+          Value: !Ref ResourceOwner
+          # TBD - Not sure kubernetes key is needed
+        - Key: !Sub kubernetes.io/cluster/${RootStackName}
+          Value: !Sub ${RootStackName}
+
+  PublicSubnetOneRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetOne
+
+#### Public Subnet Two Resources
+  PublicSubnetTwo:
+    Condition: 3AZCondition
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref IBMCloudPrivateVPC
+      AvailabilityZone: !Select [1, !Ref AvailabilityZones]
+      CidrBlock: !Select [1, !Ref PublicSubnets]
+      Tags:
+        - Key: Name
+          Value: PublicSubnetTwo
+        - Key: Network
+          Value: Public
+        - Key: Owner
+          Value: !Ref ResourceOwner
+          # TBD - Not sure kubernetes key is needed
+        - Key: !Sub kubernetes.io/cluster/${RootStackName}
+          Value: !Sub ${RootStackName}
+
+  PublicSubnetTwoRouteTableAssociation:
+    Condition: 3AZCondition
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetTwo
+
+#### Public Subnet Three Resources
+  PublicSubnetThree:
+    Condition: 3AZCondition
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref IBMCloudPrivateVPC
+      AvailabilityZone: !Select [2, !Ref AvailabilityZones]
+      CidrBlock: !Select [2, !Ref PublicSubnets]
+      Tags:
+        - Key: Name
+          Value: PublicSubnetThree
+        - Key: Network
+          Value: Public
+        - Key: Owner
+          Value: !Ref ResourceOwner
+          # TBD - Not sure kubernetes key is needed
+        - Key: !Sub kubernetes.io/cluster/${RootStackName}
+          Value: !Sub ${RootStackName}
+
+  PublicSubnetThreeRouteTableAssociation:
+    Condition: 3AZCondition
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicSubnetRouteTable
+      SubnetId: !Ref PublicSubnetThree
+
+Outputs:
+
+  PublicSubnetIds:
+    Description: Comma separated list of public subnet resource Ids
+    # WARNING: The Fn::If can only deal with a condition name.
+    Value: !If
+      - 3AZCondition
+      - !Join [',', [!Ref PublicSubnetOne, !Ref PublicSubnetTwo, !Ref PublicSubnetThree]]
+      - !Ref PublicSubnetOne
