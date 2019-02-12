@@ -1,0 +1,20 @@
+
+# Custom variable map
+# At minimum, the variables file must have a kind of variables.
+#
+# If a command set doesn't use any custom substitution variables, i.e., it either
+# uses no variables (static command) or it only uses intrinsic variables, then
+# a variables.yaml file is not needed.
+#
+# A variables file may have a CustomVariables entry that provides a set of
+# custom variables and their corresponding values. 
+# 
+---
+kind: variables
+
+# IntrinsicVariables get assigned a value based on the ICP deployment.
+#
+# Custom subsitution variables
+CustomVariables:
+  AWSServiceBrokerChartVersion: 1.0.0-beta.3
+...

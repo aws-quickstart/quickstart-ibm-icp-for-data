@@ -1,0 +1,54 @@
+---
+#
+# Load the IBM Cloud Private images from the ICP installation tar ball
+#
+# NOTE: This playbook is intended for use with the AWS ICP Quickstart CloudFormation
+# script that makes sure for RHEL/CENTOS policycoreutils-python is installed by the 
+# CF script. For ubuntu the policycoreutils-python-utils is installed by the CF script.
+#
+# The CloudFormation script that deploys the cluster nodes also copies the ICP install
+# tar ball to /tmp/icp-install-archive.tgz
+#
+# INPUTS:
+#   vars:
+#     target_nodes - a regex string or group name that defines the hosts or
+#                    host group.
+#
+#     You can define the vars on the ansible-playbook command line using --extra-vars.
+#     Or define vars in your hosts inventory or any of the other ways to define
+#     Ansible variables.
+#     The --inventory option can be used to provide a path to an inventory file
+#     on the ansible-playbook command line.
+#
+# Root privilege is needed to run this configuration script.
+# The tasks where root is needed use the "become" option.
+#
+# ASSUMPTIONS:
+#   1. Docker has been installed and it is running.
+#   2. The ICP image tarball is in a file /tmp/icp-install-archive.tgz
+#
+# Sample invocation:
+#   ansible-playbook load-icp-images.yaml --extra-vars "target_nodes=cluster"
+#
+#   The above invocation assumes the ansible hosts file has a group defined
+#   in it named cluster with all the nodes in the ICP cluster including the boot
+#   node.
+#
+- hosts: "{{ target_nodes }}"
+  tasks:
+  
+  - name: "Create root logs directory"
+    file:
+      path: /root/logs
+      state: directory
+      owner: root
+      group: root
+    become: True
+
+  - name: "Load IBM Cloud Private images to the local docker registry."
+    shell: tar -zxvf icp-install-archive.tgz -O | docker load | tee /root/logs/load-icp-images.log
+    args:
+      chdir: /tmp
+      creates: /root/logs/load-icp-images.log 
+    become: True
+

@@ -1,0 +1,36 @@
+#
+# The values of the intrinsic variables are derived from the ICP deployment 
+# on AWS and provided by the deployment bootstrap scripting.
+#
+
+# Custom variable and keyword map
+---
+kind: variables
+
+# The VariableKeywordMap provides the mapping from the variable names
+# defined in this file to the keywords used to defined macro substitutions
+# in the command files.
+#
+# The keywords are used in the command files in the same directory 
+# as this variables file.  It turns out to be convenient to have
+# one level of indirection between the variable names and the macro
+# names used for macro substitution in the command files.
+#
+# NOTE: All IntrinsicaVariables used in the command files and all variables 
+# defined in the VariableValues table must have an entry in the VariableKeywordMap
+#
+VariableKeywordMap:
+  ClusterDNSName: CLUSTER_DNS_NAME
+  ProxyDNSName: PROXY_DNS_NAME
+  TADB_UserName: TA_DB_USERNAME
+  TADB_Password: TA_DB_SECRET
+  TA_StorageClass: TA_STORAGE_CLASS
+
+# Custom variable values
+# user name and password need to be base64 encoded
+# user: admin
+# password: secret01
+VariableValues:
+  TADB_UserName: YWRtaW4=
+  TADB_Password: c2VjcmV0
+  TA_StorageClass: aws-efs

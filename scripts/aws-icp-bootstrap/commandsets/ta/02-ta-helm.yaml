@@ -1,0 +1,19 @@
+---
+kind: helm
+command: install
+chart: ibm-charts/ibm-transadv-dev
+
+# flags have only a name with no associated value
+flags:
+  - tls
+
+# options have a name and a value
+options:
+  name: butterfly
+
+# there can be multiple --set value inputs
+set-values:
+  authentication.icp.edgeIp: ${ClusterDNSName}
+  authentication.icp.secretName: trans-adv-secret
+  couchdb.persistence.storageClassName: ${TA_StorageClass}
+...

@@ -1,0 +1,60 @@
+#
+# Stop kubelet, stop docker, start docker, start kublet
+#
+# It is often the case that stopping kubelet and docker and then starting them
+# is a cure-all for situations where a particular node needs the equivalent of
+# a reboot.  In the case of the ICP installation on AWS, it seems that such a
+# reboot is needed to get the calico networking fully engaged.
+# 
+# INPUTS:
+#   vars:
+#     target_nodes - a regex string or group name that defines the hosts or
+#                    host group.
+#
+#     You can define the vars on the ansible-playbook command line using --extra-vars.
+#     Or define vars in your hosts inventory or any of the other ways to define
+#     Ansible variables.
+#     The --inventory option can be used to provide a path to an inventory file
+#     on the ansible-playbook command line.
+#
+# Root privilege is needed to run this script. The tasks where root is needed use the 
+# "become" option.
+#
+# Sample invocation:
+#   ansible-playbook restart-kubelet-and-docker.yaml --extra-vars "target_nodes=worker*"
+#
+#   The above invocation assumes the ansible hosts file has nodes with
+#   names that start with worker, e.g., worker01, worker02, ...
+#
+#
+
+---
+
+- hosts: "{{ target_nodes }}"
+  tasks:
+
+  - name: "Stop the kubelet service"
+    service:
+      name: kubelet
+      state: stopped
+    become: True
+
+  - name: "Stop the docker service"
+    service:
+      name: docker
+      state: stopped
+    become: True
+
+  - name: "Start the docker service"
+    service:
+      name: docker
+      state: started
+      enabled: yes
+    become: True
+
+  - name: "Start the kubelet service"
+    service:
+      name: kubelet
+      state: started
+      enabled: yes
+    become: True

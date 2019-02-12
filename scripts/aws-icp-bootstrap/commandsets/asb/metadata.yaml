@@ -1,0 +1,22 @@
+
+# The metadata file is used to manage the command set.
+
+# In the case of the AWS Service Broker installation command set,
+# If all of the intrinsic-variables do not have a value, the
+# command set is not processed.
+
+---
+kind: metadata
+
+
+# The following intrinsic variables must have a non-empty value for this command set.
+# The command set is skipped if any of these intrinsic variables are empty.
+required-intrinsics:
+  - AWSAccessKeyId
+  - AWSSecretKey
+  - AWSRegion
+  - VPCId
+
+post-processing:
+  delete: [asb-helm-command.yaml]
+...

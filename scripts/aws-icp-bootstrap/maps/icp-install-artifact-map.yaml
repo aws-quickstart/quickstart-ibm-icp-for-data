@@ -1,0 +1,59 @@
+---
+# Every bucket is expected to have a folder in it for each ICP version that
+# is currently supported. Each version folder will have the following attributes:
+# VERSION: - the ICP version, e.g., 3.1.0, 3.1.1, etc
+#   icp-base-install-archive: - name of the icp base isntall tar ball
+#   docker-install-binary:    - name of the docker install binary file
+#   inception-image-name:     - the name of the inception image
+#   inception-command:        - the inception command string
+#   fixpack:
+#     file-name:              - the name of the fixpack file (.tar file)
+#     fixpack-executable:     - the name of the fixpack executable (.sh file)
+#     inception-image-name:   - the fixpack inception image name
+#     inception-command:      - the fixpack inception command string
+#
+# For file transfer efficiency, each AWS region has a bucket.
+# The s3-buckets table maps regions to bucket names.
+# 
+# By convention the bucket names are ibm-cloud-private-REGION
+# where REGION is the region name.  Whatever the bucket name 
+# actually is, it needs to be reflected in this yaml file.
+# NOTE: S3 bucket names must be globally unique.  There is no
+# scoping of bucket names even at account boundaries.
+#
+
+3.1.0:
+  icp-base-install-archive: ibm-cloud-private-x86_64-3.1.0.tar.gz
+  docker-install-binary: icp-docker-18.03.1_x86_64.bin
+  inception-image-name: ibmcom/icp-inception-amd64:3.1.0-ee
+  inception-command: "install -v"
+
+3.1.1:
+  icp-base-install-archive: ibm-cloud-private-x86_64-3.1.1.tar.gz
+  docker-install-binary: icp-docker-18.03.1_x86_64.bin
+  inception-image-name: ibmcom/icp-inception-amd64:3.1.1-ee
+  inception-command: "install -v"
+
+# s3-buckets is deprecated.  Remove after testing
+# ICPArchiveBucketName is input to boot and cluster templates
+# See root template for mapping of region to bucket name.
+s3-buckets:
+  ap-northeast-1: ibm-cloud-private-data-ap-northeast-1
+  ap-northeast-2: ibm-cloud-private-data-ap-northeast-2
+  ap-northeast-3: ibm-cloud-private-data-ap-northeast-3
+  ap-south-1: ibm-cloud-private-data-ap-south-1
+  ap-southeast-1: ibm-cloud-private-data-ap-southeast-1
+  ap-southeast-2: ibm-cloud-private-data-ap-southeast-2
+  ca-central-1: ibm-cloud-private-data-ca-central-1
+  eu-central-1: ibm-cloud-private-data-eu-central-1
+  eu-north-1: ibm-cloud-private-data-eu-north-1
+  eu-west-1: ibm-cloud-private-data-eu-west-1
+  eu-west-2: ibm-cloud-private-data-eu-west-2
+  eu-west-3: ibm-cloud-private-data-eu-west-3
+  sa-east-1: ibm-cloud-private-data-sa-east-1
+  us-east-1: ibm-cloud-private-data-us-east-1
+  us-east-2: ibm-cloud-private-data-us-east-2
+  us-west-1: ibm-cloud-private-data-us-west-1
+  us-west-2: ibm-cloud-private-data-us-west-2
+
+

@@ -1,0 +1,100 @@
+---
+Resources:
+  ICPMasterSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      VpcId: ${IBMCloudPrivateVPC}
+      GroupDescription: >-
+        Security group enabling access to the ICP Master node ports from any IP address.
+      SecurityGroupIngress:
+        - Description: Kubernetes API server Boot node private IP
+          IpProtocol: tcp
+          FromPort: 8001
+          ToPort: 8001
+          CidrIp: ${BootNodePrivateIPv4Address}/32
+        - Description: Kubernetes API server Boot node public IP
+          IpProtocol: tcp
+          FromPort: 8001
+          ToPort: 8001
+          CidrIp: ${BootNodePublicIPv4Address}/32
+        - Description: Kubernetes API server NAT Gateway public IP
+          IpProtocol: tcp
+          FromPort: 8001
+          ToPort: 8001
+          CidrIp: ${NATGatewayPublicIPv4Address}/32
+        - Description: Management console (HTTP) Boot node private IP
+          IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: ${BootNodePrivateIPv4Address}/32
+        - Description: Management console (HTTP) Boot node public IP
+          IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: ${BootNodePublicIPv4Address}/32
+        - Description: Management console (HTTP) NAT Gateway public IP
+          IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp: ${NATGatewayPublicIPv4Address}/32
+        - Description: Management console (HTTPS) Boot node private IP
+          IpProtocol: tcp
+          FromPort: 8443
+          ToPort: 8443
+          CidrIp: ${BootNodePrivateIPv4Address}/32
+        - Description: Management console (HTTPS) Boot node public IP
+          IpProtocol: tcp
+          FromPort: 8443
+          ToPort: 8443
+          CidrIp: ${BootNodePublicIPv4Address}/32
+        - Description: Management console (HTTPS) NAT Gateway public IP
+          IpProtocol: tcp
+          FromPort: 8443
+          ToPort: 8443
+          CidrIp: ${NATGatewayPublicIPv4Address}/32
+        - Description: Image manager 8500 Boot node private IP
+          IpProtocol: tcp
+          FromPort: 8500
+          ToPort: 8500
+          CidrIp: ${BootNodePrivateIPv4Address}/32
+        - Description: Image manager 8500 Boot node public IP
+          IpProtocol: tcp
+          FromPort: 8500
+          ToPort: 8500
+          CidrIp: ${BootNodePublicIPv4Address}/32
+        - Description: Image manager 8500 NAT Gateway public IP
+          IpProtocol: tcp
+          FromPort: 8500
+          ToPort: 8500
+          CidrIp: ${NATGatewayPublicIPv4Address}/32
+        - Description: Image manager 8600 Boot node private IP
+          IpProtocol: tcp
+          FromPort: 8600
+          ToPort: 8600
+          CidrIp: ${BootNodePrivateIPv4Address}/32
+        - Description: Image manager 8600 Boot node public IP
+          IpProtocol: tcp
+          FromPort: 8600
+          ToPort: 8600
+          CidrIp: ${BootNodePublicIPv4Address}/32
+        - Description: Image manager 8600 NAT Gateway public IP
+          IpProtocol: tcp
+          FromPort: 8600
+          ToPort: 8600
+          CidrIp: ${NATGatewayPublicIPv4Address}/32
+        - Description: Metering server on Master node(s) Boot node private IP
+          IpProtocol: tcp
+          FromPort: 9443
+          ToPort: 9443
+          CidrIp: ${BootNodePrivateIPv4Address}/32
+        - Description: Metering server on Master node(s) Boot node public IP
+          IpProtocol: tcp
+          FromPort: 9443
+          ToPort: 9443
+          CidrIp: ${BootNodePublicIPv4Address}/32
+        - Description: Metering server on Master node(s) NAT Gateway public IP
+          IpProtocol: tcp
+          FromPort: 9443
+          ToPort: 9443
+          CidrIp: ${NATGatewayPublicIPv4Address}/32
+          

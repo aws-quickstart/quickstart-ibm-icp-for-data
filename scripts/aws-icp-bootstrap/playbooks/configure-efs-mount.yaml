@@ -1,0 +1,44 @@
+---
+# DESCRIPTION:
+# 
+#   Configure a mount point on each worker node in /etc/fstab for the EFS storage
+#
+# INPUTS:
+#   vars:
+#     target_nodes - a regex string or group name that defines the hosts or
+#                    host group.
+#
+#     You can define the vars on the ansible-playbook command line using --extra-vars.
+#     Or define vars in your hosts inventory or any of the other ways to define
+#     Ansible variables.
+#     The --inventory option can be used to provide a path to an inventory file
+#     on the ansible-playbook command line.
+#
+# An explanation of all the columns in /etc/fstab can be found here:
+#   http://www.linfo.org/etc_fstab.html
+#
+# An explanation of the mount command to be used for dynamically mounting an 
+# EFS volume can be found here:
+#   https://docs.aws.amazon.com/efs/latest/ug/wt1-test.html#wt1-mount-fs-and-test
+#
+# Root privilege is needed to run this configuration script.
+# The tasks where root is needed use the "become" option.
+#
+# Sample invocation:
+#   ansible-playbook configure-efs-mount.yaml --extra-vars "@efs-config.yaml"
+#
+#   The above invocation is using an input file for the variables that define
+#   the EFS mount.  The mount requires too many varibles to conveniently add to  
+#   the command line.
+#
+
+- hosts: "{{ target_nodes }}"
+  tasks:
+    - name: "Set EFS mount point in /etc/fstab"
+      mount:
+        src: "{{ mount_src }}"
+        fstype: "{{ mount_type }}"
+        path: "{{ mount_point }}"
+        opts: "{{ mount_options }}"
+        state: mounted
+      become: True
