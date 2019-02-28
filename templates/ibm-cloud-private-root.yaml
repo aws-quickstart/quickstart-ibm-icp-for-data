@@ -368,7 +368,6 @@ Parameters:
     Type: Number
     Default: 12000
 
-  # NOTE - It is best to pass the ICPD version explicitly.
   ICPDVersion:
     Description: >-
       The version of IBM Cloud Private for Data to be deployed.  The full version must be provided, e.g., 1.2.0.
@@ -717,11 +716,11 @@ Mappings:
 
   ScriptPackageMap:
     boot-node:
-      ScriptPackagePath: submodules/scripts/aws-icp-bootstrap.zip
+      ScriptPackagePath: submodules/quickstart-ibm-cloud-private/scripts/aws-icp-bootstrap.zip
     boot-node-icpd:
       ScriptPackagePath: scripts/aws-icpd-bootstrap.zip  
     cluster-node:
-      ScriptPackagePath: scripts/aws-icp-nodeinit.zip
+      ScriptPackagePath: scripts/quickstart-ibm-cloud-private/aws-icp-nodeinit.zip
 
   ICPDtoICPVersionMap:
     1.2.0:
@@ -903,7 +902,7 @@ Resources:
     DependsOn: InternetGatewayAttachment
     Properties:
       TemplateURL: !Sub
-        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/templates/icp-public-subnets.yaml
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/quickstart-ibm-cloud-private/templates/icp-public-subnets.yaml
         - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
       Parameters:
         AvailabilityZoneCount: !Ref AvailabilityZoneCount
@@ -922,7 +921,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
-        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/templates/icp-private-subnets.yaml
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/quickstart-ibm-cloud-private/templates/icp-private-subnets.yaml
         - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
       Parameters:
         AvailabilityZoneCount: !Ref AvailabilityZoneCount
@@ -938,7 +937,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
-        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/templates/ibm-cloud-private-iam-security.yaml
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/quickstart-ibm-cloud-private/templates/ibm-cloud-private-iam-security.yaml
         - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
       Parameters:
         ClusterPKIBucketName: !Ref ClusterPKIBucketName
@@ -977,7 +976,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
-        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/templates/ibm-cloud-private-shared-storage.yaml
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/quickstart-ibm-cloud-private/templates/ibm-cloud-private-shared-storage.yaml
         - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
       Parameters:
         AvailabilityZoneCount: !Ref AvailabilityZoneCount
@@ -1052,7 +1051,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
-        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/templates/icp-cluster-members.yaml
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/quickstart-ibm-cloud-private/templates/icp-cluster-members.yaml
         - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
       Parameters:
         AMIImageId: !FindInMap [AWSRegionAMIEC2, !Ref "AWS::Region", Ubuntu16]
@@ -1069,7 +1068,7 @@ Resources:
         ICPNodeProfile: !GetAtt IAMResources.Outputs.ICPNodeProfile
         ICPNodeRole: !GetAtt IAMResources.Outputs.ICPNodeRole
         ICPS3KeyPrefix: !Sub 
-          - ${KeyPrefix}submodules/ 
+          - ${KeyPrefix}submodules/quickstart-ibm-cloud-private/ 
           - {KeyPrefix: !Ref QSS3KeyPrefix}
         ICPScriptBucketName: !Ref QSS3BucketName
         ICPVersion: !FindInMap [ICPDtoICPVersionMap, !Ref ICPDVersion, ICP]
