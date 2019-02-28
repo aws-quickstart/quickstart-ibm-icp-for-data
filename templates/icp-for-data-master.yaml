@@ -1,0 +1,75 @@
+#
+# NOTES:
+#  Each ICP node has an ICPRole tag that is used by the bootstrapping
+#  scripts to determine the role of the node.  The following values
+#  for the ICPRole tag and accepted (case insensitive):
+#    Master, Worker, Proxy, Management, VA, etcd
+#
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Master node EC2 instances. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template. (qs-1p8m99ouo)
+
+Parameters:
+  # Variables are declared in alphabetical order.
+
+  IBMCloudPrivateVPC:
+    Description: >-
+      The VPC resource ID for the IBMCloudPrivateVPC deployed by the root template.
+    Type: String
+
+  MasterNodeCount:
+    Description: >-
+      Number of master nodes to be deployed in the ICP cluster. Must be an odd number. For a development deployment 1 is sufficient. For production deployments typically 3 or 5.
+    Type: String
+
+  MasterNodeOne:
+    Description: >-
+      Number of master nodes to be deployed in the ICP cluster. Must be an odd number. For a development deployment 1 is sufficient. For production deployments typically 3 or 5.
+    Type: String
+
+  MasterNodeTwo:
+    Description: >-
+      Number of master nodes to be deployed in the ICP cluster. Must be an odd number. For a development deployment 1 is sufficient. For production deployments typically 3 or 5.
+    Type: String
+
+  MasterNodeThree:  
+    Description: >-
+      Number of master nodes to be deployed in the ICP cluster. Must be an odd number. For a development deployment 1 is sufficient. For production deployments typically 3 or 5.
+    Type: String
+
+  MasterNodeLoadBalancer:
+    Description: >-
+      MasterNodeLoadBalancer reference from master node
+    Type: String
+
+
+Conditions:
+  3MastersCondition: !Equals [!Ref MasterNodeCount, 3]
+
+
+Resources:
+
+  MasterNode31843TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Port: 31843
+      Protocol: TCP
+      Targets: !If
+        - 3MastersCondition
+        - - Id: !Ref MasterNodeOne
+          - Id: !Ref MasterNodeTwo
+          - Id: !Ref MasterNodeThree
+        - - Id: !Ref MasterNodeOne
+      VpcId: !Ref IBMCloudPrivateVPC  
+      
+  MasterNodeLoadBalancer31843Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref MasterNodeLoadBalancer
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref MasterNode31843TargetGroup
+      Port: 31843
+      Protocol: TCP    
+
