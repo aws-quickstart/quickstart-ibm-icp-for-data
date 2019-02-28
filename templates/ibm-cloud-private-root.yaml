@@ -205,8 +205,11 @@ Parameters:
   # Variables are declared in alphabetical order.
   AdminPassword:
     Description: >-
-      The IBM Cloud Private administrator (super user) password.
+      The IBM Cloud Private administrator (super user) password. As of IBM Cloud Private v3.1.2 the default password enforcement rule is '^([a-zA-Z0-9\-]{32,})$': The password must be a minimum of 32 characters long and contain only lower and uppercase characters, numbers and dashes.
     NoEcho: true
+    AllowedPattern: '^([a-zA-Z0-9\-]{32,})$'
+    ConstraintDescription: >-
+      The password must be a minimum of 32 characters long and contain only lower and uppercase characters, numbers and dashes.
     Type: String
 
   AdminUser:
@@ -547,8 +550,7 @@ Parameters:
 
   VPCDomain:
     Description: >-
-      The network domain of the VPC. The VPCDomain parameter is used when defining the hosted zone. If an existing hosted zone is to be used, you must provide the hosted zone ID in the HostedZoneId parameter. Otherwise, a new hosted zone will be created. If a subdomain is to be created, then you must provide a VPCSubdomainPrefix parameter. When a VPCSubdomainPrefix parameter is provided, it is combined with VPCDomain to form the full network domain name. The ClusterName parameter is combined with the VPC subdomain, if provided, and the VPC domain name to form the ClusterDNSName; which is used in the IBM Cloud Private configuration for the cluster_CA_domain parameter in the config.yaml file.
-      Note: If PKI certificates are provided for the deployment, the CN used for creating the certificates must match the value of ClusterName concatenated with a dot, concatenated with the VPCSubdomainPrefix (if provided), concatenated with the VPCDomain.
+      The network domain of the VPC. The VPCDomain is used when defining the hosted zone. If an existing hosted zone is to be used, you must provide the hosted zone ID in the HostedZoneId parameter. Otherwise, a new hosted zone will be created. If a subdomain is to be created, then you must provide a VPCSubdomainPrefix. When a VPCSubdomainPrefix parameter is provided, it is combined with the VPCDomain to form the full network domain name. The ClusterName parameter is combined with the VPC subdomain, if provided, and the VPC domain name to form the ClusterDNSName; which is used in the IBM Cloud Private configuration for the cluster_CA_domain parameter in the config.yaml file. Note: If PKI certificates are provided for the deployment, the CN used for creating the certificates must match the value of the ClusterName is combined with the VPCSubdomainPrefix (if provided), and the VPCDomain.) A dot character separates each component of the CN.
     Type: String
 
   VPCName:
@@ -744,9 +746,7 @@ Rules:
           - us-west-1
           - us-west-2
         - !Ref AWS::Region
-      AssertDescription: This Quick Start utilizes Amazon EFS which is not available in your chosen region.
-        Please launch the stack in a region where EFS is available. Visit https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/ to
-        check Amazon EFS service availability by region.
+      AssertDescription: This Quick Start utilizes Amazon EFS which is not available in your chosen region. Please launch the stack in a region where EFS is available. Visit https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/ to check Amazon EFS service availability by region.
 
   LicenseAgreementRule:
     Assertions:
@@ -938,7 +938,6 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
-        # Sharath TODO  : this will have submodules/ as we will be using base version and use IAMResourcesUpdate for ICPD specfic changes
         - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/templates/ibm-cloud-private-iam-security.yaml
         - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
       Parameters:
@@ -1115,7 +1114,6 @@ Resources:
           - !GetAtt ClusterMembersStack.Outputs.MasterNodeThree
           - ""
         MasterNodeLoadBalancer: !GetAtt ClusterMembersStack.Outputs.MasterNodeLoadBalancer
-
 
   InstallationCompletedHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
