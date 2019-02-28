@@ -720,7 +720,7 @@ Mappings:
     boot-node-icpd:
       ScriptPackagePath: scripts/aws-icpd-bootstrap.zip  
     cluster-node:
-      ScriptPackagePath: scripts/quickstart-ibm-cloud-private/aws-icp-nodeinit.zip
+      ScriptPackagePath: scripts/aws-icp-nodeinit.zip
 
   ICPDtoICPVersionMap:
     1.2.0:
