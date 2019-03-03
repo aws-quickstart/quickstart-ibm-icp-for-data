@@ -4,6 +4,7 @@ from subprocess import call, check_call, CalledProcessError
 import boto3
 import socket
 import yaml
+from yapl.aws.LogExporter import LogExporter
 from yapl.utilities.Trace import Trace, Level
 from yapl.exceptions.Exceptions import MissingArgumentException
 from yapl.exceptions.ICPExceptions import ICPInstallationException
@@ -33,63 +34,7 @@ class ICPDBootstrap(object):
     self.home = os.path.expanduser("~")
     self.logsHome = os.path.join(self.home,"logs")
 
-  def loadInstallMap(self, version=None, region=None):
-    """
-      Return a dictionary that holds all the installation image information needed to 
-      retrieve the installation images from S3. 
-      
-      Which install images to use is driven by the ICPD version.
-      Which S3 bucket to use is driven by the AWS region of the deployment.
-      
-      The source of the information is icpd-install-artifact-map.yaml packaged with the
-      boostrap script package.  The yaml file holds the specifics regarding which bucket
-      to use and the S3 path for the ICP and Docker images as well as the Docker image
-      name and the inception commands to use for the installation.          
-    """
-    methodName = "loadInstallMap"
-    
-    if (not version):
-      raise MissingArgumentException("The ICPD version must be provided.")
-    #endIf
-    
-    if (not region):
-      raise MissingArgumentException("The AWS region must be provided.")
-    #endIf
-        
-    installDocPath = os.path.join(self.home,"maps","icpd-install-artifact-map.yaml")
-    
-    with open(installDocPath,'r') as installDocFile:
-      installDoc = yaml.load(installDocFile)
-    #endWith
-    
-    if (TR.isLoggable(Level.FINEST)):
-      TR.finest(methodName,"Install doc: %s" % installDoc)
-    #endIf
-    
-    installMap = installDoc.get(version)
-    if (not installMap):
-      raise ICPInstallationException("No ICPD installation images defined for ICPD version: %s" % version)
-    #endIf
-    
-    buckets = installDoc.get('s3-buckets')
-    
-    if (TR.isLoggable(Level.FINEST)):
-      TR.finest(methodName,"S3 installation image buckets: %s" % buckets)
-    #endIf
-    
-    regionBucket = buckets.get(region)
-    if (not regionBucket):
-      raise ICPInstallationException("No S3 bucket for installation images defined for region: %s" % region)
-    #endIf
-    
-    # The version is needed to get to the proper folder in the region bucket.
-    installMap['version'] = version
-    installMap['s3bucket'] = regionBucket
-    
-    return installMap
-    
-  #endDef
-
+  
   def installICPD(self):
     """
       Install ICPD by executing the script
@@ -178,16 +123,18 @@ class ICPDBootstrap(object):
         self.bootstrap.rootStackName = cmdLineArgs.get('stack-name')  
         self.bootstrap._init(self.bootstrap.rootStackName,self.bootStackId)
         
-        #self.ICPDeploymentLogsBucketName = StackParameters.get("ICPDeploymentLogsBucketName")
-        #self.ICPVersion = StackParameters.get("ICPVersion")
-        #self.ICPDVersion = StackParameters.get("ICPDVersion")
-        #self.ClusterDNSName = StackParameters.get("ClusterDNSName")
-        #self.InstallationCompletedURL = StackParameters.get("InstallationCompletedURL")
+        self.logExporter = LogExporter(region=self.bootstrap.region,
+                                   bucket=self.bootstrap.ICPDeploymentLogsBucketName,
+                                   keyPrefix='logs/%s' % self.bootstrap.rootStackName,
+                                   role=self.bootstrap.role,
+                                   fqdn=self.bootstrap.fqdn
+                                   )
         self.icpHome = "/opt/icp/%s" % self.bootstrap.ICPVersion
-        self.installMap = self.loadInstallMap(version=self.bootstrap.ICPDVersion, region=self.bootstrap.region)
+        installMapPath = os.path.join(self.home,"maps","icpd-install-artifact-map.yaml")
+        self.installMap = self.bootstrap.loadInstallMap(mapPath=installMapPath, version=self.bootstrap.ICPDVersion, region=self.bootstrap.region)
         icpdS3Path = "{version}/{object}".format(version=self.installMap['version'],object=self.installMap['icpd-base-install-archive'])
         destPath = "/tmp/icp4d.tar"
-        self.bootstrap.getS3Object(self.installMap['s3bucket'], icpdS3Path, destPath) 
+        self.bootstrap.getS3Object(self.bootstrap.ICPDArchiveBucketName, icpdS3Path, destPath) 
       
         self.stackIds =  self.bootstrap._getStackIds(self.bootStackId)
         self.bootstrap._getHosts(self.stackIds)
@@ -207,7 +154,7 @@ class ICPDBootstrap(object):
     finally:
         try:
           # Copy icpHome/logs to the S3 bucket for logs.
-          self.bootstrap.exportLogs(self.bootstrap.ICPDeploymentLogsBucketName,self.bootstrap.rootStackName,"%s/cluster/logs" % self.icpHome)
+          self.logExporter.exportLogs("%s/cluster/logs" % self.icpHome)
         except Exception, e:
           TR.error(methodName,"ERROR: %s" % e, e)
           self.rc = 1
@@ -227,7 +174,7 @@ class ICPDBootstrap(object):
       
         try:
           # Copy the bootstrap logs to the S3 bucket for logs.
-          self.bootstrap.exportLogs(self.bootstrap.ICPDeploymentLogsBucketName,self.bootstrap.rootStackName,self.logsHome)
+          self.logExporter.exportLogs(self.logsHome)
         except Exception, e:
           TR.error(methodName,"ERROR: %s" % e, e)
           self.rc = 1
