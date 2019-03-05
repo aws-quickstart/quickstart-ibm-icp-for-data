@@ -990,7 +990,7 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
-        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}templates/ibm-cloud-private-boot.yaml
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}templates/ibm-icp-for-data-boot.yaml
         - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
       Parameters:
         AMIImageId: !FindInMap [AWSRegionAMIEC2, !Ref "AWS::Region", Ubuntu16]
@@ -1113,6 +1113,7 @@ Resources:
           - !GetAtt ClusterMembersStack.Outputs.MasterNodeThree
           - ""
         MasterNodeLoadBalancer: !GetAtt ClusterMembersStack.Outputs.MasterNodeLoadBalancer
+
 
   InstallationCompletedHandle:
     Type: AWS::CloudFormation::WaitConditionHandle
