@@ -963,13 +963,10 @@ Resources:
       Parameters:
         BootNodeRole: !GetAtt IAMResources.Outputs.BootNodeRole
         ExternalICPAdminLocation: !Ref ExternalICPAdminLocation
-        IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
         ICPDArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPArchiveBucket]
         ICPDScriptBucketName: !Ref QSS3BucketName
         ICPMasterSecurityGroup: !GetAtt IAMResources.Outputs.ICPMasterSecurityGroup
         #FineGrainedInternalICPSecurityGroup: !GetAtt IAMResources.Outputs.FineGrainedInternalICPSecurityGroup
-        PrivateSubnetCIDR: !Ref PrivateSubnetCIDR
-        ResourceOwner: !Ref ResourceOwner  
 
 
   ClusterSharedStorage:
@@ -1123,14 +1120,21 @@ Resources:
 
 
   # The wait starts once the BootNodeStack has been created.
-  InstallationCompleted:
+  ICPInstallationCompleted:
     Type: AWS::CloudFormation::WaitCondition
     DependsOn: BootNodeStack
     Properties:
       Count: 1
       Handle: !Ref InstallationCompletedHandle
-      Handle: !Ref ICPDInstallationCompletedHandle
       Timeout: !Ref InstallationTimeout
+
+  ICPDInstallationCompleted:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: ICPInstallationCompleted
+    Properties:
+      Count: 1
+      Handle: !Ref ICPDInstallationCompletedHandle
+      Timeout: !Ref InstallationTimeout    
 
 
 Outputs:

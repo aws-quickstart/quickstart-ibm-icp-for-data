@@ -27,12 +27,6 @@ Parameters:
   #     FineGrainedInternalICPSecurityGroup for ICPD related update
   #   Type: String
 
-
-  IBMCloudPrivateVPC:
-    Description: >-
-      The IBMCloudPrivateVPC resource ID from the parent template.
-    Type: String
-
   ICPDArchiveBucketName:
     Description: >-
       The name of the S3 bucket where the ICPD install archive and Docker install binary is located.  The bucket name is needed to establish permission to access the ICP and Docker installation archives. Root template uses a mapping based on AWS region to provide the archive bucket name.
@@ -46,16 +40,6 @@ Parameters:
   ICPMasterSecurityGroup:
     Description: >-
       ICPMasterSecurityGroup for ICPD related update
-    Type: String
-
-  PrivateSubnetCIDR:
-    Description: >-
-      The PrivateSubnetCIDR resource reference used in defining security groups.
-    Type: String
-
-  ResourceOwner:
-    Description: >-
-      Value for the owner tag for the deployed resources associated with the stack.
     Type: String
 
 Resources:
