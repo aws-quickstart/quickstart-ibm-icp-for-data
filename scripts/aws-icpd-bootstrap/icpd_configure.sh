@@ -47,9 +47,9 @@ echo $(ls -la)
 echo "run installer to extract icpd"
 printf 'A\nA\n' | ./installer.x86_64.29 --existing-ICP
 echo "find and replace docker registry and storage class"
-sed -i "s/mycluster.icp/mycluster.icp4d-test.com/g" InstallPackage/components/install.yaml
+sed -i "s/mycluster.icp/$2/g" InstallPackage/components/install.yaml
 sed -i "s/oketi-gluster/aws-efs/g" InstallPackage/components/install.yaml
-sed -i "s/mycluster.icp/mycluster.icp4d-test.com/g" InstallPackage/components/installer.sh
+sed -i "s/mycluster.icp/$2/g" InstallPackage/components/installer.sh
 
 
 echo "Docker login"

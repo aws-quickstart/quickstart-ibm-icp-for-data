@@ -25,15 +25,8 @@
 1.2.0:
   icpd-base-install-archive: icp4d_ee_pre_1.2.0.0.tar
 
-s3-buckets:
-  us-east-1: ibm-cloud-private-data-us-east-1
-  us-east-2: ibm-cloud-private-data-us-east-2
-  us-west-1: ibm-cloud-private-data-us-west-1
-  ap-northeast-1: ibm-cloud-private-data-ap-northeast-1
-  ap-northeast-2: ibm-cloud-private-data-ap-northeast-2
-  eu-central-1: ibm-cloud-private-data-eu-central-1
-  eu-west-1: ibm-cloud-private-data-eu-west-1
-  eu-west-2: ibm-cloud-private-data-eu-west-2
-  eu-west-3: ibm-cloud-private-data-eu-west-3
+1.2.1:
+  icpd-base-install-archive: icp4d_ee_pre_1.2.1.0.tar  
+
 
 
