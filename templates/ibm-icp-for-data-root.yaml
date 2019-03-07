@@ -365,7 +365,7 @@ Parameters:
     Description: >-
       The timeout (in seconds) associated with the installation and configuration of the IBM Cloud Private for Data cluster, from start to finish. The InstallationTimeout must be equal to or greater than the InceptionTimeout. The InstallationTimeout needs to be sufficient to allow the bootstrap installation script to complete. See InceptionTimeout for guidance on expected installation time.
     Type: Number
-    Default: 12000
+    Default: 15000
 
   ICPDVersion:
     Description: >-
@@ -380,7 +380,7 @@ Parameters:
     Description: >-
       The number of seconds to wait for the IBM Cloud Private for Data inception container to complete the installation.  For a small HA cluster (12 nodes), the inception process typically completes the installation in about 120 minutes. The start-to-finish installation time is about 150 minutes for such a cluster.  The InceptionTimeout should be equal to or smaller than the InstallationTimeout.
     Type: Number
-    Default: 12000
+    Default: 15000
 
   KeyFilePath:
     Description: >-
@@ -396,7 +396,7 @@ Parameters:
   
   LicenseAgreement:
     Description: >-
-      I have read and agree to the license terms for IBM Cloud Private for Data (http://ibm.biz/BdY3AY).
+      I have read and agree to the license terms for IBM Cloud Private for Data (https://ibm.biz/Bd2QDA).
     Type: String
     Default: '-'
     AllowedValues:
@@ -962,7 +962,7 @@ Resources:
       Parameters:
         BootNodeRole: !GetAtt IAMResources.Outputs.BootNodeRole
         ExternalICPAdminLocation: !Ref ExternalICPAdminLocation
-        ICPDArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPArchiveBucket]
+        ICPDArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPDArchiveBucket]
         ICPDScriptBucketName: !Ref QSS3BucketName
         ICPMasterSecurityGroup: !GetAtt IAMResources.Outputs.ICPMasterSecurityGroup
 
