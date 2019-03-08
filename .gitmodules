@@ -1,0 +1,4 @@
+[submodule "submodules/quickstart-ibm-cloud-private"]
+	path = submodules/quickstart-ibm-cloud-private
+	url = git@github.com:aws-quickstart/quickstart-ibm-cloud-private.git
+	branch = develop

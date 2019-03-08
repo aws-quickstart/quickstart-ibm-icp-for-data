@@ -1,0 +1,32 @@
+---
+# Every bucket is expected to have a folder in it for each ICP version that
+# is currently supported. Each version folder will have the following attributes:
+# VERSION: - the ICP version, e.g., 3.1.0, 3.1.1, etc
+#   icp-base-install-archive: - name of the icp base isntall tar ball
+#   docker-install-binary:    - name of the docker install binary file
+#   inception-image-name:     - the name of the inception image
+#   inception-command:        - the inception command string
+#   fixpack:
+#     file-name:              - the name of the fixpack file (.tar file)
+#     fixpack-executable:     - the name of the fixpack executable (.sh file)
+#     inception-image-name:   - the fixpack inception image name
+#     inception-command:      - the fixpack inception command string
+#
+# For file transfer efficiency, each AWS region has a bucket.
+# The s3-buckets table maps regions to bucket names.
+# 
+# By convention the bucket names are ibm-cloud-private-REGION
+# where REGION is the region name.  Whatever the bucket name 
+# actually is, it needs to be reflected in this yaml file.
+# NOTE: S3 bucket names must be globally unique.  There is no
+# scoping of bucket names even at account boundaries.
+#
+
+1.2.0:
+  icpd-base-install-archive: icp4d_ee_pre_1.2.0.0.tar
+
+1.2.1:
+  icpd-base-install-archive: icp4d_ee_pre_1.2.1.0.tar  
+
+
+

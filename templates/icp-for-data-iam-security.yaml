@@ -1,0 +1,119 @@
+
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  IAM resources used by the root template and all other stack templates used to deploy the IBM Cloud Private cluster.
+
+Parameters:
+
+  BootNodeRole:
+    Description: >-
+      BootNodeRole paramter from IAMResource for ICPD related update
+    Type: String
+
+  ExternalICPAdminLocation:
+    Description: >-
+      The network CIDR for IP addresses that can be used to SSH to the boot node. In single user test situations this can be a /32 CIDR.  Additional values can be added post-deployment from the AWS CloudFormation console.
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    AllowedPattern: >-
+      ((\d{1,3})\.){3}\d{1,3}/\d{1,2}
+    ConstraintDescription: >-
+      Must be a valid IP CIDR range of the form x.x.x.x/x.
+
+  # FineGrainedInternalICPSecurityGroup:
+  #   Description: >-
+  #     FineGrainedInternalICPSecurityGroup for ICPD related update
+  #   Type: String
+
+  ICPDArchiveBucketName:
+    Description: >-
+      The name of the S3 bucket where the ICPD install archive and Docker install binary is located.  The bucket name is needed to establish permission to access the ICP and Docker installation archives. Root template uses a mapping based on AWS region to provide the archive bucket name.
+    Type: String
+
+  ICPDScriptBucketName:
+    Description: >-
+      The name of the S3 bucket where the ICP boostrap script packages are located.
+    Type: String
+
+  ICPMasterSecurityGroup:
+    Description: >-
+      ICPMasterSecurityGroup for ICPD related update
+    Type: String
+
+Resources:
+  RolePolicies: 
+    Type: AWS::IAM::Policy
+    Properties: 
+      PolicyName: ICPDBucketPolicy
+      PolicyDocument: 
+        Version: 2012-10-17
+        Statement:
+        - Action:
+            - s3:ListBucket
+          Resource: !Sub arn:aws:s3:::${ICPDArchiveBucketName}
+          Effect: Allow
+        - Action:
+            - s3:GetObject
+          Resource: !Sub arn:aws:s3:::${ICPDArchiveBucketName}/*
+          Effect: Allow
+        - Action:
+            - s3:ListBucket
+          Resource: !Sub arn:aws:s3:::${ICPDScriptBucketName}
+          Effect: Allow
+        - Action:
+            - s3:GetObject
+          Resource: !Sub arn:aws:s3:::${ICPDScriptBucketName}/*
+          Effect: Allow
+      Roles: 
+        - 
+          Ref: BootNodeRole
+  RootInstanceProfile: 
+    Type: "AWS::IAM::InstanceProfile"
+    Properties: 
+      Path: "/"
+      Roles: 
+        - 
+          Ref: BootNodeRole   
+
+
+  # NOTE: Additional ingress rules are added by the SecurityHelper
+  # in the bootstrap script after deployment once the boot node IP
+  # addresses are known.  The boot node needs access to these ports
+  # on the master node(s).
+  ICPDMgmtConsoleIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ICPMasterSecurityGroup
+      IpProtocol: tcp
+      FromPort: 31843
+      ToPort: 31843
+      CidrIp: !Ref ExternalICPAdminLocation  
+  
+  # TODO: Review for ports, protocols used in ICP 3.1.0
+  # For AWS doc, see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_AuthorizeSecurityGroupIngress.html
+  # Missing: some ports such as LDAP prots (389, 686)
+  # TODO: This FineGrainedInternalSecurityGroup is on the shelf
+  # until we get other more basic things working.
+  # SecurityGroupIngress:
+  #   Type: AWS::EC2::SecurityGroupIngress
+  #   Properties:
+  #     GroupId: !Ref FineGrainedInternalICPSecurityGroup
+  #       IpProtocol: tcp
+  #       FromPort: 31483
+  #       ToPort: 31483
+  #       CidrIp: !Ref PrivateSubnetCIDR
+
+# PVS: Experimented with Export, but for the ICP deployment
+# using Outputs is easier and more appropriate given the topology.
+# Outputs in alphabetical order
+Outputs:
+  ICPMasterSecurityGroup:
+    Description: >-
+      ICPMasterSecurityGroup resource ID for use by parent stack template.
+    Value: !Ref ICPMasterSecurityGroup
+  BootNodeRole:
+    Description: >-
+      BootNodeRole resource ID for use by parent stack templates(s)
+    Value: !Ref BootNodeRole
