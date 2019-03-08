@@ -361,12 +361,6 @@ Parameters:
       The name of the S3 bucket where IBM Cloud Private for Data stack deployment logs are to be exported. The deployment logs provide a record of the boot strap scripting actions and are useful for problem determination if the deployment fails in some way.
     Type: String
 
-  InstallationTimeout:
-    Description: >-
-      The timeout (in seconds) associated with the installation and configuration of the IBM Cloud Private for Data cluster, from start to finish. The InstallationTimeout must be equal to or greater than the InceptionTimeout. The InstallationTimeout needs to be sufficient to allow the bootstrap installation script to complete. See InceptionTimeout for guidance on expected installation time.
-    Type: Number
-    Default: 15000
-
   ICPDVersion:
     Description: >-
       The version of IBM Cloud Private for Data to be deployed.  The full version must be provided, e.g., 1.2.0.
@@ -378,7 +372,13 @@ Parameters:
 
   InceptionTimeout:
     Description: >-
-      The number of seconds to wait for the IBM Cloud Private for Data inception container to complete the installation.  For a small HA cluster (12 nodes), the inception process typically completes the installation in about 120 minutes. The start-to-finish installation time is about 150 minutes for such a cluster.  The InceptionTimeout should be equal to or smaller than the InstallationTimeout.
+      The number of seconds to wait for the IBM Cloud Private for Data inception container to complete the installation.  For a small HA cluster (12 nodes), the inception process typically completes the installation in about 120 minutes. The start-to-finish installation time is about 180 minutes for such a cluster.  The InceptionTimeout should be equal to or smaller than the InstallationTimeout.
+    Type: Number
+    Default: 15000
+
+  InstallationTimeout:
+    Description: >-
+      The timeout (in seconds) associated with the installation and configuration of the IBM Cloud Private for Data cluster, from start to finish. The InstallationTimeout must be equal to or greater than the InceptionTimeout. The InstallationTimeout needs to be sufficient to allow the bootstrap installation script to complete. See InceptionTimeout for guidance on expected installation time.
     Type: Number
     Default: 15000
 
