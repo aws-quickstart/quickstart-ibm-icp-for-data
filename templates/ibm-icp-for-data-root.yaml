@@ -67,6 +67,12 @@ Metadata:
           - WorkerNodeCount
 
       - Label:
+          default: IBM Cloud Private for Data configuration
+        Parameters:
+          - ICPDVersion
+          - LicenseAgreement
+
+      - Label:
           default: Security configuration
         Parameters:
           - KeyName
@@ -77,12 +83,6 @@ Metadata:
           default: Application workload configuration
         Parameters:
           - ApplicationStorageMountPoint
-
-      - Label:
-          default: IBM Cloud Private for Data configuration
-        Parameters:
-          - LicenseAgreement
-          - ICPDVersion
 
       - Label:
           default: (Optional) Advanced deployment configuration
