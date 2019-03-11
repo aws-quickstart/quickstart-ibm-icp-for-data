@@ -4,10 +4,6 @@
     "ParameterValue": "$[taskcat_genpass_34A]"
   },
   {
-    "ParameterKey": "AdminUser",
-    "ParameterValue": "icpadmin"
-  },
-  {
     "ParameterKey": "AvailabilityZoneCount",
     "ParameterValue": "3"
   },
