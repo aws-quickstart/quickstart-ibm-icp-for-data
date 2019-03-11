@@ -22,11 +22,6 @@ Parameters:
     ConstraintDescription: >-
       Must be a valid IP CIDR range of the form x.x.x.x/x.
 
-  # FineGrainedInternalICPSecurityGroup:
-  #   Description: >-
-  #     FineGrainedInternalICPSecurityGroup for ICPD related update
-  #   Type: String
-
   ICPDArchiveBucketName:
     Description: >-
       The name of the S3 bucket where the ICPD install archive and Docker install binary is located.  The bucket name is needed to establish permission to access the ICP and Docker installation archives. Root template uses a mapping based on AWS region to provide the archive bucket name.
@@ -77,11 +72,6 @@ Resources:
         - 
           Ref: BootNodeRole   
 
-
-  # NOTE: Additional ingress rules are added by the SecurityHelper
-  # in the bootstrap script after deployment once the boot node IP
-  # addresses are known.  The boot node needs access to these ports
-  # on the master node(s).
   ICPDMgmtConsoleIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -90,24 +80,6 @@ Resources:
       FromPort: 31843
       ToPort: 31843
       CidrIp: !Ref ExternalICPAdminLocation  
-  
-  # TODO: Review for ports, protocols used in ICP 3.1.0
-  # For AWS doc, see: https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_AuthorizeSecurityGroupIngress.html
-  # Missing: some ports such as LDAP prots (389, 686)
-  # TODO: This FineGrainedInternalSecurityGroup is on the shelf
-  # until we get other more basic things working.
-  # SecurityGroupIngress:
-  #   Type: AWS::EC2::SecurityGroupIngress
-  #   Properties:
-  #     GroupId: !Ref FineGrainedInternalICPSecurityGroup
-  #       IpProtocol: tcp
-  #       FromPort: 31483
-  #       ToPort: 31483
-  #       CidrIp: !Ref PrivateSubnetCIDR
-
-# PVS: Experimented with Export, but for the ICP deployment
-# using Outputs is easier and more appropriate given the topology.
-# Outputs in alphabetical order
 Outputs:
   ICPMasterSecurityGroup:
     Description: >-

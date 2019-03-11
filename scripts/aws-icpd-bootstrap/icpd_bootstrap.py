@@ -56,12 +56,6 @@ class ICPDBootstrap(object):
     
       if (retcode != 0):
         raise ICPInstallationException("Error calling: './icpd_configure.sh' - Return code: %s" % retcode)
-
-      retcode = call(['sudo','/root/manage_admin_user.sh','--enable-admin', str("admin"), str(self.bootstrap.AdminPassword)], stdout=knownHostsFile)
-      
-    
-      if (retcode != 0):
-        raise ICPInstallationException("Error calling: './manage_admin_user.sh' - Return code: %s" % retcode)  
       #endif  
     #endwith
     TR.info(methodName,"IBM Cloud Private for Data installation completed.")
