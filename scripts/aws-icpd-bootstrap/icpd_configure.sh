@@ -42,28 +42,12 @@ cd /tmp
 cd /ibm
 echo $(ls)
 echo "change permission for installer"
-chmod +x installer.x86_64.29
+chmod +x installer.x86_64.373
 echo $(ls -la)
-echo "run installer to extract icpd"
-printf 'A\nA\n' | ./installer.x86_64.29 --existing-ICP
-echo "find and replace docker registry and storage class"
-sed -i "s/mycluster.icp/$2/g" InstallPackage/components/install.yaml
-sed -i "s/oketi-gluster/aws-efs/g" InstallPackage/components/install.yaml
-sed -i "s/mycluster.icp/$2/g" InstallPackage/components/installer.sh
-
-
 echo "Docker login"
-docker login $2:8500 -u ${prop_uname} -p ${prop_pwd}
-echo "cd to InstallPackage"
-echo $(pwd)
-cd InstallPackage
-echo " run deploy_on_existing.sh to install base modules"
-printf "${prop_uname}\n${prop_pwd}\nY\nY\nY\nY\n" | ./deploy_on_existing.sh
-echo "cd to components to install IIG and cognos modules"
-cd components
-echo $(pwd)
-echo " run iig installer"
-printf 'Y\nY\nY\nY\n' | ./deploy.sh /ibm/modules/ibm-iisee-zen-1.0.0.tar
-echo " run cognos installer"
-printf 'Y\nY\nY\nY\n' | ./deploy.sh /ibm/modules/ibm-dde-0.13.4-x86_64.tar
-cp /ibm/InstallPackage/components/deploy.log /root/logs
+docker login $2:8500/zen -u ${prop_uname} -p ${prop_pwd}
+echo "run installer to extract icpd"
+storageclass=$(($(kubectl get storageclass | nl | grep aws-efs | awk '{print $1}') - 1))
+echo ${storageclass}
+printf "\nA\nzen\nY\n$2:8500/zen\n\nY\nN\n${storageclass}\nY\nY" | ./installer.x86_64.373 
+cp /ibm/InstallPackage/components/install.log /root/logs

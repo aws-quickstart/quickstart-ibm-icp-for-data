@@ -49,7 +49,6 @@ Metadata:
       - Label:
           default: IBM Cloud Private configuration
         Parameters:
-          - AdminUser
           - AdminPassword
           - ClusterName
           - ClusterDomain
@@ -67,12 +66,6 @@ Metadata:
           - WorkerNodeCount
 
       - Label:
-          default: IBM Cloud Private for Data configuration
-        Parameters:
-          - ICPDVersion
-          - LicenseAgreement
-
-      - Label:
           default: Security configuration
         Parameters:
           - KeyName
@@ -83,6 +76,12 @@ Metadata:
           default: Application workload configuration
         Parameters:
           - ApplicationStorageMountPoint
+
+      - Label:
+          default: IBM Cloud Private for Data configuration
+        Parameters:
+          - LicenseAgreement
+          - ICPDVersion
 
       - Label:
           default: (Optional) Advanced deployment configuration
@@ -100,8 +99,6 @@ Metadata:
       # Parameter labels in aphabetical order
       AdminPassword:
         default: IBM Cloud Private super user password
-      AdminUser:
-        default: IBM Cloud Private super user name
       ApplicationStorageMountPoint:
         default: Application storage mount point
       AppSubdomainPrefix:
@@ -205,7 +202,7 @@ Parameters:
   # Variables are declared in alphabetical order.
   AdminPassword:
     Description: >-
-      The IBM Cloud Private administrator (super user) password. As of IBM Cloud Private v3.1.2 the default password enforcement rule is '^([a-zA-Z0-9\-]{32,})$': The password must be a minimum of 32 characters long and contain only lower and uppercase characters, numbers and dashes.
+      The IBM Cloud Private administrator (admin) password. As of IBM Cloud Private v3.1.2 the default password enforcement rule is '^([a-zA-Z0-9\-]{32,})$': The password must be a minimum of 32 characters long and contain only lower and uppercase characters, numbers and dashes.
     NoEcho: true
     AllowedPattern: '^([a-zA-Z0-9\-]{32,})$'
     ConstraintDescription: >-
@@ -216,6 +213,7 @@ Parameters:
     Description: >-
       The IBM Cloud Private administrator (super user) name.
     Type: String
+    Default: admin
 
   ApplicationStorageMountPoint:
     Description: >-
@@ -363,12 +361,11 @@ Parameters:
 
   ICPDVersion:
     Description: >-
-      The version of IBM Cloud Private for Data to be deployed.  The full version must be provided, e.g., 1.2.0.
+      The version of IBM Cloud Private for Data to be deployed.  The full version must be provided, e.g., 1.2.1.
     Type: String
     AllowedValues:
-      - 1.2.0
       - 1.2.1
-    Default: 1.2.0
+    Default: 1.2.1
 
   InceptionTimeout:
     Description: >-
@@ -1149,7 +1146,9 @@ Outputs:
       IBM Cloud Private for Data management console URL.  If you are using a HostedZone with a public domain name, then the cluster DNS name used in the URL should resolve.  Otherwise, you will need to create an alias entry in your DNS that maps the cluster DNS name to the master node load balancer public DNS name provided in the output above.  For testing purposes you can create an entry in your /etc/hosts file that maps one of the IP addresses of the master node load balancer to the cluster DNS name. (Use nslookup to get the IP address(es) of the master node load balancer.)
     Value: !If
       - EmptySubdomainPrefix
-      - !Sub https://${ClusterName}.${VPCDomain}:31843/
+      - !Sub 
+        - https://${MasterNodeELB}:31843/
+        - { MasterNodeELB: !GetAtt ClusterMembersStack.Outputs.MasterNodeLoadBalancerDNSName }
       - !Sub https://${ClusterName}.${VPCSubdomainPrefix}.${VPCDomain}:31843/
 
   ICPAdminUser:
