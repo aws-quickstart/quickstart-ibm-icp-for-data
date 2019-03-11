@@ -18,29 +18,26 @@ global:
     - us-west-2
   reporting: true
 tests:
-  icpd-ha:
-    parameter_input: icpd120-ha-parameters.json
-    template_file: ibm-icp-for-data-root.yaml
-    regions:
-      - ap-northeast-1
-      - ap-southeast-1
-      - eu-central-1
-      - eu-west-1
-      - us-east-1
+  # icpd-ha:
+  #   parameter_input: icpd120-ha-parameters.json
+  #   template_file: ibm-icp-for-data-root.yaml
+  #   regions:
+  #     - ap-northeast-1
+  #     - eu-west-1
   # icpd-ha-dns:
   #   parameter_input: icpd120-ha-dns.json
   #   template_file: ibm-icp-for-data-root.yaml
-  #   regions:     
-  icpd-non-ha:
+  #   regions:
+  #     - us-east-1
+  #     - us-west-2
+   icpd-non-ha:
     parameter_input: icpd120-non-ha.json
     template_file: ibm-icp-for-data-root.yaml
     regions:
-      - ap-northeast-2
-      - us-west-1
-      - us-east-2
-      - us-west-2
-  icpd-non-ha-sydney:
-    parameter_input: icpd120-non-ha-ap-southeast-2.json
-    template_file: ibm-icp-for-data-root.yaml
-    regions:
-      - ap-southeast-2
+      - us-east-1
+  #    - us-west-1
+  # icpd-non-ha-sydney:
+  #   parameter_input: icpd120-non-ha-ap-southeast-2.json
+  #   template_file: ibm-icp-for-data-root.yaml
+  #   regions:
+  #     - ap-southeast-2

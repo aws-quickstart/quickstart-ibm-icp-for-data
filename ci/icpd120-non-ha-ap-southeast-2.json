@@ -4,12 +4,16 @@
     "ParameterValue": "$[taskcat_genpass_34A]"
   },
   {
+    "ParameterKey": "AdminUser",
+    "ParameterValue": "icpadmin"
+  },
+  {
     "ParameterKey": "AvailabilityZoneCount",
     "ParameterValue": "1"
   },
   {
     "ParameterKey": "AvailabilityZones",
-    "ParameterValue": "ap-southeast-2a"
+    "ParameterValue": "ap-southeast-2b"
   },
   {
     "ParameterKey": "AppSubdomainPrefix",
@@ -33,15 +37,15 @@
   },
   {
     "ParameterKey": "ExternalApplicationLocation",
-    "ParameterValue": "10.0.0.0/16"
+    "ParameterValue": "0.0.0.0/0"
   },
   {
     "ParameterKey": "ExternalICPAdminLocation",
-    "ParameterValue": "10.0.0.0/16"
+    "ParameterValue": "0.0.0.0/0"
   },
   {
     "ParameterKey": "ExternalSSHLocation",
-    "ParameterValue": "10.0.0.0/16"
+    "ParameterValue": "0.0.0.0/0"
   },
   {
     "ParameterKey": "ICPDeploymentLogsBucketName",
@@ -122,9 +126,5 @@
   {
     "ParameterKey": "WorkerNodeInstanceType",
     "ParameterValue": "m5.4xlarge"
-  },
-  {
-    "ParameterKey":"ICPDVersion",
-    "ParameterValue":"1.2.1"
   }
 ]
