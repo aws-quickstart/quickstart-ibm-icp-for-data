@@ -49,6 +49,7 @@ Metadata:
       - Label:
           default: IBM Cloud Private configuration
         Parameters:
+          - AdminUser
           - AdminPassword
           - ClusterName
           - ClusterDomain
@@ -99,6 +100,8 @@ Metadata:
       # Parameter labels in aphabetical order
       AdminPassword:
         default: IBM Cloud Private super user password
+      AdminUser:
+        default: IBM Cloud Private super user name
       ApplicationStorageMountPoint:
         default: Application storage mount point
       AppSubdomainPrefix:
@@ -211,9 +214,11 @@ Parameters:
 
   AdminUser:
     Description: >-
-      The IBM Cloud Private administrator (super user) name.
+      The IBM Cloud Private administrator (super user) name. Only admin is supported as username for IBM ICP for Data.
     Type: String
     Default: admin
+    AllowedValues:
+      - admin
 
   ApplicationStorageMountPoint:
     Description: >-
