@@ -179,7 +179,7 @@ Metadata:
       ServiceCIDR:
         default: ICPD service network CIDR
       StorageIOPS:
-        default: Storage Input/Output operations per second
+        default: Storage input/output operations per second
       VPCCIDR:
         default: Virtual private cloud CIDR
       VPCDomain:
@@ -205,7 +205,7 @@ Parameters:
   # Variables are declared in alphabetical order.
   AdminPassword:
     Description: >-
-      The IBM Cloud Private administrator (admin) password. As of IBM Cloud Private v3.1.2 the default password enforcement rule is '^([a-zA-Z0-9\-]{32,})$': The password must be a minimum of 32 characters long and contain only lower and uppercase characters, numbers and dashes.
+      The IBM Cloud Private administrator (admin) password for IBM Cloud Private and IBM Cloud Private for Data management consoles. The password must be a minimum of 32 characters long and contain only lower and uppercase characters, numbers and dashes.
     NoEcho: true
     AllowedPattern: '^([a-zA-Z0-9\-]{32,})$'
     ConstraintDescription: >-
@@ -261,7 +261,7 @@ Parameters:
 
   ClusterCIDR:
     Description: >-
-      The CIDR for the ICPD cluster overlay network.  This gets assigned to the network_cidr attribute in the IBM Cloud Private for Data installation config.yaml. The value provided must be a network that does not overlap with the AWS VPC network (VPCCIDR).  It also must not overlap with the IBM Cloud Private for Data cluser service overlay network defined by the ServiceCIDR.
+      The CIDR for the ICPD cluster overlay network.  This gets assigned to the network_cidr attribute in the IBM Cloud Private for Data installation config.yaml. The value provided must be a network that does not overlap with the AWS VPC network (VPCCIDR).  It also must not overlap with the IBM Cloud Private for Data cluster service overlay network defined by the ServiceCIDR.
     Type: String
     MinLength: 9
     MaxLength: 18
@@ -333,7 +333,7 @@ Parameters:
 
   ExternalICPAdminLocation:
     Description: >-
-      The IP address CIDR for IP addresses permitted to access the IBM Cloud Private for Data master nodes on the access ports (8001, 8080, 8443, 8500, 8600, 9443). The CIDR provided is intended to allow access for IBM Cloud Private for Data administrators. Additional values can be added post-deployment from the AWS CloudFormation console.
+      The IP address CIDR for IP addresses permitted to access the IBM Cloud Private for Data master nodes on the access ports (8001, 8080, 8443, 8500, 8600, 9443, 31843). The CIDR provided is intended to allow access for IBM Cloud Private for Data administrators. Additional values can be added post-deployment from the AWS CloudFormation console.
     Type: String
     MinLength: 9
     MaxLength: 18
