@@ -491,7 +491,7 @@ Parameters:
     ConstraintDescription: >-
       Quick Start bucket name can include numbers, lowercase letters, uppercase
       letters, and hyphens (-). It cannot start or end with a hyphen (-).
-    Default: aws-icpd-quickstart-us-east-1
+    Default: aws-quickstart
     Description: >-
       S3 bucket name for the Quick Start assets. This bucket name can include
       numbers, lowercase letters, uppercase letters, and hyphens (-), but should
