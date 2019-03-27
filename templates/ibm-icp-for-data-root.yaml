@@ -374,7 +374,7 @@ Parameters:
 
   InceptionTimeout:
     Description: >-
-      The number of seconds to wait for the IBM Cloud Private for Data inception container to complete the installation.  For a small HA cluster (12 nodes), the inception process typically completes the installation in about 120 minutes. The start-to-finish installation time is about 180 minutes for such a cluster.  The InceptionTimeout should be equal to or smaller than the InstallationTimeout.
+      The number of seconds to wait for the IBM Cloud Private for Data inception container to complete the installation. An IBM Cloud Private for Data non-high availability (HA) deployment takes around 3 hours, and an HA deployment takes around 4 hours to complete. The InceptionTimeout should be equal to or smaller than the InstallationTimeout.
     Type: Number
     Default: 15000
 
