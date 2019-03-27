@@ -1146,9 +1146,9 @@ Outputs:
     Description: The DNS name of the ICPD Proxy node Elastic Load Balancer.
     Value: !GetAtt ClusterMembersStack.Outputs.ProxyNodeLoadBalancerDNSName
 
-  ICPDManagementConsole:
+  ICPDWebClientURL:
     Description: >-
-      IBM Cloud Private for Data management console URL.  If you are using a HostedZone with a public domain name, then the cluster DNS name used in the URL should resolve.  Otherwise, you will need to create an alias entry in your DNS that maps the cluster DNS name to the master node load balancer public DNS name provided in the output above.  For testing purposes you can create an entry in your /etc/hosts file that maps one of the IP addresses of the master node load balancer to the cluster DNS name. (Use nslookup to get the IP address(es) of the master node load balancer.)
+      IBM Cloud Private for Data web client URL. If you are using a HostedZone with a public domain name, then the cluster DNS name used in the URL should resolve. Otherwise, you will need to create an alias entry in your DNS that maps the cluster DNS name to the master node load balancer public DNS name provided in thee earlier output. For testing purposes, you can create an entry in your /etc/hosts file that maps one of the IP addresses of the master node load balancer to the cluster DNS name. Note: You can use nslookup to get the IP addresses of the master node load balancer.
     Value: !If
       - EmptySubdomainPrefix
       - !Sub 
