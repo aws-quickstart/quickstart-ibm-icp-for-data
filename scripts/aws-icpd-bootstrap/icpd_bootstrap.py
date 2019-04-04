@@ -1,6 +1,6 @@
 #!/usr/bin/python
-import sys, os.path, time
-from subprocess import call, check_call, CalledProcessError
+import sys, os, time, stat
+from subprocess import call, check_call, CalledProcessError, Popen, check_output, PIPE
 import boto3
 import socket
 import yaml
@@ -34,7 +34,50 @@ class ICPDBootstrap(object):
     self.home = os.path.expanduser("~")
     self.logsHome = os.path.join(self.home,"logs")
 
-  
+  def makeDir(self, path):
+    if not os.path.exists(path):
+      os.makedirs(path)
+    #endif 
+  #enddef
+
+
+  def setupBootNode(self, icpdInstallLogFile):
+    methodName = "setupBootNode"
+    # copy .docker contents to bootnode from masternode
+    
+    dockerpath = "/root/.docker"
+    configFile = '/.docker/config.json'
+    remoteHost = "root@"+self.bootstrap.getMasterIPAddresses()[0]
+    scpCmd ="scp -o StrictHostKeyChecking=no "+remoteHost+":"
+    config_scp = scpCmd+"~"+configFile+" ."
+
+    TR.info(methodName,"Copy %s file from  %s using scp command %s" %(configFile, remoteHost,config_scp))     
+    self.makeDir(dockerpath)
+    os.chdir(dockerpath)
+    call(config_scp,shell=True, stdout=icpdInstallLogFile)
+
+    #copy certs from masternode to bootnode
+
+    etcDockerPath ='/etc/docker/'
+    certsPath = etcDockerPath+'certs.d/'
+    registry = self.bootstrap.ClusterDNSName+':8500'
+    registryPath = certsPath+registry
+    rootCert= registryPath+'/root-ca.crt'
+    caCert =  registryPath+'/ca.crt' 
+    ca_scp = scpCmd+caCert+" ."
+    root_scp = scpCmd+rootCert+" ."
+
+    TR.info(methodName,"Copy %s and %s file from %s" %(rootCert, caCert, remoteHost)) 
+    TR.info(methodName,"RootCert scp command:  %s" %(root_scp))
+    TR.info(methodName,"CACert scp command:  %s" %(ca_scp))
+    
+    self.makeDir(registryPath)
+    os.chdir(registryPath)
+    call(ca_scp,shell=True, stdout=icpdInstallLogFile)
+    call(root_scp,shell=True, stdout=icpdInstallLogFile)
+
+  #endDef
+
   def installICPD(self):
     """
       Install ICPD by executing the script
@@ -45,30 +88,55 @@ class ICPDBootstrap(object):
     """
     methodName = "installICPD"
     TR.info(methodName,"IBM Cloud Private for Data installation started.")
+    # We really do not need this when ICP fixes the bootnode docker and certs issue
+    # copy .docker contents to bootnode from masternode
 
     logFilePath = os.path.join(self.logsHome,"icpd_install.log")
-    with open(logFilePath,"a+") as knownHostsFile:
-      TR.info(methodName,"self.home = %s"%(self.home))
-      # Sharath MasterIPAddress needs to be retrieved from hosts
-      TR.info(methodName," MasterIPAddress = %s CLustername = %s" %(self.bootstrap.getMasterIPAddresses()[0], self.bootstrap.ClusterDNSName))
-      retcode = call(['sudo','/root/icpd_configure.sh', str(self.bootstrap.getMasterIPAddresses()[0]), str(self.bootstrap.ClusterDNSName), str(self.icpHome)], stdout=knownHostsFile)
-      
     
-      if (retcode != 0):
-        raise ICPInstallationException("Error calling: './icpd_configure.sh' - Return code: %s" % retcode)
+    with open(logFilePath,"a+") as icpdInstallLogFile:
+      self.setupBootNode(icpdInstallLogFile)
 
-      retcode = call(['sudo','/root/manage_admin_user.sh','--enable-admin', str("admin"), str(self.bootstrap.AdminPassword)], stdout=knownHostsFile)
+      # create /ibm folder and extract icp4d.tar contents to it
+      TR.info(methodName,"Extract icp4d.tar to /ibm")
+
+      self.makeDir('/ibm')
+      call('tar -xvf /tmp/icp4d.tar -C /ibm/',shell=True, stdout=icpdInstallLogFile)
+      os.chdir('/ibm')
       
-    
-      if (retcode != 0):
-        raise ICPInstallationException("Error calling: './manage_admin_user.sh' - Return code: %s" % retcode)  
-      #endif  
+      # cd to /ibm and give +x to installer file
+      installCMD = self.installMap['installCMD']
+      TR.info(methodName,"install CMD : %s" %(installCMD))
+      os.chmod(installCMD, stat.S_IEXEC)	
+
+      # docker login to registry to be on safer side
+      registry = self.bootstrap.ClusterDNSName+':8500'
+      dockerCMD = 'docker login '+registry+'/zen -u '+self.bootstrap.AdminUser+' -p '+self.bootstrap.AdminPassword
+      call(dockerCMD, shell=True, stdout=icpdInstallLogFile)
+      storageclass = int(self.storageclassValue)-1
+      #Run installer with subprocess Popen command as pass input values through stdin pipe
+      input = '\nA\nzen\nY\n'+registry+'/zen\n\nY\nN\n'+str(storageclass)+'\nY\nY'
+      TR.info(methodName,"Input for installer : %s" %(input))
+      
+      runInstaller = 'sudo /ibm/'+installCMD
+      process=Popen(runInstaller,shell=True,
+                            stdin=PIPE,
+                            stdout=icpdInstallLogFile,
+                            stderr=icpdInstallLogFile,close_fds=True)     
+      stdoutdata,stderrdata=process.communicate(input)
+
+
+      TR.info(methodName,"%s"%(stdoutdata))    
+      manageUser = "sudo python /root/manage_admin_user.py admin "+self.bootstrap.AdminPassword
+      TR.info(methodName,"Start manageUser = %s"%(manageUser))    
+      call(manageUser, shell=True, stdout=icpdInstallLogFile)
+      TR.info(methodName,"End manageUser = %s"%(manageUser))    
+      TR.info(methodName,"IBM Cloud Private for Data installation completed.")
+
     #endwith
-    TR.info(methodName,"IBM Cloud Private for Data installation completed.")
-
-  #endDef
+  #endDef  
 
   def signalWaitHandle(self, eth, etm, ets):
+
     """
       Send a status signal to the "install completed" wait condition via the pre-signed URL
       provided to the stack.
@@ -106,6 +174,7 @@ class ICPDBootstrap(object):
     #endTry    
   #endDef 
 
+
   def main(self,argv):
     methodName ="main"
     self.rc = 0
@@ -140,6 +209,10 @@ class ICPDBootstrap(object):
         self.installMap = self.bootstrap.loadInstallMap(mapPath=installMapPath, version=self.bootstrap.ICPDVersion, region=self.bootstrap.region)
         icpdS3Path = "{version}/{object}".format(version=self.installMap['version'],object=self.installMap['icpd-base-install-archive'])
         destPath = "/tmp/icp4d.tar"
+        storageClassCmd = "kubectl get storageclass | nl | grep aws-efs | awk '{print $1}'"
+        TR.info(methodName,"check_output Get StorageClass value from kubectl %s"%(storageClassCmd))
+        self.storageclassValue=check_output(['bash','-c', storageClassCmd])
+        TR.info(methodName,"check_output  StorageclassValue returned : %s"%(self.storageclassValue))
         self.bootstrap.getS3Object(self.bootstrap.ICPDArchiveBucketName, icpdS3Path, destPath) 
       
         self.stackIds =  self.bootstrap._getStackIds(self.bootStackId)

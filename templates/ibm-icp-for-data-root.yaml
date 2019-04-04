@@ -369,8 +369,9 @@ Parameters:
       The version of IBM Cloud Private for Data to be deployed.  The full version must be provided, e.g., 1.2.1.
     Type: String
     AllowedValues:
+      - 1.2.1.1
       - 1.2.1
-    Default: 1.2.1
+    Default: 1.2.1.1
 
   InceptionTimeout:
     Description: >-
@@ -724,8 +725,8 @@ Mappings:
       ScriptPackagePath: scripts/aws-icp-nodeinit.zip
 
   ICPDtoICPVersionMap:
-    1.2.0:
-      ICP: 3.1.0
+    1.2.1.1:
+      ICP: 3.1.2
     1.2.1:
       ICP: 3.1.2       
 
