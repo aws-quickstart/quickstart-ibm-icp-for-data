@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  docker_registry_prefix: <CLUSTERDNSNAME>:8500/zen
+  docker_registry_secret: icp4d-anyuid-docker-pull
+kind: ConfigMap
+metadata:
+  labels:
+    icpdata-configmap: "true"
+  name: icpdata-configmap
+  namespace: zen

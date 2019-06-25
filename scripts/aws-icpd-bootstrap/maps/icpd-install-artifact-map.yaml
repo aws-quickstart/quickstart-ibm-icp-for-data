@@ -30,3 +30,28 @@
   icpd-base-install-archive: icp4d_ee_pre_1.2.1.1_x86_64.tar
   installCMD: installer.x86_64.393
 
+2.1.0.1:
+  icpd-base-install-archive: icp4d_ee_pre_2.1.0.1_x86_64.tar
+  installCMD: installer.x86_64.483
+
+  addon-install-CMD: /ibm/InstallPackage/components/deploy.sh
+  decision-optimization-archive: Addons/DO/dods_dsx_addon.x86_64-1.0-doicp4d-v2.1.0.0-b23.tar
+  decision-optimization-dest: /ibm/InstallPackage/modules/decision_optimization/dods_dsx_addon.tgz
+  
+  data-refinery-archive: Addons/DR/0190-shaper.tar
+  data-refinery-dest: /ibm/InstallPackage/modules/data_refinery/data_refinery.tar
+
+  spss-modeler-archive: Addons/SPSS/spss-modeler.tar 
+  spss-modeler-dest: /ibm/InstallPackage/modules/spss/spss-modeler.tar 
+
+  watson-explorer-archive: Addons/WEX/wex-server.tar
+  watson-explorer-dest: /ibm/InstallPackage/modules/wex/wex-server.tar
+
+  db2-warehouse-archive: Addons/WHSMP/db2wh-icp4d_x86_64_2019-05-22_20-35.tar.gz
+  db2-warehouse-dest:  /ibm/InstallPackage/databases/db2whsmp.tar.gz
+  
+  data-virtualization-archive: Addons/DV/dv-ppa.tar
+  data-virtualization-dest: /ibm/InstallPackage/modules/data_virtualization/dv-ppa.tar
+
+  zenaddnode: Addons/zenaddnode.tar
+
