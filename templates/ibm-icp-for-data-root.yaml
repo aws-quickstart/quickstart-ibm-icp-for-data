@@ -394,13 +394,13 @@ Parameters:
     Description: >-
       The number of seconds to wait for the IBM Cloud Pak for Data inception container to complete the installation. An IBM Cloud Pak for Data non-high availability (HA) deployment takes around 3 hours, and an HA deployment takes around 4 hours to complete. The InceptionTimeout should be equal to or smaller than the InstallationTimeout.
     Type: Number
-    Default: 9000
+    Default: 10000
 
   InstallationTimeout:
     Description: >-
       The timeout (in seconds) associated with the installation and configuration of the IBM Cloud Pak for Data cluster, from start to finish. The InstallationTimeout must be equal to or greater than the InceptionTimeout. The InstallationTimeout needs to be sufficient to allow the bootstrap installation script to complete. See InceptionTimeout for guidance on expected installation time.
     Type: Number
-    Default: 15000
+    Default: 18000
 
   KeyFilePath:
     Description: >-
