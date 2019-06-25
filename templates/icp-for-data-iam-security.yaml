@@ -2,7 +2,7 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  IAM resources used by the root template and all other stack templates used to deploy the IBM Cloud Private cluster.
+  IAM resources used by the root template and all other stack templates used to deploy the IBM Cloud Pak cluster.
 
 Parameters:
 
@@ -37,11 +37,16 @@ Parameters:
       ICPMasterSecurityGroup for ICPD related update
     Type: String
 
+  ICPNodeRole:
+    Description: >-
+      ICPNodeRole paramter from IAMResource for IBM Cloud Pak for Data related update
+    Type: String  
+
 Resources:
-  RolePolicies: 
+  BootPolicies: 
     Type: AWS::IAM::Policy
     Properties: 
-      PolicyName: ICPDBucketPolicy
+      PolicyName: ICPDBootPolicy
       PolicyDocument: 
         Version: 2012-10-17
         Statement:
@@ -61,16 +66,53 @@ Resources:
             - s3:GetObject
           Resource: !Sub arn:aws:s3:::${ICPDScriptBucketName}/*
           Effect: Allow
+        - Action:
+            - ec2messages:DeleteMessage
+            - ec2messages:GetEndpoint
+            - ec2messages:FailMessage
+            - ec2messages:AcknowledgeMessage
+            - ec2messages:SendReply
+          Effect: 'Allow'
+          Resource:  '*'
       Roles: 
         - 
           Ref: BootNodeRole
-  RootInstanceProfile: 
+  
+  ICPPolicies: 
+    Type: AWS::IAM::Policy
+    Properties: 
+      PolicyName: ICPDICPNodePolicy
+      PolicyDocument: 
+        Version: 2012-10-17
+        Statement:
+        - Action:
+            - ssm:SendCommand
+            - ssm:ListCommands
+            - ssm:DescribeInstanceInformation
+            - ssm:GetCommandInvocation
+          Effect: 'Allow'
+          Resource:  '*'
+      Roles: 
+        - 
+          Ref: ICPNodeRole 
+
+  BootNodeProfile: 
     Type: "AWS::IAM::InstanceProfile"
     Properties: 
       Path: "/"
       Roles: 
         - 
-          Ref: BootNodeRole   
+          Ref: BootNodeRole             
+
+  ICPNodeProfile: 
+    Type: "AWS::IAM::InstanceProfile"
+    Properties: 
+      Path: "/"
+      Roles: 
+        - 
+          Ref: ICPNodeRole  
+
+
 
   ICPDMgmtConsoleIngress:
     Type: AWS::EC2::SecurityGroupIngress
@@ -89,3 +131,8 @@ Outputs:
     Description: >-
       BootNodeRole resource ID for use by parent stack templates(s)
     Value: !Ref BootNodeRole
+
+  ICPNodeRole:
+    Description: >-
+      ICPNodeRole resource ID for use by parent stack templates(s)
+    Value: !Ref ICPNodeRole  

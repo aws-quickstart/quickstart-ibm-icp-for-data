@@ -8,7 +8,7 @@
 ---
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
-  Boot node for orchestrating the deployment of an IBM Cloud Private for Data cluster. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template. (qs-1p8m99oui)
+  Boot node for orchestrating the deployment of an IBM Cloud Pak for Data cluster. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template. (qs-1p8m99oui)
 
 Parameters:
   # Variables are declared in alphabetical order.
@@ -17,14 +17,19 @@ Parameters:
       The AMI virutal machine image identifier.  Root template defines the mapping by region.
     Type: String
 
+  Addons:
+    Description: >-
+      Addons to be installed along with IBM Cloud Pak for Data.
+    Type: String
+
   AdminPassword:
     Description: >-
-      IBM Cloud Private administrator (super user) password. Used in the bootstrap script.
+      IBM Cloud Pak administrator (super user) password. Used in the bootstrap script.
     Type: String
 
   AdminUser:
     Description: >-
-      IBM Cloud Private administrator (super user) name. Used in the bootstrap script.
+      IBM Cloud Pak administrator (super user) name. Used in the bootstrap script.
     Type: String
 
   ApplicationStorageMountPoint:
@@ -104,7 +109,7 @@ Parameters:
 
   ExcludedMgmtServices:
     Description: >-
-      String with the form of a comma delimited list of management services to be excluded from the IBM Cloud Private deployment.  Services that may be excluded are: service-catalog, metering, monitoring, istio, vulnerability-advisor, custom-metrics-adapter
+      String with the form of a comma delimited list of management services to be excluded from the IBM Cloud Pak deployment.  Services that may be excluded are: service-catalog, metering, monitoring, istio, vulnerability-advisor, custom-metrics-adapter
     Type: String
 
   ExternalSSHSecurityGroup:
@@ -144,7 +149,7 @@ Parameters:
 
   ICPS3KeyPrefix:
     Description: >-
-      The S3 key prefix (context root) for IBM Cloud Private installation artifacts in the ICPScriptBucketName S3 bucket. By convention the value includes a trailing slash. (The ICPScriptBucketName gets assigned the value of the QSS3BucketName.)
+      The S3 key prefix (context root) for IBM Cloud Pak installation artifacts in the ICPScriptBucketName S3 bucket. By convention the value includes a trailing slash. (The ICPScriptBucketName gets assigned the value of the QSS3BucketName.)
     Type: String
 
   ICPScriptBucketName:
@@ -164,7 +169,7 @@ Parameters:
 
   InceptionTimeout:
     Description: >-
-      The number of seconds to wait for the IBM Cloud Private inception container to complete the installation.  Provided by the parent stack.  Used in the bootstrap script.
+      The number of seconds to wait for the IBM Cloud Pak inception container to complete the installation.  Provided by the parent stack.  Used in the bootstrap script.
     Type: Number
 
   InstallationCompletedURL:
@@ -229,7 +234,7 @@ Parameters:
 
   SecurityStackId:
     Description: >-
-      The stack ID of the "security" stack where the security resources are defined.  The bootstrap script modifies security groups once the IP addresses are known for the boot node in order to ensure only limited access to the IBM Cloud Private cluster nodes.
+      The stack ID of the "security" stack where the security resources are defined.  The bootstrap script modifies security groups once the IP addresses are known for the boot node in order to ensure only limited access to the IBM Cloud Pak cluster nodes.
     Type: String
 
   ServiceCIDR:
@@ -249,7 +254,7 @@ Parameters:
 
   StorageIOPS:
     Description: >-
-      The maximum number of read and write operations per second for the EBS storage devices provisioned to the IBM Cloud Private cluster member EC2 instances. The io1 storage volume type supports an explicit setting of the IOPS of the device. The EBSVolumeType parameter specifies the storage volume type. This parameter is ignored if the EBSVolumeType is set to gp2.
+      The maximum number of read and write operations per second for the EBS storage devices provisioned to the IBM Cloud Pak cluster member EC2 instances. The io1 storage volume type supports an explicit setting of the IOPS of the device. The EBSVolumeType parameter specifies the storage volume type. This parameter is ignored if the EBSVolumeType is set to gp2.
     Type: Number
 
   VPCDomain:
@@ -376,7 +381,7 @@ Resources:
           Ebs:
             VolumeType: !Ref EBSVolumeType
             DeleteOnTermination: true
-            VolumeSize: 300
+            VolumeSize: 500
             Iops: !If [GPStorage, !Ref "AWS::NoValue", !Ref StorageIOPS]
 
       IamInstanceProfile: !Ref BootNodeProfile

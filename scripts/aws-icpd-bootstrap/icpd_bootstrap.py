@@ -87,7 +87,7 @@ class ICPDBootstrap(object):
       It is assumed all the pre-installation configuration steps have been completed.
     """
     methodName = "installICPD"
-    TR.info(methodName,"IBM Cloud Private for Data installation started.")
+    TR.info(methodName,"IBM Cloud Pak for Data installation started.")
     # We really do not need this when ICP fixes the bootnode docker and certs issue
     # copy .docker contents to bootnode from masternode
 
@@ -112,9 +112,23 @@ class ICPDBootstrap(object):
       registry = self.bootstrap.ClusterDNSName+':8500'
       dockerCMD = 'docker login '+registry+'/zen -u '+self.bootstrap.AdminUser+' -p '+self.bootstrap.AdminPassword
       call(dockerCMD, shell=True, stdout=icpdInstallLogFile)
+
+       #create namepsace
+      namespaceCMD = "sudo kubectl create -f /root/zen.yaml"
+      call(namespaceCMD, shell=True, stdout=icpdInstallLogFile)
+
+      #create docker secret
+      secretCMD = "sudo kubectl create secret -n zen docker-registry icp4d-anyuid-docker-pull --docker-server="+registry+" --docker-username=admin --docker-password="+self.bootstrap.AdminPassword
+      call(secretCMD, shell=True, stdout=icpdInstallLogFile)
+
+
       storageclass = int(self.storageclassValue)-1
       #Run installer with subprocess Popen command as pass input values through stdin pipe
-      input = '\nA\nzen\nY\n'+registry+'/zen\n\nY\nN\n'+str(storageclass)+'\nY\nY'
+      portValue = ''
+      if(self.bootstrap.ICPDVersion== "2.1.0.1"):
+        portValue='\n31843\nY'
+      #endIf    
+      input = '\nA\nzen\nY'+portValue+'\n'+registry+'/zen\n\nY\nN\n'+str(storageclass)+'\nY\nY\nY'
       TR.info(methodName,"Input for installer : %s" %(input))
       
       runInstaller = 'sudo /ibm/'+installCMD
@@ -127,11 +141,46 @@ class ICPDBootstrap(object):
 
       TR.info(methodName,"%s"%(stdoutdata))    
       manageUser = "sudo python /root/manage_admin_user.py admin "+self.bootstrap.AdminPassword
-      TR.info(methodName,"Start manageUser = %s"%(manageUser))    
+      TR.info(methodName,"Start manageUser")    
       call(manageUser, shell=True, stdout=icpdInstallLogFile)
-      TR.info(methodName,"End manageUser = %s"%(manageUser))    
-      TR.info(methodName,"IBM Cloud Private for Data installation completed.")
+      TR.info(methodName,"End manageUser")    
+      TR.info(methodName,"IBM Cloud Pak for Data installation completed.")
 
+      source_file = open("/root/acitvate-license.sh").read()
+      source_file = source_file.replace('<CLUSTERDNSNAME>', self.bootstrap.ClusterDNSName)
+      updated_file = open("/root/acitvate-license.sh", 'w')
+      updated_file.write(source_file)
+      updated_file.close()
+
+      TR.info(methodName,"Create configmap for addons")
+      source_file = open("/root/configmap.yaml").read()
+      source_file = source_file.replace('<CLUSTERDNSNAME>', self.bootstrap.ClusterDNSName)
+      updated_file = open("/root/configmap.yaml", 'w')
+      updated_file.write(source_file)
+      updated_file.close()
+      # run kubectl create configmap.yaml
+      kubectlCMD = "sudo kubectl create -f /root/configmap.yaml"
+      check_call(kubectlCMD,shell=True,stdout=icpdInstallLogFile)
+      TR.info(methodName,"Created configmap for addons")
+
+      addonList = self.bootstrap.Addons.split(",")
+      if(addonList!=['']):
+        for addon in addonList:
+            TR.info(methodName,"Addon to be installed %s" % addon)
+            installAddon = "sudo python /root/deploy_icpd_addons.py "+addon
+            TR.info(methodName,"Intitate addon %s installation with following command %s" %(addon,installAddon))
+            retcode = check_call(installAddon,shell=True,stdout=icpdInstallLogFile)
+            TR.info(methodName,"Return code for addon %s installation is %s"%(addon,retcode))
+        #endFor
+      #endIf     
+      TR.info(methodName,"IBM Cloud Pak for Data Addons %s installation completed."% addonList)    
+      url ="wget -q -O - http://169.254.169.254/latest/meta-data/instance-id"
+      bootInstanceId = check_output(url,shell=True)
+      self.bootstrap.putSSMParameter("/%s/bootInstanceId" %self.bootstrap.rootStackName, bootInstanceId,description="Boot InstanceId of %s"%self.bootstrap.rootStackName)
+      TR.info(methodName,"Set flag for stack creation completion")
+      self.bootstrap.putSSMParameter("/%s/stackStatus" %self.bootstrap.rootStackName, "Created",description=" %s is created successfully." %self.bootstrap.rootStackName)
+      
+      #endFor    
     #endwith
   #endDef  
 
@@ -158,7 +207,7 @@ class ICPDBootstrap(object):
         success = 'false'
         status = 'FAILURE: Check boot node logs in S3 log bucket or on the boot node EC2 instance in /root/logs bootstrap.log and /opt/icp/%s/cluster/logs install.log.*' % self.bootstrap.ICPVersion
       #endIf
-      data = "%s: IBM Cloud Private installation elapsed time: %d:%02d:%02d" % (status,eth,etm,ets)
+      data = "%s: IBM Cloud Pak installation elapsed time: %d:%02d:%02d" % (status,eth,etm,ets)
       TR.info(methodName,"Signaling: %s with status: %s, data: %s" % (self.bootstrap.ICPDInstallationCompletedURL,status,data))
       # Deployer should use --disable-rollback to avoid deleting the stack on failures and allow a post mortem.
       check_call(['/usr/local/bin/cfn-signal', 
@@ -173,8 +222,7 @@ class ICPDBootstrap(object):
       raise e      
     #endTry    
   #endDef 
-
-
+  
   def main(self,argv):
     methodName ="main"
     self.rc = 0
@@ -195,9 +243,10 @@ class ICPDBootstrap(object):
         self.bootstrap.fqdn = socket.getfqdn()
 
         self.bootStackId = cmdLineArgs.get('stackid')
-        self.bootstrap.rootStackName = cmdLineArgs.get('stack-name')  
-        self.bootstrap._init(self.bootstrap.rootStackName,self.bootStackId)
+        self.bootstrap.rootStackName = cmdLineArgs.get('stack-name')
         
+        self.bootstrap._init(self.bootstrap.rootStackName,self.bootStackId)
+        TR.info(methodName,"Addons to be installed %s" % self.bootstrap.Addons)
         self.logExporter = LogExporter(region=self.bootstrap.region,
                                    bucket=self.bootstrap.ICPDeploymentLogsBucketName,
                                    keyPrefix='logs/%s' % self.bootstrap.rootStackName,
@@ -214,7 +263,6 @@ class ICPDBootstrap(object):
         self.storageclassValue=check_output(['bash','-c', storageClassCmd])
         TR.info(methodName,"check_output  StorageclassValue returned : %s"%(self.storageclassValue))
         self.bootstrap.getS3Object(self.bootstrap.ICPDArchiveBucketName, icpdS3Path, destPath) 
-      
         self.stackIds =  self.bootstrap._getStackIds(self.bootStackId)
         self.bootstrap._getHosts(self.stackIds)
         
