@@ -146,9 +146,9 @@ class ICPDBootstrap(object):
       TR.info(methodName,"End manageUser")    
       TR.info(methodName,"IBM Cloud Pak for Data installation completed.")
 
-      source_file = open("/root/acitvate-license.sh").read()
+      source_file = open("/root/activate-license.sh").read()
       source_file = source_file.replace('<CLUSTERDNSNAME>', self.bootstrap.ClusterDNSName)
-      updated_file = open("/root/acitvate-license.sh", 'w')
+      updated_file = open("/root/activate-license.sh", 'w')
       updated_file.write(source_file)
       updated_file.close()
 
