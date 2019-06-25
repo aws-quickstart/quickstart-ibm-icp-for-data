@@ -1,0 +1,1236 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  Root template for an IBM Cloud Pak for Data deployment. This is the root template for a collection of nested stacks that make up the full ICPD deployment. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template. (qs-1pek09fje)
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: VPC network configuration
+        Parameters:
+          - AppSubdomainPrefix
+          - AvailabilityZoneCount
+          - AvailabilityZones
+          - ExternalApplicationLocation
+          - ExternalICPAdminLocation
+          - ExternalSSHLocation
+          - HostedZoneId
+          - PrivateSubnetCIDR
+          - PrivateSubnets
+          - PublicSubnetCIDR
+          - PublicSubnets
+          - VPCCIDR
+          - VPCDomain
+          - VPCName
+          - VPCSubdomainPrefix
+
+      - Label:
+          default: EC2 configuration
+        Parameters:
+          - BootNodeInstanceType
+          - MasterNodeInstanceType
+          - ManagementNodeInstanceType
+          - ProxyNodeInstanceType
+          - ResourceOwner
+          - VulnerabilityAdvisorNodeInstanceType
+          - WorkerNodeInstanceType
+          - EBSVolumeType
+          - StorageIOPS
+
+      - Label:
+          default: Deployment control configuration
+        Parameters:
+          - InceptionTimeout
+          - InstallationTimeout
+          - WhichClusterLBAddress
+          - WhichProxyLBAddress
+          - ICPDeploymentLogsBucketName
+
+      - Label:
+          default: IBM Cloud Pak configuration
+        Parameters:
+          - AdminUser
+          - AdminPassword
+          - ClusterName
+          - ClusterDomain
+          - ClusterCIDR
+          - ExcludedMgmtServices
+          - ServiceCIDR
+
+      - Label:
+          default: IBM Cloud Pak cluster configuration
+        Parameters:
+          - MasterNodeCount
+          - ManagementNodeCount
+          - ProxyNodeCount
+          - VulnerabilityAdvisorNodeCount
+          - WorkerNodeCount
+
+      - Label:
+          default: IBM Cloud Pak for Data configuration
+        Parameters:
+          - Addons
+          - ICPDVersion
+          - LicenseAgreement
+
+      - Label:
+          default: Security configuration
+        Parameters:
+          - KeyName
+          - ClusterPKIBucketName
+          - ClusterPKIRootPath
+
+      - Label:
+          default: Application workload configuration
+        Parameters:
+          - ApplicationStorageMountPoint
+
+      - Label:
+          default: (Optional) Advanced deployment configuration
+        Parameters:
+          - CustomArtifactsPath
+          - KeyFilePath
+
+      - Label:
+          default: AWS Quick Start configuration
+        Parameters:
+          - QSS3BucketName
+          - QSS3KeyPrefix
+
+    ParameterLabels:
+      # Parameter labels in aphabetical order
+      Addons:
+        default: IBM Cloud Pak for Data Add-ons
+      AdminPassword:
+        default: IBM Cloud Pak super user password
+      AdminUser:
+        default: IBM Cloud Pak super user name
+      ApplicationStorageMountPoint:
+        default: Application storage mount point
+      AppSubdomainPrefix:
+        default: Application subdomain prefix
+      AvailabilityZoneCount:
+        default: Availability Zone count
+      AvailabilityZones:
+        default: Availability Zones
+      BootNodeInstanceType:
+        default: Boot node EC2 instance type
+      ClusterCIDR:
+        default: Cluster network CIDR
+      ClusterDomain:
+        default: Cluster domain
+      ClusterName:
+        default: Cluster name
+      ClusterPKIBucketName:
+        default: Cluster PKI bucket name
+      ClusterPKIRootPath:
+        default: Cluster PKI root path
+      CustomArtifactsPath:
+        default: Custom artifacts path
+      EBSVolumeType:
+        default: Elastic Block Storage volume type
+      ExcludedMgmtServices:
+        default: Excluded management services
+      ExternalApplicationLocation:
+        default: External application location
+      ExternalICPAdminLocation:
+        default: External IBM Cloud Pak for Data admin location
+      ExternalSSHLocation:
+        default: External SSH location
+      HostedZoneId:
+        default: Hosted zone identifier
+      ICPDeploymentLogsBucketName:
+        default: IBM Cloud Pak for Data deployment logs bucket name
+      ICPDVersion:
+        default: IBM Cloud Pak for Data version     
+      InceptionTimeout:
+        default: Inception timeout
+      InstallationTimeout:
+        default: Installation timeout
+      KeyFilePath:
+        default: Key file path
+      KeyName:
+        default: EC2 key pair name
+      LicenseAgreement:
+        default: License agreement
+      ManagementNodeInstanceType:
+        default: Management node EC2 instance type
+      MasterNodeInstanceType:
+        default: Master node EC2 instance type
+      MasterNodeCount:
+        default: Master node count
+      ManagementNodeCount:
+        default: Management node count
+      PrivateSubnetCIDR:
+        default: Private subnet CIDR
+      PrivateSubnets:
+        default: Private subnets
+      PublicSubnetCIDR:
+        default: Public subnet CIDR
+      PublicSubnets:
+        default: Public subnets
+      ProxyNodeInstanceType:
+        default: Proxy node EC2 instance type
+      ProxyNodeCount:
+        default: Proxy node count
+      QSS3BucketName:
+        default: QuickStart S3 bucket name
+      QSS3KeyPrefix:
+        default: QuickStart S3 key prefix
+      ResourceOwner:
+        default: Resource owner
+      ServiceCIDR:
+        default: ICPD service network CIDR
+      StorageIOPS:
+        default: Storage input/output operations per second
+      VPCCIDR:
+        default: Virtual private cloud CIDR
+      VPCDomain:
+        default: Virtual private cloud network domain
+      VPCName:
+        default: Virtual private cloud name
+      VPCSubdomainPrefix:
+        default: Virtual private cloud network subdomain prefix
+      VulnerabilityAdvisorNodeInstanceType:
+        default: Vulnerability Advisor node EC2 instance type
+      VulnerabilityAdvisorNodeCount:
+        default: Vulnerability Advisor node count
+      WhichClusterLBAddress:
+        default: Which cluster load balancer address
+      WhichProxyLBAddress:
+        default: Which proxy load balancer address
+      WorkerNodeCount:
+        default: Worker node count
+      WorkerNodeInstanceType:
+        default: Worker node EC2 instance type
+
+Parameters:
+  # Variables are declared in alphabetical order.
+  Addons:
+    Description: >-
+      Comma delimited list of addons to be installed along with IBM Cloud Pak for Data quickstart from the list of DSX Premium, Data Virtualization and Db2 Warehouse.
+    Type: String
+    AllowedValues:
+      - ""
+      - "DSX_Premium, Data_Virtualization, Db2_Warehouse"
+      - "DSX_Premium"
+      - "Data_Virtualization"
+      - "Db2_Warehouse"
+      - "DSX_Premium, Data_Virtualization"
+      - "DSX_Premium, Db2_Warehouse"
+      - "Data_Virtualization, Db2_Warehouse"
+    Default: ""  
+
+  AdminPassword:
+    Description: >-
+      The IBM Cloud Pak administrator (admin) password for IBM Cloud Pak and IBM Cloud Pak for Data management consoles. The password must be a minimum of 32 characters long and contain only lower and uppercase characters, numbers and dashes.
+    NoEcho: true
+    AllowedPattern: '^([a-zA-Z0-9\-]{32,})$'
+    ConstraintDescription: >-
+      The password must be a minimum of 32 characters long and contain only lower and uppercase characters, numbers and dashes.
+    Type: String
+
+  AdminUser:
+    Description: >-
+      The IBM Cloud Pak administrator (super user) name. Only admin is supported as username for IBM ICP for Data.
+    Type: String
+    Default: admin
+    AllowedValues:
+      - admin
+
+  ApplicationStorageMountPoint:
+    Description: >-
+      Mount point for the EFS volume to be used for application shared storage. The Kubernetes EFS provisioner uses this mount point.
+    Type: String
+    Default: /mnt/storage
+
+  AppSubdomainPrefix:
+    Description: >-
+      The subdomain for application DNS names.  If a VPCSubdomainPrefix is defined, a wildcard entry is put in Route53 that looks like: *.AppSubdomainPrefix.VPCSubdomainPrefix.VPCDomain. If the VPCSubdomainPrefix is empty, then the wildcard entry in Route53 looks like: *.AppSubdomainPrefix.VPCDomain.
+    Type: String
+    Default: apps
+
+  AvailabilityZoneCount:
+    Description: >-
+      The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to 2 Availability Zones.  For a single ICP cluster to be highly available, 3 Availability Zones are needed to avoid a single point of failure when using 3, 5 or 7 master nodes or etcd nodes.  With less than 3 Availability Zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority of the etcd instances.
+    Type: Number
+    Default: 1
+    # For now, only 1 or 3 AZs can be used.
+    AllowedValues:
+      - 1
+      - 3
+
+  AvailabilityZones:
+    Description: >-
+      List of Availability Zones to use for the subnets in the VPC. One or three Availability Zones are used for this deployment, and the logical order of your selections is preserved.
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+
+  BootNodeInstanceType:
+    Description: The EC2 instance type of the IBM Cloud Pak boot node.
+    Type: String
+    Default: m5.xlarge
+    AllowedValues:
+      - m5.xlarge
+      - m5.2xlarge
+      - m5d.large
+      - m5d.xlarge
+      - m5d.2xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  ClusterCIDR:
+    Description: >-
+      The CIDR for the ICPD cluster overlay network.  This gets assigned to the network_cidr attribute in the IBM Cloud Pak for Data installation config.yaml. The value provided must be a network that does not overlap with the AWS VPC network (VPCCIDR).  It also must not overlap with the IBM Cloud Pak for Data cluster service overlay network defined by the ServiceCIDR.
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    Default: 192.168.0.0/16
+    AllowedPattern: >-
+      ((\d{1,3})\.){3}\d{1,3}/\d{1,2}
+    ConstraintDescription: >-
+      Must be a valid IP CIDR range of the form x.x.x.x/x.
+
+  # WARNING: A defect in ICP 3.1.0 causes MongoDB to fail to start if the
+  # ClusterDomain is anything other than cluster.local.
+  # Should be corrected in ICP 3.1.0 fixpack
+  ClusterDomain:
+    Description: >-
+      The network domain of the IBM Cloud Pak for Data cluster overlay network. WARNING: Due to a known issue in IBM Cloud Pak version 3.1.0, the ClusterDomain value must be cluster.local.
+    Type: String
+    Default: cluster.local
+
+  ClusterName:
+    Description: >-
+      The name of the cluster. The cluster name is combined with the VPC subdomain prefix (VPCSubdomainPrefix), if present, and the VPC domain (VPCDomain) to form the cluster DNS name (ClusterDNSName). An alias record is created in Route53 that maps the ClusterDNSName to the master node load balancer DNS name.
+    Type: String
+    Default: mycluster
+
+  ClusterPKIBucketName:
+    Description: >-
+      (Optional) The S3 bucket where the cluster PKI artifacts are located. If not provided, self-signed PKI artifacts will be created and used.
+    Type: String
+    Default: ''
+
+  ClusterPKIRootPath:
+    Description: >-
+      (Optional) The path in the cluster PKI S3 bucket where the user defined PKI key and certificate files are found.  This is the key and certificate to be used for the master node identity.  The CN of the key and certificate must be the same value that is provided in combination of the ClusterName, VPCSubdomainPrefix (if provided) and the VPCDomain. The extensions on the root path are assumed to be .key and .crt to get the key and certificate files respectively. DO NOT provide a leading / on the path value. If not provided, self-signed PKI artifacts will be created and used.
+    Type: String
+    Default: ''
+
+  CustomArtifactsPath:
+    Description: >-
+      (Optional) The path to the .zip archive in the IBM Cloud Pak for Data script bucket (QSS3BucketName) for an archive of additional artifacts, typically scripts, for IBM Cloud Pak cluster administration extracted on the boot node in the root home directory.
+    Type: String
+    Default: ''
+
+  EBSVolumeType:
+    Description: >-
+      The type of EBS volume to use for the cluster member EC2 instances. The gp2 volume type is less expensive and performs reasonably well. The io1 volume type supports the specification of the disk IOPS.  For high performance requirements, use io1 with 8000 or more IOPS. See the StorageIOPS parameter to specify the IOPS of an io1 storage device.
+    Type: String
+    Default: gp2
+    AllowedValues:
+      - io1
+      - gp2
+
+  ExcludedMgmtServices:
+    Description: >-
+      Comma separated list of management services to be excluded from the IBM Cloud Pak for Data deployment.  Services that may be excluded are: service-catalog, metering, monitoring, istio, vulnerability-advisor, custom-metrics-adapter.  Do not include vulnerability-advisor in this list if you choose to deploy Vulnerability Advisor.
+    Type: String
+    Default:
+      "istio,vulnerability-advisor,custom-metrics-adapter"
+
+  ExternalApplicationLocation:
+    Description: >-
+      The IP address CIDR for IP addresses permitted to access the IBM Cloud Pak for Data proxy nodes on ports 80 and 443. All deployed workloads are accessed through proxy nodes. The value `0.0.0.0/0` permits all IP addresses to access the proxy nodes. Additional values can be added post-deployment from the AWS CloudFormation console.
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    AllowedPattern: >-
+      ((\d{1,3})\.){3}\d{1,3}/\d{1,2}
+    ConstraintDescription: >-
+      Must be a valid IP CIDR range of the form x.x.x.x/x.
+
+  ExternalICPAdminLocation:
+    Description: >-
+      The IP address CIDR for IP addresses permitted to access the IBM Cloud Pak for Data master nodes on the access ports (8001, 8080, 8443, 8500, 8600, 9443, 31843). The CIDR provided is intended to allow access for IBM Cloud Pak for Data administrators. Additional values can be added post-deployment from the AWS CloudFormation console.
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    AllowedPattern: >-
+      ((\d{1,3})\.){3}\d{1,3}/\d{1,2}
+    ConstraintDescription: >-
+      Must be a valid IP CIDR range of the form x.x.x.x/x.
+
+  ExternalSSHLocation:
+    Description: >-
+      The network CIDR for IP addresses that can be used to SSH to the boot node. In single user test situations, this can be a /32 CIDR. The CIDR provided is intended to allow access for IBM Cloud Pak for Data administrators. Additional values can be added post-deployment from the AWS CloudFormation console.
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    AllowedPattern: >-
+      ((\d{1,3})\.){3}\d{1,3}/\d{1,2}
+    ConstraintDescription: >-
+      Must be a valid IP CIDR range of the form x.x.x.x/x.
+
+  HostedZoneId:
+    Description: >-
+      (Optional) If an existing DNS hosted zone is to be used, then the hosted zone ID needs to be specified with this parameter.  Leave it empty if a DNS hosted zone is to be created as part of the deployment.
+    Type: String
+    Default: ''
+
+  ICPDeploymentLogsBucketName:
+    Description: >-
+      The name of the S3 bucket where IBM Cloud Pak for Data stack deployment logs are to be exported. The deployment logs provide a record of the boot strap scripting actions and are useful for problem determination if the deployment fails in some way.
+    Type: String
+
+  ICPDVersion:
+    Description: >-
+      The version of IBM Cloud Pak for Data to be deployed.  The full version must be provided, e.g., 1.2.1.
+    Type: String
+    AllowedValues:
+      - 2.1.0.1
+    Default: 2.1.0.1
+
+  InceptionTimeout:
+    Description: >-
+      The number of seconds to wait for the IBM Cloud Pak for Data inception container to complete the installation. An IBM Cloud Pak for Data non-high availability (HA) deployment takes around 3 hours, and an HA deployment takes around 4 hours to complete. The InceptionTimeout should be equal to or smaller than the InstallationTimeout.
+    Type: Number
+    Default: 10000
+
+  InstallationTimeout:
+    Description: >-
+      The timeout (in seconds) associated with the installation and configuration of the IBM Cloud Pak for Data cluster, from start to finish. The InstallationTimeout must be equal to or greater than the InceptionTimeout. The InstallationTimeout needs to be sufficient to allow the bootstrap installation script to complete. See InceptionTimeout for guidance on expected installation time.
+    Type: Number
+    Default: 18000
+
+  KeyFilePath:
+    Description: >-
+      (Optional) The path to a file in the IBM Cloud Pak for Data script bucket (`QSS3BucketName`) with public keys for administrators who need SSH access to the boot node. The public keys in the file in Amazon S3 at the KeyFilePath are copied to the `authorized_keys` file of the `ubuntu` user on the boot node.
+    Type: String
+    Default: ''
+
+  KeyName:
+    Description: >-
+      Name of an existing EC2 key pair to enable SSH access to the boot node. The private half of this key pair is used by the deployer to deploy the IBM Cloud Pak for Data cluster. This key is configured for SSH access to the boot node. Anyone who is a deployer needs to create an EC2 key pair in the region in which the IBM Cloud Pak for Data cluster is to be deployed. The key name must be the name of an existing EC2 key pair that is defined in the region where the deployment is to occur.
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: Must be the name of an existing EC2 KeyPair.
+  
+  LicenseAgreement:
+    Description: >-
+      I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/Bd2QDA).
+    Type: String
+    Default: '-'
+    AllowedValues:
+      - I agree
+      - '-'
+    ConstraintDescription: must answer 'I agree'
+
+  ManagementNodeCount:
+    Description: >-
+      Number of management nodes to be deployed in the ICPD cluster. For a dev deployment 1 is sufficient. For production deployments, at least 2 and typically 3 are deployed.  The management nodes run the resource and log monitoring components, e.g., Prometheus, Grafana and the ELK stack.
+    Type: Number
+    Default: 1
+
+  ManagementNodeInstanceType:
+    Description: The EC2 instance type of the IBM Cloud Pak for Data management node.
+    Type: String
+    Default: m5.2xlarge
+    AllowedValues:
+      - m5.xlarge
+      - m5.2xlarge
+      - m5d.xlarge
+      - m5d.2xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  MasterNodeCount:
+    Description: >-
+      Number of master nodes to be deployed in the ICPD cluster. Must be an odd number. For a development deployment 1 is sufficient; for production deployments 3. Currently, the master node count can only be 1 or 3.
+    Type: Number
+    AllowedValues:
+      - 1
+      - 3
+    Default: 1
+
+  MasterNodeInstanceType:
+    Description: The EC2 instance type of the IBM Cloud Pak for Data master node.
+    Type: String
+    Default: m5.2xlarge
+    AllowedValues:
+      - m5.xlarge
+      - m5.2xlarge
+      - m5d.xlarge
+      - m5d.2xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  PrivateSubnetCIDR:
+    Description: >-
+      The CIDR block to be used for the private subnets. The PrivateSubnetCIDR must be within the network defined by the VPCCIDR and not overlap with the PublicSubnetCIDR.
+    Type: String
+    Default: 10.10.10.0/20
+
+  PrivateSubnets:
+    Description: >-
+      A list of CIDR blocks to be used for the private subnets defined in 1 or 3 Availability Zones.  If there is only 1 Availability Zone, then the subnet can be the same as the PrivateSubnetCIDR.  The private subnets cannot overlap and must be within the PrivateSubnetCIDR. The parameter type is declared String; however, it is intended to be a comma-delimited list. For example, for three Availability Zones: 10.10.10.0/24, 10.10.11.0/24, 10.10.12.0/24.
+    Type: String
+    Default: 10.10.10.0/24
+
+  ProxyNodeCount:
+    Description: >-
+      Number of Proxy nodes to be deployed in the ICPD cluster. For a dev deployment 1 is sufficient. For production deployments, at least 2 and typically 3 are deployed.
+    Type: Number
+    Default: 1
+
+  ProxyNodeInstanceType:
+    Description: The EC2 instance type of the IBM Cloud Pak for Data proxy node.
+    Type: String
+    Default: m5.xlarge
+    AllowedValues:
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5d.large
+      - m5d.xlarge
+      - m5d.2xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  PublicSubnetCIDR:
+    Description: >-
+      CIDR block used for the public subnets.  The PublicSubnetCIDR is used for defining public subnet security groups.  The PublicSubnetCIDR must be within the network defined by the VPCCIDR and not overlap with the PrivateSubnetCIDR.
+    Type: String
+    Default: 10.10.20.0/22
+
+  PublicSubnets:
+    Description: >-
+      List of CIDRs to be used for 1 or 3 public subnets of the VPC. The number of CIDRs provided must equal the number of Availability Zones (AvailabilityZoneCount). The public subnets cannot overlap and must be within the network defined by the PublicSubnetCIDR.  The parameter type is declared String; however, it is intended to be a comma-delimited list. For example, for three Availability Zones: 10.10.20.0/24, 10.10.21.0/24, 10.10.22.0/24.
+    Type: String
+    Default: 10.10.20.0/24
+
+  QSS3BucketName:
+    AllowedPattern: '^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$'
+    ConstraintDescription: >-
+      Quick Start bucket name can include numbers, lowercase letters, uppercase
+      letters, and hyphens (-). It cannot start or end with a hyphen (-).
+    Default: aws-quickstart
+    Description: >-
+      S3 bucket name for the Quick Start assets. This bucket name can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-), but should
+      not start or end with a hyphen. You can specify your own bucket if you
+      copy all of the assets and submodules into it, if you want to override the
+      Quick Start behavior for your specific implementation.
+    Type: String
+
+  QSS3KeyPrefix:
+    AllowedPattern: '^[0-9a-zA-Z-/]*$'
+    ConstraintDescription: >-
+      Quick Start key prefix can include numbers, lowercase letters, uppercase
+      letters, hyphens (-), and forward slash (/).
+    Default: quickstart-ibm-icp-for-data/
+    Description: >-
+      S3 key prefix for the Quick Start assets. Quick Start key prefix can
+      include numbers, lowercase letters, uppercase letters, hyphens (-), and
+      forward slash (/).
+    Type: String
+
+  ResourceOwner:
+    Description: >-
+      The value for the owner tag for the deployed resources associated with the stacks.
+    Type: String
+    Default: ICP-Quickstart
+
+  ServiceCIDR:
+    Description: >-
+      The CIDR for the ICPD service overlay network.  This gets assigned to the service_cluster_ip_range attribute in IBM Cloud Pak for Data config.yaml.  The value provided must be a network that does not overlap with the AWS VPC network (VPCCIDR).  It also must not overlap with the ICPD cluster overlay network (network_cidr) defined in the ClusterCIDR.
+    Type: String
+    MinLength: 9
+    MaxLength: 18
+    Default: 172.16.0.0/24
+    AllowedPattern: >-
+      ((\d{1,3})\.){3}\d{1,3}/\d{1,2}
+    ConstraintDescription: >-
+      Must be a valid IP CIDR range of the form x.x.x.x/x.
+
+  StorageIOPS:
+    Description: >-
+      The maximum number of read and write operations per second for the EBS storage devices provisioned to the IBM Cloud Pak for Data cluster member EC2 instances. The io1 storage volume type supports an explicit setting of the IOPS of the device. See the EBSVolumeType parameter to specify the storage volume type. This parameter is ignored if the EBSVolumeType is set to gp2.
+    Type: Number
+    Default: 8000
+
+  VPCCIDR:
+    Description: >-
+      The VPC CIDR block. Must be in the form x.x.x.x/16-28.
+    Type: String
+    # TBD: The regex in the QuickStart sample template seems to be broken
+    # 10.0.0.0/16 fails the QuickStart sample regex.
+    AllowedPattern: >-
+      ((\d{1,3})\.){3}\d{1,3}/\d{1,2}
+    ConstraintDescription: >-
+      CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.10.0.0/16
+
+  VPCDomain:
+    Description: >-
+      The network domain of the VPC. The VPCDomain is used when defining the hosted zone. If an existing hosted zone is to be used, you must provide the hosted zone ID in the HostedZoneId parameter. Otherwise, a new hosted zone will be created. If a subdomain is to be created, then you must provide a VPCSubdomainPrefix. When a VPCSubdomainPrefix parameter is provided, it is combined with the VPCDomain to form the full network domain name. The ClusterName parameter is combined with the VPC subdomain, if provided, and the VPC domain name to form the ClusterDNSName; which is used in the IBM Cloud Pak configuration for the cluster_CA_domain parameter in the config.yaml file. Note: If PKI certificates are provided for the deployment, the CN used for creating the certificates must match the value of the ClusterName is combined with the VPCSubdomainPrefix (if provided), and the VPCDomain.) A dot character separates each component of the CN.
+    Type: String
+
+  VPCName:
+    Description: The name of the deployed Virtual Private Cloud.
+    Type: String
+    Default: IBMCloudPrivateVPC
+
+  VPCSubdomainPrefix:
+    Description: >-
+      (Optional) If a subdomain is to be created as part of the deployment, then provide the subdomain prefix with this parameter.  Otherwise, the full domain is assumed to be provided as the value of the VPCDomain parameter. If a non-empty value is provided in the VPCSubdomainPrefix, a subdomain is created and the full domain used for the deployment is the VPCSubdomainPrefix combined with the VPCDomain.
+    Type: String
+    Default: ''
+
+  VulnerabilityAdvisorNodeCount:
+    Description: >-
+      Number of Vulnerability Advisor nodes to be deployed in the ICPD cluster. Not typically deployed for a development environment. For production deployments, typically 3 are deployed. VA uses zookeeper which requires an odd number of instances for consistency voting purposes. The VA nodes run the resource image and container security scanning components.
+    Type: Number
+    AllowedValues:
+      - 0
+      - 1
+      - 3
+    Default: 0
+
+  VulnerabilityAdvisorNodeInstanceType:
+    Description: The EC2 instance type of the IBM Cloud Pak for Data Vulnerability Advisor node.
+    Type: String
+    Default: m5.2xlarge
+    AllowedValues:
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5d.2xlarge
+      - m5d.4xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  WhichClusterLBAddress:
+    Description: >-
+      The value to use for the cluster load balancer address.  This value is used to drive the logic in the bootstrap script.
+    Type: String
+    AllowedValues:
+      - UseMasterELBAddress
+      - UseMasterELBName
+      - UseClusterName
+    Default: UseClusterName
+
+  WhichProxyLBAddress:
+    Description: >-
+      Selector for the value to use for the proxy load balancer address.  This value is used to drive scripting logic in the bootstrap script.
+    Type: String
+    AllowedValues:
+      - UseProxyELBAddress
+      - UseProxyELBName
+      - UsePrimaryAppDomain
+    Default: UseProxyELBName
+
+  WorkerNodeCount:
+    Description: >-
+      Number of worker nodes (desired capacity) to be deployed in the ICPD cluster.Minimum of 3 nodes required.
+    Type: Number
+    Default: 3
+
+  WorkerNodeInstanceType:
+    Description: The EC2 instance type of the IBM Cloud Pak for Data worker node.
+    Type: String
+    Default: m5.4xlarge
+    AllowedValues:
+      - m5.4xlarge
+      - m5.12xlarge
+      - m5.24xlarge
+      - m5a.4xlarge
+      - m5a.12xlarge
+      - m5a.24xlarge
+      - c5.4xlarge
+      - c5.12xlarge
+      - c5.18xlarge
+      - c5.24xlarge
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+Mappings:
+  # See https://cloud-images.ubuntu.com/locator/ec2/
+  # Builds needed that support HVM, Elastic Network Adapter (ENA)
+  # in order to use the MD5 instance types.
+  # Use EBS backed storage as opposed to "instance-store", e.g., hvm:ebs-ssd
+  # As of 20 JAN 2019 all Ubuntu images are release: 20190122.1
+  AWSRegionAMIEC2:
+    ap-northeast-1:
+      Ubuntu16: ami-04afce36be5236d87
+    ap-northeast-2:
+      Ubuntu16: ami-07293f39d3a08de15
+    ap-northeast-3:
+      Ubuntu16: ami-0188b2d037ee29ff6
+    ap-south-1:
+      Ubuntu16: ami-00fce1780262edd51
+    ap-southeast-1:
+      Ubuntu16: ami-07c1483ef8c3dfece
+    ap-southeast-2:
+      Ubuntu16: ami-04382b669b79925fb
+    ca-central-1:
+      Ubuntu16: ami-01dc5f3365131b133
+    eu-central-1:
+      Ubuntu16: ami-0602105b1a2ed9449
+    eu-north-1:
+      Ubuntu16: ami-13d75e6d
+    eu-west-1:
+      Ubuntu16: ami-00182431c78dff2fa
+    eu-west-2:
+      Ubuntu16: ami-095ed825090131933
+    eu-west-3:
+      Ubuntu16: ami-0edefbe5e8f36e2fe
+    sa-east-1:
+      Ubuntu16: ami-00514f4d33197006b
+    us-east-1:
+      Ubuntu16: ami-09677e0a6b14905b0
+    us-east-2:
+      Ubuntu16: ami-0e2a10a0edd037f7e
+    us-west-1:
+      Ubuntu16: ami-0c67212f0e9b7b73b
+    us-west-2:
+      Ubuntu16: ami-042b1570ee0c84f5a
+
+  AWSRegionS3Bucket:
+    ap-northeast-1:
+      ICPArchiveBucket: ibm-cloud-private-ap-northeast-1
+      ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-1
+    ap-northeast-2:
+      ICPArchiveBucket: ibm-cloud-private-ap-northeast-2
+      ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-2
+    ap-northeast-3:
+      ICPArchiveBucket: ibm-cloud-private-ap-northeast-3
+      ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-3
+    ap-south-1:
+      ICPArchiveBucket: ibm-cloud-private-ap-south-1
+      ICPDArchiveBucket: ibm-cloud-private-data-ap-south-1
+    ap-southeast-1:
+      ICPArchiveBucket: ibm-cloud-private-ap-southeast-1
+      ICPDArchiveBucket: ibm-cloud-private-data-ap-southeast-1
+    ap-southeast-2:
+      ICPArchiveBucket: ibm-cloud-private-ap-southeast-2
+      ICPDArchiveBucket: ibm-cloud-private-data-ap-southeast-2
+    ca-central-1:
+      ICPArchiveBucket: ibm-cloud-private-ca-central-1
+      ICPDArchiveBucket: ibm-cloud-private-data-ca-central-1
+    eu-central-1:
+      ICPArchiveBucket: ibm-cloud-private-eu-central-1
+      ICPDArchiveBucket: ibm-cloud-private-data-eu-central-1
+    eu-north-1:
+      ICPArchiveBucket: ibm-cloud-private-eu-north-1
+      ICPDArchiveBucket: ibm-cloud-private-data-eu-north-1
+    eu-west-1:
+      ICPArchiveBucket: ibm-cloud-private-eu-west-1
+      ICPDArchiveBucket: ibm-cloud-private-data-eu-west-1
+    eu-west-2:
+      ICPArchiveBucket: ibm-cloud-private-eu-west-2
+      ICPDArchiveBucket: ibm-cloud-private-data-eu-west-2
+    eu-west-3:
+      ICPArchiveBucket: ibm-cloud-private-eu-west-3
+      ICPDArchiveBucket: ibm-cloud-private-data-eu-west-3
+    sa-east-1:
+      ICPArchiveBucket: ibm-cloud-private-sa-east-1
+      ICPDArchiveBucket: ibm-cloud-private-data-sa-east-1
+    us-east-1:
+      ICPArchiveBucket: ibm-cloud-private-us-east-1
+      ICPDArchiveBucket: ibm-cloud-private-data-us-east-1
+    us-east-2:
+      ICPArchiveBucket: ibm-cloud-private-us-east-2
+      ICPDArchiveBucket: ibm-cloud-private-data-us-east-2
+    us-west-1:
+      ICPArchiveBucket: ibm-cloud-private-us-west-1
+      ICPDArchiveBucket: ibm-cloud-private-data-us-west-1
+    us-west-2:
+      ICPArchiveBucket: ibm-cloud-private-us-west-2
+      ICPDArchiveBucket: ibm-cloud-private-data-us-west-2
+
+  ScriptPackageMap:
+    boot-node:
+      ScriptPackagePath: submodules/quickstart-ibm-cloud-private/scripts/aws-icp-bootstrap.zip
+    boot-node-icpd:
+      ScriptPackagePath: scripts/aws-icpd-bootstrap.zip  
+    cluster-node:
+      ScriptPackagePath: scripts/aws-icp-nodeinit.zip
+
+  ICPDtoICPVersionMap:
+    2.1.0.1:
+      ICP: 3.1.2  
+
+Rules:
+  EFSSupportedRegionRule:
+    Assertions:
+    - Assert:
+        Fn::Contains:
+        - - ap-northeast-1
+          - ap-northeast-2
+          - ap-southeast-1
+          - ap-southeast-2
+          - eu-central-1
+          - eu-west-1
+          - eu-west-2
+          - us-east-1
+          - us-east-2
+          - us-west-1
+          - us-west-2
+        - !Ref AWS::Region
+      AssertDescription: This Quick Start utilizes Amazon EFS which is not available in your chosen region. Please launch the stack in a region where EFS is available. Visit https://aws.amazon.com/about-aws/global-infrastructure/regional-product-services/ to check Amazon EFS service availability by region.
+
+  LicenseAgreementRule:
+    Assertions:
+    - Assert:
+        Fn::Contains:
+        - - I agree
+        - Ref: LicenseAgreement
+      AssertDescription: User must agree to the terms of the license agreement. 
+
+  AddonsNodeRequirementRule:
+    Assertions:
+    - Assert: !Or
+        - !Not [!Contains [['1','2','3'],!Ref WorkerNodeCount]]
+        - !Not [!Contains [["DSX_Premium, Db2_Warehouse","DSX_Premium, Data_Virtualization","DSX_Premium, Data_Virtualization, Db2_Warehouse", "Data_Virtualization, Db2_Warehouse"],!Ref Addons]]
+        - !Not [!Contains [["c5.4xlarge", "m5a.4xlarge", "m5.4xlarge"],!Ref WorkerNodeInstanceType]]
+      AssertDescription: Worker node count should be more than 3 for selected Addon deployment  
+
+  AddonsNodeRequirementRule2:
+    Assertions:
+    - Assert: !Or
+        - !Not [!Contains [['1','2'],!Ref WorkerNodeCount]]
+        - !Not [!Contains [["DSX_Premium, Db2_Warehouse","DSX_Premium, Data_Virtualization","DSX_Premium, Data_Virtualization, Db2_Warehouse", "Data_Virtualization, Db2_Warehouse"],!Ref Addons]]
+        - !Contains [["c5.4xlarge", "m5a.4xlarge", "m5.4xlarge"],!Ref WorkerNodeInstanceType]
+      AssertDescription: Worker node count should be more than 2 for selected Addon deployment
+
+  WorkerNodeCountRule:
+    Assertions:
+    - Assert: !Or
+        - !Not [!Contains [['1','2'],!Ref WorkerNodeCount]]
+        - !Not [!Contains [["c5.4xlarge", "m5a.4xlarge", "m5.4xlarge"],!Ref WorkerNodeInstanceType]]
+      AssertDescription: Worker node count should be 3 or more for the selected Instance Type     
+         
+Conditions:
+  EmptyHostedZoneId: !Equals [!Ref HostedZoneId, '']
+
+  SetupSubdomain: !And
+    - !Not [!Equals [!Ref VPCSubdomainPrefix, '']]
+    - !Not [!Equals [!Ref HostedZoneId, '']]
+
+  EmptySubdomainPrefix: !Equals [!Ref VPCSubdomainPrefix, '']
+  3MastersCondition: !Equals [!Ref MasterNodeCount, 3]
+  
+
+Resources:
+
+  IBMCloudPrivateVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VPCCIDR
+      InstanceTenancy: default
+      # Enabling DNS is required to resolve host names.
+      # The VPC DNS will include all hosts in its CidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Ref VPCName
+        - Key: Owner
+          Value: !Ref ResourceOwner
+        - Key: !Sub kubernetes.io/cluster/${AWS::StackName}
+          Value: !Ref AWS::StackName
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: InternetGateway
+        - Key: Owner
+          Value: !Ref ResourceOwner
+        - Key: !Sub kubernetes.io/cluster/${AWS::StackName}
+          Value: !Ref AWS::StackName
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref IBMCloudPrivateVPC
+      InternetGatewayId: !Ref InternetGateway
+
+  # When the VPCs attribute has a value, the HostedZone is private.
+  # This resource does not get created if a HostedZoneId is provided at launch.
+  VPCHostedZone:
+    Condition: EmptyHostedZoneId
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: >-
+          Private hosted zone for use by the deployed IBM Cloud Pak for Data cluster.
+      Name: !If
+        - EmptySubdomainPrefix
+        - !Ref VPCDomain
+        - !Sub ${VPCSubdomainPrefix}.${VPCDomain}
+      VPCs:
+        - VPCId: !Ref IBMCloudPrivateVPC
+          VPCRegion: !Ref AWS::Region
+      HostedZoneTags:
+        - Key: Owner
+          Value: !Ref ResourceOwner
+
+  # The VPCSubdomianHostedZone gets created if a HostedZoneId is provided
+  # and a VPCSubdomainPrefix is provided.
+  VPCSubdomainHostedZone:
+    Condition: SetupSubdomain
+    Type: AWS::Route53::HostedZone
+    Properties:
+      HostedZoneConfig:
+        Comment: >-
+          Sub-domain hosted zone for use by the deployed IBM Cloud Pak for Data cluster.
+      Name: !Sub ${VPCSubdomainPrefix}.${VPCDomain}
+
+
+  # Subdomain name server records
+  VPCSubdomainNS:
+    Condition: SetupSubdomain
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Sub ${VPCSubdomainPrefix}.${VPCDomain}
+      ResourceRecords: !GetAtt VPCSubdomainHostedZone.NameServers
+      Type: NS
+      # TTL is of type String.  Go figure.
+      TTL: "600"
+
+
+  # If a HostedZoneId is not provided, the ClusterDNSEntries are placed
+  # in the VPCHostedZone that gets created as part of this deployment.
+  # If a HostZoneId *is* provided but a VPCSubdomainPrefix was not provided,
+  # then the ClusterDNSEntries are placed in the hosted zone referenced by
+  # the HostedZoneId. If a HostedZoneId and a VPCSubdomainPrefix is provided,
+  # then the ClusterDNSEntries are placed in the subdomain hosted zone created
+  # as part of this deployment.
+  ClusterDNSEntries:
+    Type: AWS::Route53::RecordSetGroup
+    Properties:
+      Comment: DNS entries for the deployed ICP cluster
+      HostedZoneId: !If
+        - EmptyHostedZoneId
+        - !Ref VPCHostedZone
+        - !If [EmptySubdomainPrefix,!Ref HostedZoneId,!Ref VPCSubdomainHostedZone]
+      RecordSets:
+        # DNS entry to map ICP cluster DNS name
+        # to the master node ELB public DNS name.
+        - Name: !If
+          - EmptySubdomainPrefix
+          - !Join ['.', [!Ref ClusterName, !Ref VPCDomain]]
+          - !Join ['.', [!Ref ClusterName, !Ref VPCSubdomainPrefix, !Ref VPCDomain]]
+          AliasTarget:
+            DNSName: !GetAtt ClusterMembersStack.Outputs.MasterNodeLoadBalancerDNSName
+            HostedZoneId: !GetAtt ClusterMembersStack.Outputs.MasterNodeLoadBalancerHostedZoneID
+          Type: A
+
+        # Wildcard application domain DNS entry
+        - Name: !If
+          - EmptySubdomainPrefix
+          - !Join ['.', ['*', !Ref AppSubdomainPrefix, !Ref VPCDomain]]
+          - !Join ['.', ['*', !Ref AppSubdomainPrefix, !Ref VPCSubdomainPrefix, !Ref VPCDomain]]
+          AliasTarget:
+            DNSName: !GetAtt ClusterMembersStack.Outputs.ProxyNodeLoadBalancerDNSName
+            HostedZoneId: !GetAtt ClusterMembersStack.Outputs.ProxyNodeLoadBalancerHostedZoneID
+          Type: A
+
+        # Application domain DNS entry
+        - Name: !If
+          - EmptySubdomainPrefix
+          - !Join ['.', [!Ref AppSubdomainPrefix, !Ref VPCDomain]]
+          - !Join ['.', [!Ref AppSubdomainPrefix, !Ref VPCSubdomainPrefix, !Ref VPCDomain]]
+          AliasTarget:
+            DNSName: !GetAtt ClusterMembersStack.Outputs.ProxyNodeLoadBalancerDNSName
+            HostedZoneId: !GetAtt ClusterMembersStack.Outputs.ProxyNodeLoadBalancerHostedZoneID
+          Type: A
+
+
+  PublicSubnetStack:
+    Type: AWS::CloudFormation::Stack
+    # The public subnet route defined in this stack depends on the
+    # InternetGatewayAttachment being defined.
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      TemplateURL: !Sub
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/quickstart-ibm-cloud-private/templates/icp-public-subnets.yaml
+        - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
+      Parameters:
+        AvailabilityZoneCount: !Ref AvailabilityZoneCount
+        AvailabilityZones: !Join [',', !Ref AvailabilityZones]
+        IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
+        InternetGateway: !Ref InternetGateway
+        PublicSubnets: !Ref PublicSubnets
+        ResourceOwner: !Ref ResourceOwner
+        RootStackName: !Ref AWS::StackName
+
+
+  PrivateSubnetStack:
+    DependsOn: InternetGatewayAttachment
+    # The NAT EIPs and NAT gateways defined in this stack depend on the
+    # InternetGatewayAttachment being defined.
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/quickstart-ibm-cloud-private/templates/icp-private-subnets.yaml
+        - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
+      Parameters:
+        AvailabilityZoneCount: !Ref AvailabilityZoneCount
+        AvailabilityZones: !Join [',', !Ref AvailabilityZones]
+        IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
+        PublicSubnetIds: !GetAtt PublicSubnetStack.Outputs.PublicSubnetIds
+        PrivateSubnets: !Ref PrivateSubnets
+        ResourceOwner: !Ref ResourceOwner
+        RootStackName: !Ref AWS::StackName
+
+
+  IAMResources:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/quickstart-ibm-cloud-private/templates/ibm-cloud-private-iam-security.yaml
+        - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
+      Parameters:
+        ClusterPKIBucketName: !Ref ClusterPKIBucketName
+        ExternalApplicationLocation: !Ref ExternalApplicationLocation
+        ExternalICPAdminLocation: !Ref ExternalICPAdminLocation
+        ExternalSSHLocation: !Ref ExternalSSHLocation
+        IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
+        ICPArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPArchiveBucket]
+        ICPScriptBucketName: !Ref QSS3BucketName
+        ICPDeploymentLogsBucketName: !Ref ICPDeploymentLogsBucketName
+        PrivateSubnetCIDR: !Ref PrivateSubnetCIDR
+        PublicSubnetCIDR: !Ref PublicSubnetCIDR
+        ResourceOwner: !Ref ResourceOwner
+
+
+  IAMResourcesUpdate:
+    DependsOn: IAMResources
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}templates/icp-for-data-iam-security.yaml
+        - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
+      Parameters:
+        BootNodeRole: !GetAtt IAMResources.Outputs.BootNodeRole
+        ExternalICPAdminLocation: !Ref ExternalICPAdminLocation
+        ICPDArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPDArchiveBucket]
+        ICPDScriptBucketName: !Ref QSS3BucketName
+        ICPMasterSecurityGroup: !GetAtt IAMResources.Outputs.ICPMasterSecurityGroup
+        ICPNodeRole: !GetAtt IAMResources.Outputs.ICPNodeRole
+
+
+  ClusterSharedStorage:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/quickstart-ibm-cloud-private/templates/ibm-cloud-private-shared-storage.yaml
+        - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
+      Parameters:
+        AvailabilityZoneCount: !Ref AvailabilityZoneCount
+        PrivateSubnetIds: !GetAtt PrivateSubnetStack.Outputs.PrivateSubnetIds
+        PrivateSubnetCIDR: !Ref PrivateSubnetCIDR
+        IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
+        ResourceOwner: !Ref ResourceOwner
+
+
+  BootNodeStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}templates/ibm-icp-for-data-boot.yaml
+        - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
+      Parameters:
+        AMIImageId: !FindInMap [AWSRegionAMIEC2, !Ref "AWS::Region", Ubuntu16]
+        Addons: !Ref Addons #!Join [',', !Ref Addons]
+        AdminPassword: !Ref AdminPassword
+        AdminUser: !Ref AdminUser
+        ApplicationStorageMountPoint: !Ref ApplicationStorageMountPoint
+        BootNodeInstanceType: !Ref BootNodeInstanceType
+        BootNodeProfile: !GetAtt IAMResources.Outputs.BootNodeProfile
+        BootNodeRole: !GetAtt IAMResourcesUpdate.Outputs.BootNodeRole
+        ClusterCIDR: !Ref ClusterCIDR
+        ClusterDNSName: !If
+          - EmptySubdomainPrefix
+          - !Join ['.', [!Ref ClusterName, !Ref VPCDomain]]
+          - !Join ['.', [!Ref ClusterName, !Ref VPCSubdomainPrefix, !Ref VPCDomain]]
+        ClusterDomain: !Ref ClusterDomain
+        ClusterName: !Ref ClusterName
+        ClusterPKIBucketName: !Ref ClusterPKIBucketName
+        ClusterPKIRootPath: !Ref ClusterPKIRootPath
+        CustomArtifactsPath: !Ref CustomArtifactsPath
+        EBSVolumeType: !Ref EBSVolumeType
+        EFSDNSName: !GetAtt ClusterSharedStorage.Outputs.EFSDNSName
+        EFSFileSystemId: !GetAtt ClusterSharedStorage.Outputs.EFSFileSystemId
+        ExcludedMgmtServices: !Ref ExcludedMgmtServices
+        ExternalSSHSecurityGroup: !GetAtt IAMResources.Outputs.ExternalSSHSecurityGroup
+        IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
+        ICPArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPArchiveBucket]
+        ICPDArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPDArchiveBucket]
+        ICPBootNodeScriptPackagePath: !FindInMap [ScriptPackageMap, boot-node, ScriptPackagePath]
+        ICPDBootNodeScriptPackagePath: !FindInMap [ScriptPackageMap, boot-node-icpd, ScriptPackagePath]
+        ICPDeploymentLogsBucketName: !Ref ICPDeploymentLogsBucketName
+        ICPDInstallationCompletedURL: !Ref ICPDInstallationCompletedHandle
+        ICPS3KeyPrefix: !Ref QSS3KeyPrefix
+        ICPScriptBucketName: !Ref QSS3BucketName
+        ICPDVersion: !Ref ICPDVersion
+        ICPVersion: !FindInMap [ICPDtoICPVersionMap, !Ref ICPDVersion, ICP]
+        InceptionTimeout: !Ref InceptionTimeout
+        InstallationCompletedURL: !Ref InstallationCompletedHandle
+        KeyFilePath: !Ref KeyFilePath
+        KeyName: !Ref KeyName
+        MasterNodeCount: !Ref MasterNodeCount
+        NATGatewayPublicIPs: !GetAtt PrivateSubnetStack.Outputs.NATGatewayPublicIPs
+        ProxyELBHostedZoneID: !GetAtt ClusterMembersStack.Outputs.ProxyNodeLoadBalancerHostedZoneID
+        WhichClusterLBAddress: !Ref WhichClusterLBAddress
+        WhichProxyLBAddress: !Ref WhichProxyLBAddress
+        ProxyNodeLoadBalancerName: !GetAtt ClusterMembersStack.Outputs.ProxyNodeLoadBalancerDNSName
+        PublicSubnetIds: !GetAtt PublicSubnetStack.Outputs.PublicSubnetIds
+        ResourceOwner: !Ref ResourceOwner
+        RootStackName: !Ref AWS::StackName
+        SecurityStackId: !GetAtt IAMResources.Outputs.StackId
+        ServiceCIDR: !Ref ServiceCIDR
+        # StackIds of stacks that have EC2 instances or auto-scaling groups (sans boot stack)
+        StackIds: !GetAtt ClusterMembersStack.Outputs.StackIds
+        StorageIOPS: !Ref StorageIOPS
+        VPCDomain: !Ref VPCDomain
+
+
+  ClusterMembersStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/quickstart-ibm-cloud-private/templates/icp-cluster-members.yaml
+        - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
+      Parameters:
+        AMIImageId: !FindInMap [AWSRegionAMIEC2, !Ref "AWS::Region", Ubuntu16]
+        ApplicationSecurityGroup: !GetAtt IAMResources.Outputs.ApplicationSecurityGroup
+        AvailabilityZoneCount: !Ref AvailabilityZoneCount
+        EBSVolumeType: !Ref EBSVolumeType
+        EFSDNSName: !GetAtt ClusterSharedStorage.Outputs.EFSDNSName
+        ExternalSSHSecurityGroup: !GetAtt IAMResources.Outputs.ExternalSSHSecurityGroup
+        IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
+        ICPArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPArchiveBucket]
+        ICPClusterNodeScriptPackagePath: !Sub
+         - ${KeyPrefix}${ScriptPackagePath}
+         -  { KeyPrefix: !Ref QSS3KeyPrefix, ScriptPackagePath: !FindInMap [ScriptPackageMap, cluster-node, ScriptPackagePath] }
+        ICPDeploymentLogsBucketName: !Ref ICPDeploymentLogsBucketName
+        ICPMasterSecurityGroup: !GetAtt IAMResourcesUpdate.Outputs.ICPMasterSecurityGroup
+        ICPNodeProfile: !GetAtt IAMResources.Outputs.ICPNodeProfile
+        ICPNodeRole: !GetAtt IAMResourcesUpdate.Outputs.ICPNodeRole
+        ICPS3KeyPrefix: !Sub 
+          - ${KeyPrefix}submodules/quickstart-ibm-cloud-private/ 
+          - {KeyPrefix: !Ref QSS3KeyPrefix}
+        ICPScriptBucketName: !Ref QSS3BucketName
+        ICPVersion: !FindInMap [ICPDtoICPVersionMap, !Ref ICPDVersion, ICP]
+        InternalICPSecurityGroup: !GetAtt IAMResources.Outputs.InternalICPSecurityGroup
+        InternalSSHSecurityGroup: !GetAtt IAMResources.Outputs.InternalSSHSecurityGroup
+        KeyName: !Ref KeyName
+        ManagementNodeCount: !Ref ManagementNodeCount
+        ManagementNodeInstanceType: !Ref ManagementNodeInstanceType
+        MasterNodeCount: !Ref MasterNodeCount
+        MasterNodeInstanceType: !Ref MasterNodeInstanceType
+        MasterNodeProfile: !GetAtt IAMResources.Outputs.MasterNodeProfile
+        MasterNodeRole: !GetAtt IAMResources.Outputs.MasterNodeRole
+        PrivateSubnetIds: !GetAtt PrivateSubnetStack.Outputs.PrivateSubnetIds
+        ProxyNodeCount: !Ref ProxyNodeCount
+        ProxyNodeInstanceType: !Ref ProxyNodeInstanceType
+        PublicSubnetIds: !GetAtt PublicSubnetStack.Outputs.PublicSubnetIds
+        ResourceOwner: !Ref ResourceOwner
+        RootStackName: !Ref AWS::StackName
+        StorageIOPS: !Ref StorageIOPS
+        VulnerabilityAdvisorNodeCount: !Ref VulnerabilityAdvisorNodeCount
+        VulnerabilityAdvisorNodeInstanceType: !Ref VulnerabilityAdvisorNodeInstanceType
+        WorkerNodeCount: !Ref WorkerNodeCount
+        WorkerNodeInstanceType: !Ref WorkerNodeInstanceType
+
+  MasterStackUpdate:
+    DependsOn: ClusterMembersStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub
+        - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}templates/icp-for-data-master.yaml
+        - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
+      Parameters:
+        IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
+        MasterNodeCount: !Ref MasterNodeCount
+        MasterNodeOne: !GetAtt ClusterMembersStack.Outputs.MasterNodeOne
+        MasterNodeTwo: !If
+          - 3MastersCondition 
+          - !GetAtt ClusterMembersStack.Outputs.MasterNodeTwo
+          - ""
+        MasterNodeThree: !If
+          - 3MastersCondition 
+          - !GetAtt ClusterMembersStack.Outputs.MasterNodeThree
+          - ""
+        MasterNodeLoadBalancer: !GetAtt ClusterMembersStack.Outputs.MasterNodeLoadBalancer
+
+
+  InstallationCompletedHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+
+  ICPDInstallationCompletedHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+
+
+  # The wait starts once the BootNodeStack has been created.
+  ICPInstallationCompleted:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: BootNodeStack
+    Properties:
+      Count: 1
+      Handle: !Ref InstallationCompletedHandle
+      Timeout: !Ref InceptionTimeout
+
+  ICPDInstallationCompleted:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: ICPInstallationCompleted
+    Properties:
+      Count: 1
+      Handle: !Ref ICPDInstallationCompletedHandle
+      Timeout: !Ref InstallationTimeout    
+
+
+Outputs:
+  MasterNodeLoadBalancerName:
+    Description: The DNS name of the ICPD Master node Elastic Load Balancer.
+    Value: !GetAtt ClusterMembersStack.Outputs.MasterNodeLoadBalancerDNSName
+
+  ProxyNodeLoadBalancerName:
+    Description: The DNS name of the ICPD Proxy node Elastic Load Balancer.
+    Value: !GetAtt ClusterMembersStack.Outputs.ProxyNodeLoadBalancerDNSName
+
+  ICPDWebClientURL:
+    Description: >-
+      IBM Cloud Pak for Data web client URL. If you are using a HostedZone with a public domain name, then the cluster DNS name used in the URL should resolve. Otherwise, you will need to create an alias entry in your DNS that maps the cluster DNS name to the master node load balancer public DNS name provided in thee earlier output. For testing purposes, you can create an entry in your /etc/hosts file that maps one of the IP addresses of the master node load balancer to the cluster DNS name. Note: You can use nslookup to get the IP addresses of the master node load balancer.
+    Value: !If
+      - EmptySubdomainPrefix
+      - !Sub 
+        - https://${MasterNodeELB}:31843/
+        - { MasterNodeELB: !GetAtt ClusterMembersStack.Outputs.MasterNodeLoadBalancerDNSName }
+      - !Sub https://${ClusterName}.${VPCSubdomainPrefix}.${VPCDomain}:31843/
+
+  ICPManagementConsole:
+    Description: >-
+      IBM Cloud Pak management console URL.  If you are using a HostedZone with a public domain name, then the cluster DNS name used in the URL should resolve.  Otherwise, you will need to create an alias entry in your DNS that maps the cluster DNS name to the master node load balancer public DNS name provided in the output above.  For testing purposes you can create an entry in your /etc/hosts file that maps one of the IP addresses of the master node load balancer to the cluster DNS name. (Use nslookup to get the IP address(es) of the master node load balancer.)
+    Value: !If
+      - EmptySubdomainPrefix
+      - !Sub https://${ClusterName}.${VPCDomain}:8443/
+      - !Sub https://${ClusterName}.${VPCSubdomainPrefix}.${VPCDomain}:8443/
+
+  ICPAdminUser:
+    Description: >-
+      The user name of the IBM Cloud Pak cluster administrator (super user).
+    Value: !Sub ${AdminUser}
+
+  EFSDNSName:
+    Description: >-
+      The public DNS name of the EFS server to be used to configure the Kubernetes EFS provisioner.
+    Value: !GetAtt ClusterSharedStorage.Outputs.EFSDNSName
+
+  EFSFileSystemId:
+    Description: >-
+      EFS file system ID to be used to configure the Kubernetes EFS provisioner.
+    Value: !GetAtt ClusterSharedStorage.Outputs.EFSFileSystemId
+
+  EFSAppSharedStorageMountPoint:
+    Description: >-
+      Mount point to use to configure the Kubernetes EFS provisioner to dynamically allocate application shared storage.
+    Value: !Ref ApplicationStorageMountPoint
