@@ -23,6 +23,7 @@ Parameters:
     Type: String
 
   AdminPassword:
+    NoEcho: true
     Description: >-
       IBM Cloud Pak administrator (super user) password. Used in the bootstrap script.
     Type: String
