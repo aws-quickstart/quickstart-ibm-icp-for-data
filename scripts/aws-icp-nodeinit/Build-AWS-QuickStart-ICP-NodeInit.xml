@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="CreateScriptPackage" name="Build-AWS-QuickStart-ICP-Bootstrap">
+
+	<!-- Main Python script name. File extension not needed. -->
+	<property name="MainPythonScript" value="nodeinit" />
+
+	<property name="RepoHome" value="${user.home}/git/quickstart-ibm-cloud-private" />
+	<property name="StagingAreaHome" value="${RepoHome}/script-packages" />
+	<property name="StagingArea" value="${StagingAreaHome}/aws-icp-nodeinit" />
+	<property name="ProjectSourceDirectory" value="${RepoHome}/scripts/aws-icp-nodeinit" />
+	<property name="YaplHome" value="${RepoHome}/scripts/YAPythonLibrary" />
+	<property name="QuickStartBucketRootName" value="aws-icp-quickstart" />
+	<property name="AWSRegions" value="us-west-1,us-east-1,us-east-2" />
+
+	<property name="ScriptPackageName" value="aws-icp-nodeinit" />
+	<property name="ScriptPackageVersion" value="0.9.3" />
+	<property name="ScriptPackageArchive" value="${ScriptPackageName}-v${ScriptPackageVersion}.zip" />
+
+
+	<property name="debug" value="true" />
+
+
+	<!--
+	  ant-contrib has various useful tasks such as <if> <then> <else> and <for>.
+	  To configure Eclipse to run the ant-contrib tasks you need to edit the Ant
+	  Runtime (under Eclipse > Preferences > Ant > Runtime).  Select the Classpath
+	  tab and then select one of the various top level classpath entries, e.g., 
+	  "Ant Home Entries", "Global Entries", "Contributed Entries".  At that point
+	  the buttons on the right of the dialog window should be enabled.  Click on 
+	  "Add External JAR" and browse to where ant-contrib-{version}.jar is located.
+	  (If Ant is installed on your machine, you likely put ant-contrib in ANT_HOME/lib. 
+	   I added the ant-contib JAR to the "Ant Home Entries" classpath.)
+	   
+	   MacOS Notes:
+	   On MacOS, If you don't have it already, install Homebrew. (See https://brew.sh/)
+	   Use Homebrew to install Ant (brew install ant).  
+	   Use Homebrew to install ant-contrib (brew install ant-contrib).  
+	   Configure Eclipse to point to the ant-contrib jar in: 
+	   /usr/local/Cellar/ant-contrib/1.0b3/share/ant/ant-contrib-1.0b3.jar.
+	   When you get to the point where you are adding the external JAR to the 
+	   Ant Home Entries, hit Command-Shift-G ant you will get a pop-up window
+	   where you can enter a raw path.  On the Mac, the root directory is not
+	   visible in the Finder browser, so you need the Command-Shift-G trick to 
+	   provide the path to the ant-contrib jar.
+	-->
+	<taskdef resource="net/sf/antcontrib/antlib.xml" />
+
+
+	<target name="init">
+		<tstamp />
+	</target>
+
+
+	<target name="CheckStagingAreaDirectoryExists" depends="init">
+		<available property="stagingarea.exists" file="${StagingArea}" type="dir" />
+	</target>
+
+
+	<target name="CreateStagingArea" depends="CheckStagingAreaDirectoryExists" unless="stagingarea.exists">
+		<mkdir dir="${StagingArea}" />
+		<echo message="Created staging area directory: ${StagingArea}" />
+	</target>
+
+
+	<target name="ExportScripts" depends="CreateStagingArea">
+
+		<!-- 
+       Copy the project directory tree to the staging directory.
+       Exclude various Eclipse meta-data files and Ant build scripts.
+    -->
+		<copy toDir="${StagingArea}">
+			<fileset dir="${ProjectSourceDirectory}" />
+		</copy>
+
+		<!-- Copy the needed parts of the YAPL library. -->
+		<copy toDir="${StagingArea}">
+			<fileset dir="${YaplHome}" />
+		</copy>
+
+		<!-- Put the version number message in the main script. -->
+		<replace token="@{VERSION}" value="${ScriptPackageVersion}" file="${StagingArea}/${MainPythonScript}.py" />
+
+	</target>
+
+
+	<target name="CreateScriptPackage" depends="ExportScripts">
+		<delete file="${StagingAreaHome}/${ScriptPackageArchive}" />
+
+		<zip destfile="${StagingAreaHome}/${ScriptPackageArchive}" duplicate="preserve">
+			<fileset dir="${StagingArea}" includes="**/*.*" />
+		</zip>
+
+    <delete dir="${StagingArea}" />
+	</target>
+
+
+	<!--
+	<target name="DeployScriptPackage" depends="CreateScriptPackage">
+		<for list="${AWSRegions}" param="AWSRegion" parallel="true">
+			<sequential>
+				<exec executable="/usr/local/bin/aws">
+					<arg value="s3" />
+					<arg value="cp" />
+					<arg value="${StagingArea}/${ScriptPackageArchive}" />
+					<arg value="s3://${QuickStartBucketRootName}-@{AWSRegion}/scripts/${ScriptPackageArchive}" />
+				</exec>
+			</sequential>
+		</for>
+	</target>
+	-->
+
+	<target name="clean">
+		<echo message="Deleting script package and the staging area directory tree." />
+		<delete file="${StagingAreaHome}/${ScriptPackageArchive}" />
+		<delete dir="${StagingArea}" />
+	</target>
+
+</project>
+
