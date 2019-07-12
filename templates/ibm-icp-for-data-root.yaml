@@ -52,7 +52,6 @@ Metadata:
           - AdminUser
           - AdminPassword
           - ClusterName
-          - ClusterDomain
           - ClusterCIDR
           - ExcludedMgmtServices
           - ServiceCIDR
@@ -117,8 +116,6 @@ Metadata:
         default: Boot node EC2 instance type
       ClusterCIDR:
         default: Cluster network CIDR
-      ClusterDomain:
-        default: Cluster domain
       ClusterName:
         default: Cluster name
       ClusterPKIBucketName:
@@ -289,15 +286,6 @@ Parameters:
     ConstraintDescription: >-
       Must be a valid IP CIDR range of the form x.x.x.x/x.
 
-  # WARNING: A defect in ICP 3.1.0 causes MongoDB to fail to start if the
-  # ClusterDomain is anything other than cluster.local.
-  # Should be corrected in ICP 3.1.0 fixpack
-  ClusterDomain:
-    Description: >-
-      The network domain of the IBM Cloud Pak for Data cluster overlay network. WARNING: Due to a known issue in IBM Cloud Pak version 3.1.0, the ClusterDomain value must be cluster.local.
-    Type: String
-    Default: cluster.local
-
   ClusterName:
     Description: >-
       The name of the cluster. The cluster name is combined with the VPC subdomain prefix (VPCSubdomainPrefix), if present, and the VPC domain (VPCDomain) to form the cluster DNS name (ClusterDNSName). An alias record is created in Route53 that maps the ClusterDNSName to the master node load balancer DNS name.
@@ -416,7 +404,8 @@ Parameters:
   
   LicenseAgreement:
     Description: >-
-      I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/Bd2QDA).
+      I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/Bdzmiv).
+      I have read and agree to the license terms for IBM Watson Studio Premium for IBM Cloud Pak for Data (https://ibm.biz/BdzmGa)
     Type: String
     Default: '-'
     AllowedValues:
@@ -751,7 +740,8 @@ Mappings:
 
   ICPDtoICPVersionMap:
     2.1.0.1:
-      ICP: 3.1.2  
+      ICP: 3.1.2
+      ClusterDomain: "cluster.local"
 
 Rules:
   EFSSupportedRegionRule:
@@ -1051,7 +1041,7 @@ Resources:
           - EmptySubdomainPrefix
           - !Join ['.', [!Ref ClusterName, !Ref VPCDomain]]
           - !Join ['.', [!Ref ClusterName, !Ref VPCSubdomainPrefix, !Ref VPCDomain]]
-        ClusterDomain: !Ref ClusterDomain
+        ClusterDomain: !FindInMap [ICPDtoICPVersionMap, !Ref ICPDVersion, ClusterDomain] 
         ClusterName: !Ref ClusterName
         ClusterPKIBucketName: !Ref ClusterPKIBucketName
         ClusterPKIRootPath: !Ref ClusterPKIRootPath

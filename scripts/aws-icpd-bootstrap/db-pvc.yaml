@@ -9,7 +9,7 @@ metadata:
   namespace: zen
 spec:
   accessModes:
-  - ReadWriteMany
+  - ReadWriteOnce
   resources:
     requests:
       storage: 200Gi
