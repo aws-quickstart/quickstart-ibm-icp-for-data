@@ -37,6 +37,11 @@ Parameters:
       ICPMasterSecurityGroup for ICPD related update
     Type: String
 
+  ExternalSSHSecurityGroup:
+    Description: >-
+      ExternalSSHSecurityGroup for ICPD related update
+    Type: String
+
   ICPNodeRole:
     Description: >-
       ICPNodeRole paramter from IAMResource for ICPD related update
@@ -121,12 +126,29 @@ Resources:
       IpProtocol: tcp
       FromPort: 31843
       ToPort: 31843
-      CidrIp: !Ref ExternalICPAdminLocation  
+      CidrIp: !Ref ExternalICPAdminLocation
+
+  ICPDSecurityGroupIngress:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      GroupId: !Ref ExternalSSHSecurityGroup
+      IpProtocol: tcp
+      FromPort: 22
+      ToPort: 22
+      CidrIp: "10.10.0.0/20"
+
+
 Outputs:
   ICPMasterSecurityGroup:
     Description: >-
       ICPMasterSecurityGroup resource ID for use by parent stack template.
     Value: !Ref ICPMasterSecurityGroup
+
+  ExternalSSHSecurityGroup:
+    Description: >-
+      ExternalSSHSecurityGroup resource ID for use by parent stack template.
+    Value: !Ref ExternalSSHSecurityGroup
+
   BootNodeRole:
     Description: >-
       BootNodeRole resource ID for use by parent stack templates(s)

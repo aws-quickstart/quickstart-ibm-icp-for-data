@@ -1001,6 +1001,7 @@ Resources:
       Parameters:
         BootNodeRole: !GetAtt IAMResources.Outputs.BootNodeRole
         ExternalICPAdminLocation: !Ref ExternalICPAdminLocation
+        ExternalSSHSecurityGroup: !GetAtt IAMResources.Outputs.ExternalSSHSecurityGroup 
         ICPDArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPDArchiveBucket]
         ICPDScriptBucketName: !Ref QSS3BucketName
         ICPMasterSecurityGroup: !GetAtt IAMResources.Outputs.ICPMasterSecurityGroup
@@ -1050,7 +1051,7 @@ Resources:
         EFSDNSName: !GetAtt ClusterSharedStorage.Outputs.EFSDNSName
         EFSFileSystemId: !GetAtt ClusterSharedStorage.Outputs.EFSFileSystemId
         ExcludedMgmtServices: !Ref ExcludedMgmtServices
-        ExternalSSHSecurityGroup: !GetAtt IAMResources.Outputs.ExternalSSHSecurityGroup
+        ExternalSSHSecurityGroup: !GetAtt IAMResourcesUpdate.Outputs.ExternalSSHSecurityGroup
         IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
         ICPArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPArchiveBucket]
         ICPDArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPDArchiveBucket]
@@ -1095,7 +1096,7 @@ Resources:
         AvailabilityZoneCount: !Ref AvailabilityZoneCount
         EBSVolumeType: !Ref EBSVolumeType
         EFSDNSName: !GetAtt ClusterSharedStorage.Outputs.EFSDNSName
-        ExternalSSHSecurityGroup: !GetAtt IAMResources.Outputs.ExternalSSHSecurityGroup
+        ExternalSSHSecurityGroup: !GetAtt IAMResourcesUpdate.Outputs.ExternalSSHSecurityGroup
         IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
         ICPArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPArchiveBucket]
         ICPClusterNodeScriptPackagePath: !Sub
