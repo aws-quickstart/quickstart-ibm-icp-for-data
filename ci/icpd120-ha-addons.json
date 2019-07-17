@@ -121,10 +121,10 @@
   },
   {
     "ParameterKey": "WorkerNodeInstanceType",
-    "ParameterValue": "m5.4xlarge"
+    "ParameterValue": "c5.4xlarge"
   },
   {
     "ParameterKey": "Addons",
-    "ParameterValue":"DSX_Premium, Data_Virtualization"
+    "ParameterValue":"DSX_Premium, Data_Virtualization, Db2_Warehouse"
   }
 ]

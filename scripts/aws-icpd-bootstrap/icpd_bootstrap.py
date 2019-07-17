@@ -144,7 +144,14 @@ class ICPDBootstrap(object):
       TR.info(methodName,"Start manageUser")    
       call(manageUser, shell=True, stdout=icpdInstallLogFile)
       TR.info(methodName,"End manageUser")    
+      
+      TR.info(methodName,"Start Activate trial")
+      icpdUrl = "https://"+self.bootstrap.ClusterDNSName+":31843"
+      activatetrial = "sudo python /root/activate-trial.py "+icpdUrl+" admin "+self.bootstrap.AdminPassword+" /root/trial.lic"
+      call(activatetrial, shell=True, stdout=icpdInstallLogFile)
+      TR.info(methodName,"End Activate trial")
       TR.info(methodName,"IBM Cloud Pak for Data installation completed.")
+      os.remove("/root/trial.lic")
 
       source_file = open("/root/activate-license.sh").read()
       source_file = source_file.replace('<CLUSTERDNSNAME>', self.bootstrap.ClusterDNSName)

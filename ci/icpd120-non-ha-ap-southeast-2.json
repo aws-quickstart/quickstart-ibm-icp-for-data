@@ -33,15 +33,15 @@
   },
   {
     "ParameterKey": "ExternalApplicationLocation",
-    "ParameterValue": "10.0.0.0/16"
+    "ParameterValue": "0.0.0.0/0"
   },
   {
     "ParameterKey": "ExternalICPAdminLocation",
-    "ParameterValue": "10.0.0.0/16"
+    "ParameterValue": "0.0.0.0/0"
   },
   {
     "ParameterKey": "ExternalSSHLocation",
-    "ParameterValue": "10.0.0.0/16"
+    "ParameterValue": "0.0.0.0/0"
   },
   {
     "ParameterKey": "ICPDeploymentLogsBucketName",
@@ -122,5 +122,9 @@
   {
     "ParameterKey": "WorkerNodeInstanceType",
     "ParameterValue": "m5.4xlarge"
+  },
+  {
+    "ParameterKey": "Addons",
+    "ParameterValue":"DSX_Premium"
   }
 ]

@@ -32,7 +32,7 @@
 
 2.1.0.1:
   icpd-base-install-archive: icp4d_ee_pre_2.1.0.1_x86_64.tar
-  installCMD: installer.x86_64.483
+  installCMD: installer.x86_64.496
 
   addon-install-CMD: /ibm/InstallPackage/components/deploy.sh
   decision-optimization-archive: Addons/DO/dods_dsx_addon.x86_64-1.0-doicp4d-v2.1.0.0-b23.tar
@@ -47,7 +47,7 @@
   watson-explorer-archive: Addons/WEX/wex-server.tar
   watson-explorer-dest: /ibm/InstallPackage/modules/wex/wex-server.tar
 
-  db2-warehouse-archive: Addons/WHSMP/db2wh-icp4d_x86_64_2019-05-22_20-35.tar.gz
+  db2-warehouse-archive: Addons/WHSMP/db2wh-icp4d_x86_64_2019-05-30_10-17.tar.gz
   db2-warehouse-dest:  /ibm/InstallPackage/databases/db2whsmp.tar.gz
   
   data-virtualization-archive: Addons/DV/dv-ppa.tar
