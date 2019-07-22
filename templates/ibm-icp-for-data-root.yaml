@@ -641,7 +641,7 @@ Mappings:
   # in order to use the MD5 instance types.
   # Use EBS backed storage as opposed to "instance-store", e.g., hvm:ebs-ssd
   # As of 20 JAN 2019 all Ubuntu images are release: 20190122.1
-  AWSRegionAMIEC2:
+  AWSAMIRegionMap:
     ap-northeast-1:
       Ubuntu16: ami-04afce36be5236d87
     ap-northeast-2:
@@ -1029,7 +1029,7 @@ Resources:
         - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}templates/ibm-icp-for-data-boot.yaml
         - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
       Parameters:
-        AMIImageId: !FindInMap [AWSRegionAMIEC2, !Ref "AWS::Region", Ubuntu16]
+        AMIImageId: !FindInMap [AWSAMIRegionMap, !Ref "AWS::Region", Ubuntu16]
         Addons: !Ref Addons #!Join [',', !Ref Addons]
         AdminPassword: !Ref AdminPassword
         AdminUser: !Ref AdminUser
@@ -1091,7 +1091,7 @@ Resources:
         - https://s3.amazonaws.com/${ScriptBucketName}/${KeyPrefix}submodules/quickstart-ibm-cloud-private/templates/icp-cluster-members.yaml
         - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix }
       Parameters:
-        AMIImageId: !FindInMap [AWSRegionAMIEC2, !Ref "AWS::Region", Ubuntu16]
+        AMIImageId: !FindInMap [AWSAMIRegionMap, !Ref "AWS::Region", Ubuntu16]
         ApplicationSecurityGroup: !GetAtt IAMResources.Outputs.ApplicationSecurityGroup
         AvailabilityZoneCount: !Ref AvailabilityZoneCount
         EBSVolumeType: !Ref EBSVolumeType
