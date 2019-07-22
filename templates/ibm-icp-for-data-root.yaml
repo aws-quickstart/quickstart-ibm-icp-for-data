@@ -3,6 +3,11 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   Root template for an IBM Cloud Pak for Data deployment. This is the root template for a collection of nested stacks that make up the full ICPD deployment. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template. (qs-1pek09fje)
 Metadata:
+  AWSAMIRegionMap:
+    Filters:
+      Ubuntu16:
+        name: 'ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-????????*'
+        owner-id: '099720109477'
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -643,39 +648,39 @@ Mappings:
   # As of 20 JAN 2019 all Ubuntu images are release: 20190122.1
   AWSAMIRegionMap:
     ap-northeast-1:
-      Ubuntu16: ami-04afce36be5236d87
+      Ubuntu16: ami-096c57cee908da809
     ap-northeast-2:
-      Ubuntu16: ami-07293f39d3a08de15
+      Ubuntu16: ami-0a25005e83c56767a
     ap-northeast-3:
-      Ubuntu16: ami-0188b2d037ee29ff6
+      Ubuntu16: ami-04c5893bcd93bc072
     ap-south-1:
-      Ubuntu16: ami-00fce1780262edd51
+      Ubuntu16: ami-03dcedc81ea3e7e27
     ap-southeast-1:
-      Ubuntu16: ami-07c1483ef8c3dfece
+      Ubuntu16: ami-04613ff1fdcd2eab1
     ap-southeast-2:
-      Ubuntu16: ami-04382b669b79925fb
+      Ubuntu16: ami-000c2343cf03d7fd7
     ca-central-1:
-      Ubuntu16: ami-01dc5f3365131b133
+      Ubuntu16: ami-0eb3e12d3927c36ef
     eu-central-1:
-      Ubuntu16: ami-0602105b1a2ed9449
+      Ubuntu16: ami-0085d4f8878cddc81
     eu-north-1:
-      Ubuntu16: ami-13d75e6d
+      Ubuntu16: ami-4bd45f35
     eu-west-1:
-      Ubuntu16: ami-00182431c78dff2fa
+      Ubuntu16: ami-03746875d916becc0
     eu-west-2:
-      Ubuntu16: ami-095ed825090131933
+      Ubuntu16: ami-0cbe2951c7cd54704
     eu-west-3:
-      Ubuntu16: ami-0edefbe5e8f36e2fe
+      Ubuntu16: ami-080d4d4c37b0aa206
     sa-east-1:
-      Ubuntu16: ami-00514f4d33197006b
+      Ubuntu16: ami-09beb384ba644b754
     us-east-1:
-      Ubuntu16: ami-09677e0a6b14905b0
+      Ubuntu16: ami-0cfee17793b08a293
     us-east-2:
-      Ubuntu16: ami-0e2a10a0edd037f7e
+      Ubuntu16: ami-0f93b5fd8f220e428
     us-west-1:
-      Ubuntu16: ami-0c67212f0e9b7b73b
+      Ubuntu16: ami-09eb5e8a83c7aa890
     us-west-2:
-      Ubuntu16: ami-042b1570ee0c84f5a
+      Ubuntu16: ami-0b37e9efc396e4c38
 
   AWSRegionS3Bucket:
     ap-northeast-1:
