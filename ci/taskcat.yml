@@ -40,8 +40,8 @@ tests:
     regions:
       - ap-northeast-2
       - us-west-1
-#  icpd-non-ha-sydney:
-#    parameter_input: icpd120-non-ha-ap-southeast-2.json
-#    template_file: ibm-icp-for-data-root.yaml
-#    regions:
-#      - ap-southeast-2
+  icpd-non-ha-sydney:
+   parameter_input: icpd120-non-ha-ap-southeast-2.json
+   template_file: ibm-icp-for-data-root.yaml
+   regions:
+     - ap-southeast-2

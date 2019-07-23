@@ -9,7 +9,7 @@
   },
   {
     "ParameterKey": "AvailabilityZones",
-    "ParameterValue": "ap-southeast-2a"
+    "ParameterValue": "ap-southeast-2b"
   },
   {
     "ParameterKey": "AppSubdomainPrefix",
@@ -122,5 +122,9 @@
   {
     "ParameterKey": "WorkerNodeInstanceType",
     "ParameterValue": "m5.4xlarge"
+  },
+  {
+    "ParameterKey": "Addons",
+    "ParameterValue":"DSX_Premium"
   }
 ]

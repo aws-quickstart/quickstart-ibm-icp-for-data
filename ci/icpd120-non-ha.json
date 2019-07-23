@@ -45,7 +45,7 @@
   },
   {
     "ParameterKey": "ICPDeploymentLogsBucketName",
-    "ParameterValue": "aws-icpd-quickstart-logs-us-west-1"
+    "ParameterValue": "aws-icpd-quickstart-logs-us-east-1"
   },
   {
     "ParameterKey": "KeyFilePath",
@@ -117,10 +117,14 @@
   },
   {
     "ParameterKey": "WorkerNodeCount",
-    "ParameterValue": "3"
+    "ParameterValue": "4"
   },
   {
     "ParameterKey": "WorkerNodeInstanceType",
     "ParameterValue": "m5.4xlarge"
+  },
+  {
+    "ParameterKey": "Addons",
+    "ParameterValue":"DSX_Premium, Data_Virtualization, Db2_Warehouse"
   }
 ]
