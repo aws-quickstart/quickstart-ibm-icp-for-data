@@ -684,55 +684,38 @@ Mappings:
 
   AWSRegionS3Bucket:
     ap-northeast-1:
-      ICPArchiveBucket: ibm-cloud-private-ap-northeast-1
       ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-1
     ap-northeast-2:
-      ICPArchiveBucket: ibm-cloud-private-ap-northeast-2
       ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-2
     ap-northeast-3:
-      ICPArchiveBucket: ibm-cloud-private-ap-northeast-3
       ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-3
     ap-south-1:
-      ICPArchiveBucket: ibm-cloud-private-ap-south-1
       ICPDArchiveBucket: ibm-cloud-private-data-ap-south-1
     ap-southeast-1:
-      ICPArchiveBucket: ibm-cloud-private-ap-southeast-1
       ICPDArchiveBucket: ibm-cloud-private-data-ap-southeast-1
     ap-southeast-2:
-      ICPArchiveBucket: ibm-cloud-private-ap-southeast-2
       ICPDArchiveBucket: ibm-cloud-private-data-ap-southeast-2
     ca-central-1:
-      ICPArchiveBucket: ibm-cloud-private-ca-central-1
       ICPDArchiveBucket: ibm-cloud-private-data-ca-central-1
     eu-central-1:
-      ICPArchiveBucket: ibm-cloud-private-eu-central-1
       ICPDArchiveBucket: ibm-cloud-private-data-eu-central-1
     eu-north-1:
-      ICPArchiveBucket: ibm-cloud-private-eu-north-1
       ICPDArchiveBucket: ibm-cloud-private-data-eu-north-1
     eu-west-1:
-      ICPArchiveBucket: ibm-cloud-private-eu-west-1
       ICPDArchiveBucket: ibm-cloud-private-data-eu-west-1
     eu-west-2:
-      ICPArchiveBucket: ibm-cloud-private-eu-west-2
       ICPDArchiveBucket: ibm-cloud-private-data-eu-west-2
     eu-west-3:
-      ICPArchiveBucket: ibm-cloud-private-eu-west-3
       ICPDArchiveBucket: ibm-cloud-private-data-eu-west-3
     sa-east-1:
-      ICPArchiveBucket: ibm-cloud-private-sa-east-1
       ICPDArchiveBucket: ibm-cloud-private-data-sa-east-1
     us-east-1:
-      ICPArchiveBucket: ibm-cloud-private-us-east-1
       ICPDArchiveBucket: ibm-cloud-private-data-us-east-1
     us-east-2:
-      ICPArchiveBucket: ibm-cloud-private-us-east-2
       ICPDArchiveBucket: ibm-cloud-private-data-us-east-2
     us-west-1:
-      ICPArchiveBucket: ibm-cloud-private-us-west-1
       ICPDArchiveBucket: ibm-cloud-private-data-us-west-1
     us-west-2:
-      ICPArchiveBucket: ibm-cloud-private-us-west-2
       ICPDArchiveBucket: ibm-cloud-private-data-us-west-2
 
   ScriptPackageMap:
@@ -988,7 +971,7 @@ Resources:
         ExternalICPAdminLocation: !Ref ExternalICPAdminLocation
         ExternalSSHLocation: !Ref ExternalSSHLocation
         IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
-        ICPArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPArchiveBucket]
+        ICPArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPDArchiveBucket]
         ICPScriptBucketName: !Ref QSS3BucketName
         ICPDeploymentLogsBucketName: !Ref ICPDeploymentLogsBucketName
         PrivateSubnetCIDR: !Ref PrivateSubnetCIDR
@@ -1058,7 +1041,7 @@ Resources:
         ExcludedMgmtServices: !Ref ExcludedMgmtServices
         ExternalSSHSecurityGroup: !GetAtt IAMResourcesUpdate.Outputs.ExternalSSHSecurityGroup
         IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
-        ICPArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPArchiveBucket]
+        ICPArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPDArchiveBucket]
         ICPDArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPDArchiveBucket]
         ICPBootNodeScriptPackagePath: !FindInMap [ScriptPackageMap, boot-node, ScriptPackagePath]
         ICPDBootNodeScriptPackagePath: !FindInMap [ScriptPackageMap, boot-node-icpd, ScriptPackagePath]
@@ -1103,7 +1086,7 @@ Resources:
         EFSDNSName: !GetAtt ClusterSharedStorage.Outputs.EFSDNSName
         ExternalSSHSecurityGroup: !GetAtt IAMResourcesUpdate.Outputs.ExternalSSHSecurityGroup
         IBMCloudPrivateVPC: !Ref IBMCloudPrivateVPC
-        ICPArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPArchiveBucket]
+        ICPArchiveBucketName: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPDArchiveBucket]
         ICPClusterNodeScriptPackagePath: !Sub
          - ${KeyPrefix}${ScriptPackagePath}
          -  { KeyPrefix: !Ref QSS3KeyPrefix, ScriptPackagePath: !FindInMap [ScriptPackageMap, cluster-node, ScriptPackagePath] }
