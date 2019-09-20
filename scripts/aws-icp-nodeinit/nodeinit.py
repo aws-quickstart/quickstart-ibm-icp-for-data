@@ -809,7 +809,9 @@ class NodeInit(object):
           if (TR.isLoggable(Level.FINE)):
             TR.fine(methodName,"Exporting log: %s to S3: %s:%s" % (bodyPath,bucketName,s3Key))
           #endIf
-          self.s3.put_object(Bucket=bucketName, Key=s3Key, Body=bodyPath)
+          with open(bodyPath, 'r') as bodyFile:
+            self.s3.put_object(Bucket=bucketName, Key=s3Key, Body=bodyFile)
+          #endWith  
         #endFor
       #endIf
     #endIf
