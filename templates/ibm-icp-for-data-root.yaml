@@ -648,39 +648,39 @@ Mappings:
   # As of 20 JAN 2019 all Ubuntu images are release: 20190122.1
   AWSAMIRegionMap:
     ap-northeast-1:
-      Ubuntu16: ami-0cca812282dd2fc0d
+      Ubuntu16: ami-02be181636ed95ac5
     ap-northeast-2:
-      Ubuntu16: ami-0f6a0c2e905062388
+      Ubuntu16: ami-0cb5c4f4360c08df9
     ap-northeast-3:
-      Ubuntu16: ami-09b6933d42ec3d437
+      Ubuntu16: ami-0166a1a40f68b6afc
     ap-south-1:
-      Ubuntu16: ami-0a943aa1c727d4c63
+      Ubuntu16: ami-054aff5bdc25a1e0d
     ap-southeast-1:
-      Ubuntu16: ami-0568159dd0c65b9b6
+      Ubuntu16: ami-0b1813db81534d741
     ap-southeast-2:
-      Ubuntu16: ami-05b67b91e1f703ebf
+      Ubuntu16: ami-0e43473e4b0d06a9d
     ca-central-1:
-      Ubuntu16: ami-0b632b55517980f65
+      Ubuntu16: ami-06a0f74c9171a795c
     eu-central-1:
-      Ubuntu16: ami-0fd4fe10cea7264a7
+      Ubuntu16: ami-0410f42dd64e525be
     eu-north-1:
-      Ubuntu16: ami-06723d9a4e8d77741
+      Ubuntu16: ami-003a26bde3b3db785
     eu-west-1:
-      Ubuntu16: ami-0c224e30f7a997d9f
+      Ubuntu16: ami-0775b4648aabb6e6c
     eu-west-2:
-      Ubuntu16: ami-00b21efcf155178c4
+      Ubuntu16: ami-03084b454e06c336d
     eu-west-3:
-      Ubuntu16: ami-0220349d77ba2e87d
+      Ubuntu16: ami-098fa516965100b01
     sa-east-1:
-      Ubuntu16: ami-0f227e142db829b50
+      Ubuntu16: ami-0a0cb9c35de2a438b
     us-east-1:
-      Ubuntu16: ami-092546daafcc8bc0d
+      Ubuntu16: ami-0ec539abc2ecc4e85
     us-east-2:
-      Ubuntu16: ami-02073f7bb66c4c56f
+      Ubuntu16: ami-074e26dac71cdcfd7
     us-west-1:
-      Ubuntu16: ami-0bc498f1207abb85c
+      Ubuntu16: ami-0d9b79b33dc8e659d
     us-west-2:
-      Ubuntu16: ami-017e1dd35b94fb074
+      Ubuntu16: ami-0829027739fdac71f
 
   AWSRegionS3Bucket:
     ap-northeast-1:
