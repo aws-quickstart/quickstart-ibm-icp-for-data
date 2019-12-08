@@ -1,0 +1,10 @@
+---
+- hosts: nodes
+  tasks:
+  - name: "Copy mkfifo"
+    copy:
+      src: /ibm/mkfifo.pp
+      dest: /root/mkfifo.pp
+  - name: "Install mkfifo"
+    shell: semodule -i /root/mkfifo.pp
+    become: True
