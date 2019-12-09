@@ -511,7 +511,7 @@ Resources:
     Properties:
       Count: 1
       Handle: !Ref ICPDInstallationCompletedHandle
-      Timeout: '18000'                
+      Timeout: '22000'                
 
 Outputs:
   OpenShiftUI:
