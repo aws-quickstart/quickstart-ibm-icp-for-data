@@ -6,7 +6,7 @@ SCRIPT=${0##*/}
 
 echo $SCRIPT
 
-aws s3 cp  s3://aws-quickstart-icpd/quickstart-ibm-cloudpak-for-data/scripts/  /ibm/ --recursive
+aws s3 cp  ${CPD_QS_S3URI}scripts/  /ibm/ --recursive
 mv /ibm/scaler.py /root/ose_scaling/aws_openshift_quickstart/scaler.py
 cd /ibm
 # Make sure there is a "logs" directory in the current directory
