@@ -463,7 +463,7 @@ Resources:
           - 3AZCondition
           - !Join [',',[!GetAtt VPCStack.Outputs.PrivateSubnet1AID, !GetAtt VPCStack.Outputs.PrivateSubnet2AID, !GetAtt VPCStack.Outputs.PrivateSubnet3AID]]
           - !GetAtt VPCStack.Outputs.PrivateSubnet1AID
-        PrivateSubnetCIDR:  !Ref 'RemoteAccessCIDR'
+        PrivateSubnetCIDR:  !Ref 'VPCCIDR'
         IBMCloudPrivateVPC: !GetAtt 'VPCStack.Outputs.VPCID'
   
 
