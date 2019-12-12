@@ -374,41 +374,6 @@ Mappings:
     ThreeNode:
       TemplatePath: submodules/quickstart-aws-vpc/templates/aws-vpc.template
 
-  AWSRegionS3Bucket:
-    ap-northeast-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-1
-    ap-northeast-2:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-2
-    ap-northeast-3:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-3
-    ap-south-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-south-1
-    ap-southeast-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-southeast-1
-    ap-southeast-2:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-southeast-2
-    ca-central-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-ca-central-1
-    eu-central-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-eu-central-1
-    eu-north-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-eu-north-1
-    eu-west-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-eu-west-1
-    eu-west-2:
-      ICPDArchiveBucket: ibm-cloud-private-data-eu-west-2
-    eu-west-3:
-      ICPDArchiveBucket: ibm-cloud-private-data-eu-west-3
-    sa-east-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-sa-east-1
-    us-east-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-us-east-1
-    us-east-2:
-      ICPDArchiveBucket: ibm-cloud-private-data-us-east-2
-    us-west-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-us-west-1
-    us-west-2:
-      ICPDArchiveBucket: ibm-cloud-private-data-us-west-2    
 Rules:
   LicenseAgreementRule:
     Assertions:
@@ -419,10 +384,6 @@ Rules:
       AssertDescription: User must agree to the terms of the license agreement.    
 
 Conditions:
-  CustomClusterName: !Not
-    - !Equals
-      - !Ref ClusterName
-      - ""
   3AZCondition: !Equals [!Ref AvailabilityZoneCount, 3] 
  
 Resources:
@@ -453,25 +414,10 @@ Resources:
         PublicSubnetTag3: "kubernetes.io/role/elb="
         VPCCIDR: !Ref 'VPCCIDR'
 
-  ClusterSharedStorage:
+  CloudPakDataStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/shared-storage.yaml
-      Parameters:
-        AvailabilityZoneCount: !Ref AvailabilityZoneCount
-        PrivateSubnetIds: !If
-          - 3AZCondition
-          - !Join [',',[!GetAtt VPCStack.Outputs.PrivateSubnet1AID, !GetAtt VPCStack.Outputs.PrivateSubnet2AID, !GetAtt VPCStack.Outputs.PrivateSubnet3AID]]
-          - !GetAtt VPCStack.Outputs.PrivateSubnet1AID
-        PrivateSubnetCIDR:  !Ref 'VPCCIDR'
-        IBMCloudPrivateVPC: !GetAtt 'VPCStack.Outputs.VPCID'
-  
-
-
-  OpenShiftStack:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub 'https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-redhat-openshift/templates/openshift.template'
+      TemplateURL: !Sub https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/ibm-cloudpak-data.yaml
       Parameters:
         NumberOfAZs: !Ref AvailabilityZoneCount
         MasterInstanceType: !Ref 'MasterInstanceType'
@@ -480,7 +426,6 @@ Resources:
         NumberOfMaster: !Ref 'NumberOfMaster'
         NumberOfEtcd: !Ref 'NumberOfEtcd'
         NumberOfNodes: !Ref 'NumberOfNodes'
-        AnsibleStorageSize: '500'
         KeyPairName: !Ref 'KeyPairName'
         PrivateSubnet1ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet1AID'
         PrivateSubnet2ID: !If
@@ -503,56 +448,28 @@ Resources:
         RemoteAccessCIDR: !Ref 'RemoteAccessCIDR'
         ContainerAccessCIDR: !Ref 'ContainerAccessCIDR'
         QSS3BucketName: !Ref 'QSS3BucketName'
-        QSS3KeyPrefix: !Sub 
-          - ${KeyPrefix}submodules/quickstart-redhat-openshift/
-          - {KeyPrefix: !Ref QSS3KeyPrefix}
-        OpenShiftAdminPassword: !Ref 'AdminPassword'
+        QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
+        AdminPassword: !Ref 'AdminPassword'
         RedhatSubscriptionUserName: !Ref 'RedhatSubscriptionUserName'
         RedhatSubscriptionPassword: !Ref 'RedhatSubscriptionPassword'
         RedhatSubscriptionPoolID: !Ref 'RedhatSubscriptionPoolID'
         OutputBucketName: !Ref 'OutputBucketName'
         VPCCIDR: !Ref 'VPCCIDR'
         VPCID: !GetAtt 'VPCStack.Outputs.VPCID'
-        OpenshiftContainerPlatformVersion: '3.11'
         HostedZoneID: !Ref 'HostedZoneID'
         DomainName: !Ref 'DomainName'
         SubDomainPrefix: !Ref 'SubDomainPrefix'
-        ClusterName: !If
-        - CustomClusterName
-        - !Ref ClusterName
-        - !Sub '${AWS::StackName}-${AWS::Region}'
         ClusterConsole: !Ref ClusterConsole
-        AnsiblePostInstallScript: !Sub s3://${QSS3BucketName}/${QSS3KeyPrefix}scripts/post-install.sh
-        AnsibleAdditionalEnvironmentVariables: !Join
-          - ','
-          - - !Sub 'Namespace=${Namespace}'
-            - !Sub 'LicenseAgreement=${LicenseAgreement}'
-            - !Sub 'EFSDNSName=${ClusterSharedStorage.Outputs.EFSDNSName}'
-            - !Sub 'EFSFileSystemId=${ClusterSharedStorage.Outputs.EFSFileSystemId}'
-            - !Sub 'ApplicationStorageMountPoint=${ApplicationStorageMountPoint}'
-            - !Sub
-              - 'ICPDArchiveBucket=${ICPDArchiveBucket}'
-              - {ICPDArchiveBucket: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPDArchiveBucket]}
-            - !Sub 'ICPDInstallationCompletedURL=${ICPDInstallationCompletedHandle}'
-            - !Sub 'CPD_QS_S3URI=s3://${QSS3BucketName}/${QSS3KeyPrefix}'
-
-  ICPDInstallationCompletedHandle:
-    Type: AWS::CloudFormation::WaitConditionHandle  
-
-  ICPDInstallationCompleted:
-    Type: AWS::CloudFormation::WaitCondition
-    Properties:
-      Count: 1
-      Handle: !Ref ICPDInstallationCompletedHandle
-      Timeout: '22000'           
+        ApplicationStorageMountPoint: !Ref ApplicationStorageMountPoint
+        ICPDVersion: !Ref ICPDVersion
+        Namespace: !Ref Namespace
+        LicenseAgreement: !Ref LicenseAgreement
+        ClusterName: !Ref ClusterName
 
 Outputs:
   OpenShiftUI:
     Description: The URL OpenShiftUI
-    Value: !GetAtt 'OpenShiftStack.Outputs.OpenShiftUI'
+    Value: !GetAtt 'CloudPakDataStack.Outputs.OpenShiftUI'
   ICPDWebClientURL:
     Description: Use this ELB to expose ports to the internet
-    Value: !Join
-      - ''
-      - - https://
-        - !GetAtt OpenShiftStack.Outputs.ContainerAccessELBName
+    Value: !GetAtt CloudPakDataStack.Outputs.ICPDWebClientURL
