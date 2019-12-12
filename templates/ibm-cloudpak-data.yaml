@@ -432,7 +432,7 @@ Resources:
           - 3AZCondition
           - !Join [',',[!Ref PrivateSubnet1ID, !Ref PrivateSubnet2ID, !Ref PrivateSubnet3ID]]
           - !Ref PrivateSubnet1ID
-        PrivateSubnetCIDR:  !Ref 'RemoteAccessCIDR'
+        PrivateSubnetCIDR:  !Ref 'VPCCIDR'
         IBMCloudPrivateVPC: !Ref 'VPCID'
 
 
