@@ -1,0 +1,9 @@
+---
+- hosts: nodes
+  tasks:
+  - name: "echo kernel.sem"
+    shell: echo "kernel.sem = 250 1024000 100 4096" >> /etc/sysctl.conf ; sysctl -p 
+    become: True
+  - name: "vm.max_map_count"
+    shell:  echo "vm.max_map_count=262144" >> /etc/sysctl.conf ; sysctl -p
+    become: True
