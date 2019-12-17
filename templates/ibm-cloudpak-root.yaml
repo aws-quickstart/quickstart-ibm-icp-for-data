@@ -4,9 +4,9 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Network Configuration
+          default: VPC network configuration
         Parameters:
-          - AvailabilityZoneCount
+          - NumberOfAZs
           - AvailabilityZones
           - VPCCIDR
           - PrivateSubnet1CIDR
@@ -18,17 +18,17 @@ Metadata:
           - RemoteAccessCIDR
           - ContainerAccessCIDR
       - Label:
-          default: DNS Configuration
+          default: DNS configuration
         Parameters:
           - DomainName
           - HostedZoneID
           - SubDomainPrefix
       - Label:
-          default: Amazon EC2 Configuration
+          default: Amazon EC2 configuration
         Parameters:
           - KeyPairName
       - Label:
-          default: OpenShift Hosts Configuration
+          default: OpenShift hosts configuration
         Parameters:
           - NumberOfMaster
           - NumberOfEtcd
@@ -41,100 +41,99 @@ Metadata:
           - ClusterConsole
           - ApplicationStorageMountPoint
       - Label:
-          default: Red Hat Subscription Information
+          default: Red Hat subscription information
         Parameters:
           - RedhatSubscriptionUserName
           - RedhatSubscriptionPassword
           - RedhatSubscriptionPoolID
-      - Label:
-          default: AWS Quick Start Configuration
-        Parameters:
-          - QSS3BucketName
-          - QSS3KeyPrefix
-          - OutputBucketName
       - Label:
           default: IBM Cloud Pak for Data configuration
         Parameters:
           - ICPDVersion
           - LicenseAgreement
           - Namespace
-          
+      - Label:
+          default: AWS Quick Start configuration
+        Parameters:
+          - QSS3BucketName
+          - QSS3KeyPrefix
+          - OutputBucketName
+
     ParameterLabels:
       KeyPairName:
-        default: SSH Key Name
-
+        default: Key pair name
       PrivateSubnet1CIDR:
-        default: Private Subnet 1 CIDR
+        default: Private subnet 1 CIDR
       PrivateSubnet2CIDR:
-        default: Private Subnet 2 CIDR
+        default: Private subnet 2 CIDR
       PrivateSubnet3CIDR:
-        default: Private Subnet 3 CIDR
+        default: Private subnet 3 CIDR
       PublicSubnet1CIDR:
-        default: Public Subnet 1 CIDR
+        default: Public subnet 1 CIDR
       PublicSubnet2CIDR:
-        default: Public Subnet 2 CIDR
+        default: Public subnet 2 CIDR
       PublicSubnet3CIDR:
-        default: Public Subnet 3 CIDR
+        default: Public subnet 3 CIDR
       QSS3BucketName:
-        default: Quick Start S3 Bucket Name
+        default: Quick Start S3 bucket name
       QSS3KeyPrefix:
-        default: Quick Start S3 Key Prefix
+        default: Quick Start S3 key prefix
       RemoteAccessCIDR:
-        default: Allowed External Access CIDR (OCP UI)
+        default: Allowed external access CIDR (OCP UI)
       ContainerAccessCIDR:
-        default: Allowed External Access CIDR (OCP Router)
+        default: Allowed external access CIDR (Cloud Pak for Data Router)
       VPCCIDR:
         default: VPC CIDR
       AdminPassword:
-        default: OpenShift UI Password
+        default: OpenShift UI password
       RedhatSubscriptionUserName:
-        default: Red Hat Subscription User Name
+        default: Red Hat subscription user name
       RedhatSubscriptionPassword:
-        default: Red Hat Subscription Password
+        default: Red Hat subscription password
       RedhatSubscriptionPoolID:
-        default: Red Hat Pool ID
+        default: Red Hat pool ID
       MasterInstanceType:
-        default: Master Instance Type
+        default: Master instance type
       EtcdInstanceType:
-        default: Etcd Instance Type
+        default: Etcd instance type
       NodesInstanceType:
-        default: Nodes Instance Type
+        default: Nodes instance type
       NumberOfMaster:
-        default: Number of Masters
+        default: Number of masters
       NumberOfEtcd:
-        default: Number of Etcds
+        default: Number of etcds
       NumberOfNodes:
-        default: Number of Nodes
+        default: Number of nodes
       OutputBucketName:
-        default: Output S3 Bucket Name
+        default: Output S3 bucket name
       DomainName:
-        default: Domain Name
+        default: Domain name
       HostedZoneID:
-        default: Route 53 Hosted Zone ID
+        default: Route 53 hosted zone ID
       SubDomainPrefix:
-        default: Subdomain Prefix
+        default: Subdomain prefix
       ApplicationStorageMountPoint:
         default: Application storage mount point 
-      AvailabilityZoneCount:
-        default: Availability Zone count  
+      NumberOfAZs:
+        default: Number of Availability Zones
       AvailabilityZones:
         default: Availability Zones
       ClusterName:
-        default: Cluster Name
+        default: Cluster name
       ClusterConsole:
-        default: Enable the cluster console (Requires OpenShift 3.11)
+        default: Enable the cluster console
       LicenseAgreement:
         default: License agreement
       ICPDVersion:
         default: IBM Cloud Pak for Data version
       Namespace:
-        default: OpenShift Project
+        default: OpenShift project
 Parameters:
-  AvailabilityZoneCount:
+  NumberOfAZs:
     Description: >-
-      The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to 2 Availability Zones.  For a single ICP cluster to be highly available, 3 Availability Zones are needed to avoid a single point of failure when using 3, 5 or 7 master nodes or etcd nodes.  With less than 3 Availability Zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority of the etcd instances.
+      The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to 2 Availability Zones.  For a single IBM Cloud Pak for Data cluster to be highly available, 3 Availability Zones are needed to avoid a single point of failure when using 3, 5 or 7 master nodes or etcd nodes.  With less than 3 Availability Zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority of the etcd instances.
     Type: Number
-    Default: 1
+    Default: 3
     # For now, only 1 or 3 AZs can be used.
     AllowedValues:
       - 1
@@ -150,45 +149,44 @@ Parameters:
     Type: List<AWS::EC2::AvailabilityZone::Name>
   KeyPairName:
     Description: The name of an existing public/private key pair, which allows you
-      to securely connect to your instance after it launches
+      to securely connect to your instance after it launches.
     Type: AWS::EC2::KeyPair::KeyName
   PrivateSubnet1CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
     Default: 10.0.0.0/19
-    Description: CIDR block for private subnet 1 located in Availability Zone 1
+    Description: The CIDR block for the private subnet located in Availability Zone 1.
     Type: String
   PrivateSubnet2CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
     Default: 10.0.32.0/19
-    Description: CIDR block for private subnet 2 located in Availability Zone 2
+    Description: The CIDR block for the private subnet located in Availability Zone 2.
     Type: String
   PrivateSubnet3CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
     Default: 10.0.64.0/19
-    Description: CIDR block for private subnet 2 located in Availability Zone 3
+    Description: The CIDR block for the private subnet located in Availability Zone 3.
     Type: String
   PublicSubnet1CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
     Default: 10.0.128.0/20
-    Description: CIDR block for the public (DMZ) subnet 1 located in Availability
-      Zone 1
+    Description: The CIDR block for the public subnet located in Availability Zone 1.
     Type: String
   PublicSubnet2CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
     Default: 10.0.144.0/20
-    Description: CIDR block for the public (DMZ) subnet 2 located in Availability
+    Description: The CIDR block for the public subnet located in Availability Zone 2.
       Zone 2
     Type: String
   PublicSubnet3CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
     Default: 10.0.160.0/20
-    Description: CIDR block for the public (DMZ) subnet 2 located in Availability
+    Description: The CIDR block for the public subnet located in Availability Zone 3.
       Zone 3
     Type: String
   QSS3BucketName:
@@ -213,32 +211,30 @@ Parameters:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
     Description: The CIDR IP range that is permitted to access the instances We recommend
-      that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access.Additional values can be added post-deployment from the AWS CloudFormation console.
+      that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
     Type: String
   ContainerAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
     Description: The CIDR IP range that is permitted to access the instances We recommend
-      that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access.Additional values can be added post-deployment from the AWS CloudFormation console.
+      that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
     Type: String
   AdminPassword:
-    Description: Password for OpenShift and Cloud Pak for Data Admin UI Must be at least 8 and no more than
-      12 characters containing letters and (minimum 1 capital letter), numbers and
-      symbols
+    Description: The password for the OpenShift Admin UI and the Cloud Pak for Data web client. The password must contain at least 8 characters, including letters (with a minimum of one capital letter), numbers, and symbols.
     Type: String
     MinLength: '8'
     AllowedPattern: ^[^ \\']+$
     NoEcho: 'true'
   RedhatSubscriptionUserName:
-    Description: Enter Redhat RHN User Name
+    Description: Enter your Red Hat Network (RHN) user name
     Type: String
   RedhatSubscriptionPassword:
     NoEcho: 'true'
-    Description: Enter Redhat RHN Password
+    Description: Enter your Red Hat Network (RHN) password
     Type: String
     AllowedPattern: ^[^ \\']+$
   RedhatSubscriptionPoolID:
-    Description: Enter Redhat RHN PoolID
+    Description: Enter your Red Hat Network (RHN) pool ID
     Type: String
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
@@ -254,7 +250,7 @@ Parameters:
       - m5d.xlarge
       - m5d.2xlarge
     ConstraintDescription: Must contain valid instance type
-    Description: Type of EC2 instance for the Master instances
+    Description: The EC2 instance type for the OpenShift master instances.
     Type: String
   EtcdInstanceType:
     Default: m5.xlarge
@@ -282,7 +278,7 @@ Parameters:
       - c4.4xlarge
       - c4.8xlarge
     ConstraintDescription: Must contain valid instance type
-    Description: Type of EC2 instance for the Etcd instances
+    Description: The EC2 instance type for the OpenShift etcd instances.
     Type: String
   NodesInstanceType:
     Default: m5.4xlarge
@@ -298,21 +294,21 @@ Parameters:
       - c5.18xlarge
       - c5.24xlarge
     ConstraintDescription: Must contain valid instance type
-    Description: Type of EC2 instance for the Node instances
+    Description: The EC2 instance type for the OpenShift node instances.
     Type: String
   NumberOfMaster:
-    Default: '1'
+    Default: '3'
     Description: The desired capacity for the OpenShift Master instances.  Must be an odd number. For a development deployment 1 is sufficient; for production deployments minimum 3 is required.
     Type: String
     AllowedPattern: '^[13579]$|(^[1-9]+[13579]$)'
   NumberOfEtcd:
-    Default: '1'
+    Default: '3'
     Description: The desired capacity for the OpenShift Etcd instances. Must be an odd number. For a development deployment 1 is sufficient; for production deployments minimum 3 is required.
     Type: String
     AllowedPattern: '^[13579]$|(^[1-9]+[13579]$)'
   NumberOfNodes:
     Default: '3'
-    Description: The desired capacity for the OpenShift node instances. Minimum of 3 nodes required.
+    Description: The desired capacity for the OpenShift node instances. Minimum of 3 nodes required. If the number of node instances exceeds your Red Hat entitlement limits or AWS instance limits, the stack will fail. Choose a number that is within your limits.
     Type: Number
   OutputBucketName:
     Description: 'OPTIONAL: Bucket Name where the zip file output should be placed,
@@ -326,28 +322,28 @@ Parameters:
     Default: ""
   DomainName:
     Description: >-
-      OPTIONAL: domain name configured for the cluster, if left blank self signed
-      certificates will be used for TLS and the LoadBalancer's auto-generated hostname
+      (Optional) domain name configured for the cluster, if left blank self signed
+      certificates will be used for TLS and the Load Balancer's auto-generated hostname
       will be used for connections from outside the cluster.
     Type: String
     Default: ""
   SubDomainPrefix:
     Default: ''
-    Description: 'OPTIONAL: Subdomain to use, if left blank DomainName will be used
+    Description: '(Optional) Subdomain to use, if left blank DomainName will be used
       without a prefix. If you specify this you must also specify DomainName and HostedZoneID'
     Type: String
   ClusterName:
     Default: ""
-    Description: Custom cluster name for kubernetes.io/cluster/ tags, if left blank will use the stackname suffixed with the region
+    Description: Custom cluster name for kubernetes.io/cluster/ tags, if left blank will use the stack name suffixed with the AWS Region.
     Type: String
   ClusterConsole:
     Default: Enabled
-    Description: Enable the Cluster Console
+    Description: Choose Disabled to disable the cluster console.
     Type: String
     AllowedValues: [ Enabled, Disabled ]
   ICPDVersion:
     Description: >-
-      The version of IBM Cloud Pak for Data to be deployed.  The full version must be provided, e.g., 2.5
+      The version of IBM Cloud Pak for Data to be deployed.  The full version must be provided, e.g., 2.5.
     Type: String
     AllowedValues:
       - 2.5
@@ -384,7 +380,7 @@ Rules:
       AssertDescription: User must agree to the terms of the license agreement.    
 
 Conditions:
-  3AZCondition: !Equals [!Ref AvailabilityZoneCount, 3] 
+  3AZCondition: !Equals [!Ref NumberOfAZs, 3]
  
 Resources:
   VPCStack:
@@ -401,7 +397,7 @@ Resources:
       Parameters:
         AvailabilityZones: !Join [ ',', !Ref 'AvailabilityZones']
         KeyPairName: !Ref 'KeyPairName'
-        NumberOfAZs: !Ref AvailabilityZoneCount
+        NumberOfAZs: !Ref NumberOfAZs
         PrivateSubnet1ACIDR: !Ref 'PrivateSubnet1CIDR'
         PrivateSubnet2ACIDR: !Ref 'PrivateSubnet2CIDR'
         PrivateSubnet3ACIDR: !Ref 'PrivateSubnet3CIDR'
@@ -419,7 +415,7 @@ Resources:
     Properties:
       TemplateURL: !Sub https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/ibm-cloudpak-data.yaml
       Parameters:
-        NumberOfAZs: !Ref AvailabilityZoneCount
+        NumberOfAZs: !Ref NumberOfAZs
         MasterInstanceType: !Ref 'MasterInstanceType'
         NodesInstanceType: !Ref 'NodesInstanceType'
         EtcdInstanceType: !Ref 'EtcdInstanceType'
