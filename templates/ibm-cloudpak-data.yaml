@@ -62,6 +62,10 @@ Metadata:
       - Label:
           default: IBM Cloud Pak for Data configuration
         Parameters:
+          - WKC
+          - WML
+          - DV
+          - WSL
           - ICPDVersion
           - LicenseAgreement
           - Namespace
@@ -136,7 +140,49 @@ Metadata:
         default: IBM Cloud Pak for Data version
       Namespace:
         default: OpenShift Project
+      WSL:
+        default: Watson Studio Addon
+      WML:
+        default: Watson Machine Learning Addon  
+      WKC:
+        default: Watson Knowledge Catalog Addon  
+      DV:
+        default: Data Virtualization Addon 
 Parameters:
+
+  DV:
+    Description: >-
+       Data Virtualization addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - False
+      - True
+    Default: False
+  WML:
+    Description: >-
+       Watson Machine Learning addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - False
+      - True
+    Default: False
+  WSL:
+    Description: >-
+       Watson Studio addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - False
+      - True
+    Default: False
+  WKC:
+    Description: >-
+       Watson Knowledge Catalog addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - False
+      - True
+    Default: False 
+
   ApplicationStorageMountPoint:
     Description: Mount point for the EFS volume to be used for application shared storage. The Kubernetes EFS provisioner uses this mount point.
     Type: String
@@ -402,7 +448,7 @@ Rules:
         - - I agree
         - Ref: LicenseAgreement
       AssertDescription: User must agree to the terms of the license agreement.    
-
+   
 Conditions:
   CustomClusterName: !Not
     - !Equals
@@ -494,6 +540,10 @@ Resources:
             - !Sub 'ICPDInstallationCompletedURL=${ICPDInstallationCompletedHandle}'
             - !Sub 'CPD_QS_S3URI=s3://${QSS3BucketName}/${QSS3KeyPrefix}'
             - !Sub 'ICPDVersion=${ICPDVersion}'
+            - !Sub 'WKC=${WKC}'
+            - !Sub 'DV=${DV}'
+            - !Sub 'WML=${WML}'
+            - !Sub 'WSL=${WSL}'
 
 
   ICPDInstallationCompletedHandle:

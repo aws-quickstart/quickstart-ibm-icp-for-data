@@ -241,27 +241,45 @@ class CPDInstall(object):
         # extractend = Utilities.currentTimeMillis()
         # TR.info(methodName,"Extracted install package")
         # self.printTime(s3end, extractend, "Extracting cpd tar")
-        wslstart = Utilities.currentTimeMillis()
-        TR.info(methodName,"Start installing WSL package")
-        self.installAssemblies("wsl","2.1.0",icpdInstallLogFile)
-        wslend = Utilities.currentTimeMillis()
-        TR.info(methodName,"WSL package installation completed")
-        self.printTime(wslstart, wslend, "Installing WSL")
-
+        litestart = Utilities.currentTimeMillis()
+        TR.info(methodName,"Start installing Lite package")
+        self.installAssemblies("lite","v2.5.0.0",icpdInstallLogFile)
+        liteend = Utilities.currentTimeMillis()
+        self.printTime(litestart, liteend, "Installing Lite")
         self.configureCPDRoute(icpdInstallLogFile)
-        
-        TR.info(methodName,"Start installing WML package")
-        self.installAssemblies("wml","2.1.0.0",icpdInstallLogFile)
-        wmlend = Utilities.currentTimeMillis()
-        TR.info(methodName,"WML package installation completed")
-        self.printTime(wslend, wmlend, "Installing WML")
-        
-        TR.info(methodName,"Start installing WKC package")
-        self.installAssemblies("wkc","3.0.333",icpdInstallLogFile)
-        wkcend = Utilities.currentTimeMillis()
-        TR.info(methodName,"WKC package installation completed")
-        self.printTime(wmlend, wkcend, "Installing WKC")
 
+
+        if(self.installWSL):
+            TR.info(methodName,"Start installing WSL package")
+            wslstart = Utilities.currentTimeMillis()
+            self.installAssemblies("wsl","2.1.0",icpdInstallLogFile)
+            wslend = Utilities.currentTimeMillis()
+            TR.info(methodName,"WSL package installation completed")
+            self.printTime(wslstart, wslend, "Installing WSL")
+
+        if(self.installDV):
+            TR.info(methodName,"Start installing DV package")
+            dvstart = Utilities.currentTimeMillis()
+            self.installAssemblies("dv","v1.3.0.0",icpdInstallLogFile)
+            dvend = Utilities.currentTimeMillis()
+            TR.info(methodName,"DV package installation completed")
+            self.printTime(dvstart, dvend, "Installing DV")
+        
+        if(self.installWML):
+            TR.info(methodName,"Start installing WML package")
+            wmlstart = Utilities.currentTimeMillis()
+            self.installAssemblies("wml","2.1.0.0",icpdInstallLogFile)
+            wmlend = Utilities.currentTimeMillis()
+            TR.info(methodName,"WML package installation completed")
+            self.printTime(wmlstart, wmlend, "Installing WML")
+        
+        if(self.installWKC):
+            TR.info(methodName,"Start installing WKC package")
+            wkcstart = Utilities.currentTimeMillis()
+            self.installAssemblies("wkc","3.0.333",icpdInstallLogFile)
+            wkcend = Utilities.currentTimeMillis()
+            TR.info(methodName,"WKC package installation completed")
+            self.printTime(wkcstart, wkcend, "Installing WKC")
 
 
         TR.info(methodName,"Installed all packages.")
@@ -323,7 +341,8 @@ class CPDInstall(object):
         install_cmd = "/ibm/cpd-linux -c aws-efs -r /ibm/repo.yaml -a "+assembly+" -n "+self.namespace+" --version="+version+" --transfer-image-to="+self.docker_registry+" --target-registry-username=unused   --target-registry-password="+self.token+" --accept-all-licenses | tee /ibm/logs/"+assembly+"_install.log"
 
         retcode = call(install_cmd,shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"Execute install command for assembly %s"%retcode)        
+        TR.info(methodName,"Execute install command for assembly %s"%retcode)  
+        self.validateInstall(icpdInstallLogFile)      
 
     def getPassword(self):
         """
@@ -473,7 +492,8 @@ class CPDInstall(object):
         install_status = check_output(['bash','-c',validate_cmd])
         TR.info(methodName,"Installation status is %s"%install_status)
         if(install_status.count("DEPLOYED")<24):
-            self.rc = 1
+            #self.rc = 1
+            TR.info(methodName,"Installation Deployed count  is %s"%install_status.count("DEPLOYED"))
             return   
 
     #endDef    
@@ -551,7 +571,10 @@ class CPDInstall(object):
                 self.namespace = params.get('Namespace')
                 self.cpdbucketName = params.get('ICPDArchiveBucket')
                 self.ICPDInstallationCompletedURL = params.get('ICPDInstallationCompletedURL')
-            
+                self.installWKC= Utilities.toBoolean(params.get('WKC'))
+                self.installWML= Utilities.toBoolean(params.get('WML'))
+                self.installWSL= Utilities.toBoolean(params.get('WSL'))
+                self.installDV= Utilities.toBoolean(params.get('DV'))
                 TR.info(methodName, "Retrieve namespace value from Env Variables %s" %self.namespace)
                 self.logExporter = LogExporter(region=self.region,
                                    bucket=self.getOutputBucket(),
@@ -592,14 +615,14 @@ class CPDInstall(object):
             TR.info(methodName,"SUCCESS END CPD Install AWS ICPD Quickstart.  Elapsed time (hh:mm:ss): %d:%02d:%02d" % (eth,etm,ets))
             self.updateStatus(status)
             os.remove("/ibm/trial.lic")
-            os.remove("/ibm/repo.yaml")
+            #os.remove("/ibm/repo.yaml")
         else:
             success = 'false'
             status = 'FAILURE: Check logs in S3 log bucket or on the AnsibleConfigServer node EC2 instance in /ibm/logs/icpd_install.log and /ibm/logs/post_install.log'
             TR.info(methodName,"FAILED END CPD Install AWS ICPD Quickstart.  Elapsed time (hh:mm:ss): %d:%02d:%02d" % (eth,etm,ets))
             self.updateStatus(status)
             os.remove("/ibm/trial.lic")
-            os.remove("/ibm/repo.yaml")
+            #os.remove("/ibm/repo.yaml")
             #endIf 
         try:
             data = "%s: IBM Cloud Pak installation elapsed time: %d:%02d:%02d" % (status,eth,etm,ets)    

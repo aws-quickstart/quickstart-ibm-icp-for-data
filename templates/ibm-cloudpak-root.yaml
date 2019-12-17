@@ -55,6 +55,10 @@ Metadata:
       - Label:
           default: IBM Cloud Pak for Data configuration
         Parameters:
+          - WKC
+          - WML
+          - DV
+          - WSL
           - ICPDVersion
           - LicenseAgreement
           - Namespace
@@ -125,11 +129,52 @@ Metadata:
         default: Enable the cluster console (Requires OpenShift 3.11)
       LicenseAgreement:
         default: License agreement
+      WSL:
+        default: Watson Studio Addon
+      WML:
+        default: Watson Machine Learning Addon  
+      WKC:
+        default: Watson Knowledge Catalog Addon  
+      DV:
+        default: Data Virtualization Addon  
       ICPDVersion:
         default: IBM Cloud Pak for Data version
       Namespace:
         default: OpenShift Project
 Parameters:
+
+  DV:
+    Description: >-
+       Data Virtualization addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - False
+      - True
+    Default: False
+  WML:
+    Description: >-
+       Watson Machine Learning addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - False
+      - True
+    Default: False
+  WSL:
+    Description: >-
+       Watson Studio addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - False
+      - True
+    Default: False
+  WKC:
+    Description: >-
+       Watson Knowledge Catalog addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - False
+      - True
+    Default: False            
   AvailabilityZoneCount:
     Description: >-
       The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to 2 Availability Zones.  For a single ICP cluster to be highly available, 3 Availability Zones are needed to avoid a single point of failure when using 3, 5 or 7 master nodes or etcd nodes.  With less than 3 Availability Zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority of the etcd instances.
@@ -465,6 +510,11 @@ Resources:
         Namespace: !Ref Namespace
         LicenseAgreement: !Ref LicenseAgreement
         ClusterName: !Ref ClusterName
+        WKC: !Ref WKC
+        WML: !Ref WML
+        WSL: !Ref WSL
+        DV: !Ref DV
+        
 
 Outputs:
   OpenShiftUI:
