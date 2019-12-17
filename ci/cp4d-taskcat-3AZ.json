@@ -4,7 +4,7 @@
         "ParameterValue": "$[taskcat_genaz_3]"
     },
     {
-        "ParameterKey": "AvailabilityZoneCount",
+        "ParameterKey": "NumberOfAZs",
         "ParameterValue":"3"
     },
     {
