@@ -409,6 +409,7 @@ Parameters:
   Namespace:
     Description: >-
       The OpenShift project that will be created for deploying Cloud Pak for Data.
+    AllowedPattern: '^[a-z0-9_\-]+$'
     Type: String
     Default: "zen"
   
