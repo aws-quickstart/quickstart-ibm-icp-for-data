@@ -110,11 +110,11 @@ Metadata:
       NodesInstanceType:
         default: Nodes instance type
       NumberOfMaster:
-        default: Number of Masters
+        default: Number of masters
       NumberOfEtcd:
-        default: Number of Etcd
+        default: Number of etcd
       NumberOfNodes:
-        default: Number of Nodes
+        default: Number of nodes
       OutputBucketName:
         default: Output S3 bucket name
       DomainName:
@@ -137,7 +137,7 @@ Metadata:
         default: OpenShift project
 Parameters:
   ApplicationStorageMountPoint:
-    Description: Mount point for the EFS volume to be used for application shared storage. The Kubernetes EFS provisioner uses this mount point.
+    Description: The mount point for the EFS volume to be used for application shared storage. The Kubernetes EFS provisioner uses this mount point.
     Type: String
     Default: /mnt/storage
 
@@ -184,14 +184,12 @@ Parameters:
   RemoteAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access the instances We recommend
-      that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
+    Description: The CIDR IP range that is permitted to access the OCP console. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
     Type: String
   ContainerAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access the instances We recommend
-      that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
+    Description: The CIDR IP range that is permitted to access Cloud Pak for Data. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
     Type: String
   AdminPassword:
     Description: The password for the OpenShift Admin UI and the Cloud Pak for Data web client. The password must contain at least 8 characters, including letters (with a minimum of one capital letter), numbers, and symbols.
@@ -275,24 +273,25 @@ Parameters:
     Type: String
   NumberOfAZs:  
     Default: 1
-    Description: The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to 2 Availability Zones.  For a single IBM Cloud Pak for Data cluster to be highly available, 3 Availability Zones are needed to avoid a single point of failure when using 3, 5 or 7 master nodes or etcd nodes.  With less than 3 Availability Zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority of the etcd instances.
+    Description: >-
+      The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to two Availability Zones. For a single IBM Cloud Pak for Data cluster to be highly available, three Availability Zones are needed to avoid a single point of failure when using three, five, or seven master nodes or etcd nodes. With fewer than three Availability Zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority of the etcd instances. Allowed values: 1, 3
     Type: Number
     AllowedValues:
     - 1
     - 3
   NumberOfMaster:
-    Default: '1'
+    Default: '3'
     Description: The desired capacity for the OpenShift Master instances.  Must be an odd number. For a development deployment 1 is sufficient; for production deployments minimum 3 is required.
     Type: String
     AllowedPattern: '^[13579]$|(^[1-9]+[13579]$)'
   NumberOfEtcd:
-    Default: '1'
-    Description: The desired capacity for the OpenShift Etcd instances. Must be an odd number. For a development deployment 1 is sufficient; for production deployments minimum 3 is required.
+    Default: '3'
+    Description: The desired capacity for the OpenShift etcd instances. Must be an odd number. For a development deployment, 1 is sufficient; for production deployments, a minimum of 3 is required.
     Type: String
     AllowedPattern: '^[13579]$|(^[1-9]+[13579]$)'
   NumberOfNodes:
     Default: '3'
-    Description: The desired capacity for the OpenShift node instances. Minimum of 3 nodes required.
+    Description: The desired capacity for the OpenShift node instances. Minimum of 3 nodes required. If the number of node instances exceeds your Red Hat entitlement limits or AWS instance limits, the stack will fail. Choose a number that is within your limits.
     Type: Number
   OutputBucketName:
     Description: '(Optional) Bucket Name where the zip file output should be placed,
@@ -300,8 +299,7 @@ Parameters:
     Type: String
     Default: ''
   HostedZoneID:
-    Description: '(Optional) Route 53 Hosted Zone ID to use. If left blank route 53
-      will not be configured and DNS must be setup manually If you specify this you must also specify DomainName'
+    Description: '(Optional) Route 53 hosted zone ID to use. If left blank, Amazon Route 53 will not be configured, and DNS must be set up manually. If you specify this, you must also specify DomainName.'
     Type: String
     Default: ""
   DomainName:
@@ -313,16 +311,15 @@ Parameters:
     Default: ""
   SubDomainPrefix:
     Default: ''
-    Description: '(Optional) Subdomain to use, if left blank DomainName will be used
-      without a prefix. If you specify this you must also specify DomainName and HostedZoneID'
+    Description: '(Optional) Subdomain to use. If left blank, DomainName will be used without a prefix. If you specify this, you must also specify DomainName and HostedZoneID.'
     Type: String
   ClusterName:
     Default: ""
-    Description: Custom cluster name for kubernetes.io/cluster/ tags, if left blank will use the stack name suffixed with the AWS Region.
+    Description: Custom cluster name for kubernetes.io/cluster/tags. If left blank, will use the stack name suffixed with the AWS Region.
     Type: String
   ClusterConsole:
     Default: Enabled
-    Description: Choose Disabled to disable the cluster console.
+    Description: To disable the cluster console, choose Disabled.
     Type: String
     AllowedValues: [ Enabled, Disabled ]
   ICPDVersion:
@@ -343,7 +340,7 @@ Parameters:
     ConstraintDescription: must answer 'I agree'
   Namespace:
     Description: >-
-      The OpenShift project that will be created for deploying Cloud Pak for Data.
+      The OpenShift project that will be created for deploying Cloud Pak for Data. It can be any lowercase string.
     Type: String
     Default: "zen"
   
