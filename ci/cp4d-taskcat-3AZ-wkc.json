@@ -41,11 +41,11 @@
     },
     {
         "ParameterKey": "ContainerAccessCIDR",
-        "ParameterValue": "10.0.0.0/16"
+        "ParameterValue": "0.0.0.0/0"
     },
     {
         "ParameterKey": "RemoteAccessCIDR",
-        "ParameterValue": "10.0.0.0/16"
+        "ParameterValue": "0.0.0.0/0"
     },
     {
         "ParameterKey": "VPCCIDR",
@@ -66,5 +66,9 @@
     {
         "ParameterKey":"APIKey",
         "ParameterValue":""
+    },
+    {
+        "ParameterKey":"WKC",
+        "ParameterValue": "True"
     }
 ]

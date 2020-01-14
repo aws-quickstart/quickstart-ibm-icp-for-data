@@ -1,11 +1,11 @@
 [
     {
         "ParameterKey": "AvailabilityZones",
-        "ParameterValue": "$[taskcat_genaz_3]"
+        "ParameterValue": "$[taskcat_genaz_1]"
     },
     {
         "ParameterKey": "NumberOfAZs",
-        "ParameterValue":"3"
+        "ParameterValue":"1"
     },
     {
         "ParameterKey": "KeyPairName",
@@ -13,11 +13,11 @@
     },
     {
         "ParameterKey": "NumberOfMaster",
-        "ParameterValue": "3"
+        "ParameterValue": "1"
     },
     {
         "ParameterKey": "NumberOfEtcd",
-        "ParameterValue": "3"
+        "ParameterValue": "1"
     },
     {
         "ParameterKey": "NumberOfNodes",
@@ -41,11 +41,11 @@
     },
     {
         "ParameterKey": "ContainerAccessCIDR",
-        "ParameterValue": "10.0.0.0/16"
+        "ParameterValue": "0.0.0.0/0"
     },
     {
         "ParameterKey": "RemoteAccessCIDR",
-        "ParameterValue": "10.0.0.0/16"
+        "ParameterValue": "0.0.0.0/0"
     },
     {
         "ParameterKey": "VPCCIDR",
@@ -66,5 +66,13 @@
     {
         "ParameterKey":"APIKey",
         "ParameterValue":""
+    },
+    {
+        "ParameterKey":"WSL",
+        "ParameterValue": "True"
+    },
+    {
+        "ParameterKey":"WML",
+        "ParameterValue": "True"
     }
 ]

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Template for an IBM Cloud Pak for Data deployment with existing VPC. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template.
+Description: Template for an IBM Cloud Pak for Data deployment with existing VPC. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template. (qs-1pek09fje)
 Metadata:
   AWSAMIRegionMap:
     Filters:
@@ -11,7 +11,7 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
-          default: Network Configuration
+          default: Network configuration
         Parameters:
           - NumberOfAZs
           - VPCID
@@ -25,17 +25,17 @@ Metadata:
           - RemoteAccessCIDR
           - ContainerAccessCIDR
       - Label:
-          default: DNS Configuration
+          default: DNS configuration
         Parameters:
           - DomainName
           - HostedZoneID
           - SubDomainPrefix
       - Label:
-          default: Amazon EC2 Configuration
+          default: Amazon EC2 configuration
         Parameters:
           - KeyPairName
       - Label:
-          default: OpenShift Hosts Configuration
+          default: OpenShift hosts configuration
         Parameters:
           - NumberOfMaster
           - NumberOfEtcd
@@ -48,92 +48,92 @@ Metadata:
           - ClusterConsole
           - ApplicationStorageMountPoint
       - Label:
-          default: Red Hat Subscription Information
+          default: Red Hat subscription information
         Parameters:
           - RedhatSubscriptionUserName
           - RedhatSubscriptionPassword
           - RedhatSubscriptionPoolID
       - Label:
-          default: AWS Quick Start Configuration
-        Parameters:
-          - QSS3BucketName
-          - QSS3KeyPrefix
-          - OutputBucketName
-      - Label:
           default: IBM Cloud Pak for Data configuration
         Parameters:
+          - ICPDVersion
+          - LicenseAgreement
+          - Namespace
           - WKC
           - WML
           - DV
           - WSL
-          - ICPDVersion
-          - LicenseAgreement
-          - Namespace
-          
+          - APIKey
+      - Label:
+          default: AWS Quick Start configuration
+        Parameters:
+          - QSS3BucketName
+          - QSS3KeyPrefix
+          - OutputBucketName
+
     ParameterLabels:
       KeyPairName:
-        default: SSH Key Name
-
+        default: Key pair name
       PrivateSubnet1ID:
-        default: Private Subnet 1 ID
+        default: Private subnet 1 ID
       PrivateSubnet2ID:
-        default: Private Subnet 2 ID
+        default: Private subnet 2 ID
       PrivateSubnet3ID:
-        default: Private Subnet 3 ID
+        default: Private subnet 3 ID
       PublicSubnet1ID:
-        default: Public Subnet 1 ID
+        default: Public subnet 1 ID
       PublicSubnet2ID:
-        default: Public Subnet 2 ID
+        default: Public subnet 2 ID
       PublicSubnet3ID:
-        default: Public Subnet 3 ID
+        default: Public subnet 3 ID
       QSS3BucketName:
-        default: Quick Start S3 Bucket Name
+        default: Quick Start S3 bucket name
       QSS3KeyPrefix:
-        default: Quick Start S3 Key Prefix
+        default: Quick Start S3 key prefix
       RemoteAccessCIDR:
-        default: Allowed External Access CIDR (OCP UI)
+        default: Allowed external access CIDR (OCP UI)
       ContainerAccessCIDR:
-        default: Allowed External Access CIDR (OCP Router)
+        default: Allowed external access CIDR (Cloud Pak for Data Router)
       VPCID:
         default: VPC ID
       VPCCIDR:
         default: VPC CIDR
       AdminPassword:
-        default: OpenShift UI Password
+        default: OpenShift UI password
       RedhatSubscriptionUserName:
-        default: Red Hat Subscription User Name
+        default: Red Hat subscription user name
       RedhatSubscriptionPassword:
-        default: Red Hat Subscription Password
+        default: Red Hat subscription password
       RedhatSubscriptionPoolID:
-        default: Red Hat Pool ID
+        default: Red Hat pool ID
       NumberOfAZs: 
-        default: Number of Availability zones  
+        default: Number of Availability Zones
       MasterInstanceType:
-        default: Master Instance Type
+        default: Master instance type
       EtcdInstanceType:
-        default: Etcd Instance Type
+        default: Etcd instance type
       NodesInstanceType:
-        default: Nodes Instance Type
+        default: Nodes instance type
       NumberOfMaster:
-        default: Number of Masters
+        default: Number of masters
       NumberOfEtcd:
-        default: Number of Etcds
+        default: Number of etcd
       NumberOfNodes:
-        default: Number of Nodes 
+        default: Number of nodes
       OutputBucketName:
-        default: Output S3 Bucket Name
+        default: Output S3 bucket name
       DomainName:
-        default: Domain Name
+        default: Domain name
       HostedZoneID:
-        default: Route 53 Hosted Zone ID
+        default: Route 53 hosted zone ID
       SubDomainPrefix:
-        default: Subdomain Prefix
+        default: Subdomain prefix
       ApplicationStorageMountPoint:
         default: Application storage mount point 
       ClusterName:
-        default: Cluster Name
+        default: Cluster name
       ClusterConsole:
-        default: Enable the cluster console (Requires OpenShift 3.11)
+        default: Enable the cluster console
       LicenseAgreement:
         default: License agreement
       ICPDVersion:
@@ -147,7 +147,9 @@ Metadata:
       WKC:
         default: Watson Knowledge Catalog Addon  
       DV:
-        default: Data Virtualization Addon 
+        default: Data Virtualization Addon
+      APIKey:
+        default: IBM Cloud Pak for Data Apikey Value  
 Parameters:
 
   DV:
@@ -155,68 +157,65 @@ Parameters:
        Data Virtualization addon to be installed along with IBM Cloud Pak for Data quickstart
     Type: String
     AllowedValues:
-      - False
-      - True
-    Default: False
+      - "False"
+      - "True"
+    Default: "False"
   WML:
     Description: >-
        Watson Machine Learning addon to be installed along with IBM Cloud Pak for Data quickstart
     Type: String
     AllowedValues:
-      - False
-      - True
-    Default: False
+      - "False"
+      - "True"
+    Default: "False"
   WSL:
     Description: >-
        Watson Studio addon to be installed along with IBM Cloud Pak for Data quickstart
     Type: String
     AllowedValues:
-      - False
-      - True
-    Default: False
+      - "False"
+      - "True"
+    Default: "False"
   WKC:
     Description: >-
        Watson Knowledge Catalog addon to be installed along with IBM Cloud Pak for Data quickstart
     Type: String
     AllowedValues:
-      - False
-      - True
-    Default: False 
-
+      - "False"
+      - "True"
+    Default: "False"
+  APIKey:
+    Description: >-
+       IBM Cloud Pak for Data Apikey to be used for installation
+    Type: String 
+    NoEcho: 'true'
   ApplicationStorageMountPoint:
-    Description: Mount point for the EFS volume to be used for application shared storage. The Kubernetes EFS provisioner uses this mount point.
+    Description: The mount point for the EFS volume to be used for application shared storage. The Kubernetes EFS provisioner uses this mount point.
     Type: String
     Default: /mnt/storage
 
   KeyPairName:
-    Description: Name of an existing EC2 key pair. All instances will launch with
-      this key pair.
+    Description: The name of an existing public/private key pair, which allows you
+      to securely connect to your instance after it launches.
     Type: AWS::EC2::KeyPair::KeyName
   PrivateSubnet1ID:
-    Description: ID of private subnet 1 in Availability Zone 1 for the Workload (e.g.,
-      subnet-a0246dcd)
+    Description: The ID of the private subnet in Availability Zone 1 for the workload (e.g., subnet-a0246dcd).
     Type: String
   PrivateSubnet2ID:
-    Description: ID of private subnet 2 in Availability Zone 2 for the Workload (e.g.,
-      subnet-b1f432cd)
+    Description: The ID of the private subnet in Availability Zone 2 for the workload (e.g., subnet-b1f432cd).
     Type: String
   PrivateSubnet3ID:
-    Description: ID of private subnet 3 in Availability Zone 3 for the Workload (e.g.,
-      subnet-b1f4a2cd)
+    Description: The ID of the private subnet in Availability Zone 3 for the workload (e.g., subnet-b1f4a2cd).
     Type: String
   PublicSubnet1ID:
-    Description: ID of public subnet 1 in Availability Zone 1 for the ELB load balancer
-      (e.g., subnet-9bc642ac)
+    Description: The ID of the public subnet in Availability Zone 1 for the ELB load balancer (e.g., subnet-9bc642ac).
     Type: String
   PublicSubnet2ID:
-    Description: ID of public subnet 2 in Availability Zone 2 for the ELB load balancer
-      (e.g., subnet-e3246d8e)
+    Description: The ID of the public subnet in Availability Zone 2 for the ELB load balancer (e.g., subnet-e3246d8e).
     Type: String
   PublicSubnet3ID:
-    Description: ID of public subnet 3 in Availability Zone 3 for the ELB load balancer
-      (e.g., subnet-e324ad8e)
+    Description: The ID of the public subnet in Availability Zone 3 for the ELB load balancer (e.g., subnet-e324ad8e).
     Type: String
-    Default: ''
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
@@ -238,33 +237,29 @@ Parameters:
   RemoteAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access the instances We recommend
-      that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access.Additional values can be added post-deployment from the AWS CloudFormation console.
+    Description: The CIDR IP range that is permitted to access the OCP console. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
     Type: String
   ContainerAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access the instances We recommend
-      that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access.Additional values can be added post-deployment from the AWS CloudFormation console.
+    Description: The CIDR IP range that is permitted to access Cloud Pak for Data. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
     Type: String
   AdminPassword:
-    Description: Password for OpenShift and Cloud Pak for Data Admin UI Must be at least 8 and no more than
-      12 characters containing letters and (minimum 1 capital letter), numbers and
-      symbols
+    Description: The password for the OpenShift Admin UI and the Cloud Pak for Data web client. The password must contain at least 8 characters, including letters (with a minimum of one capital letter), numbers, and symbols.
     Type: String
     MinLength: '8'
     AllowedPattern: ^[^ \\']+$
     NoEcho: 'true'
   RedhatSubscriptionUserName:
-    Description: Enter Redhat RHN User Name
+    Description: Enter your Red Hat Network (RHN) user name
     Type: String
   RedhatSubscriptionPassword:
     NoEcho: 'true'
-    Description: Enter Redhat RHN Password
+    Description: Enter your Red Hat Network (RHN) password
     Type: String
     AllowedPattern: ^[^ \\']+$
   RedhatSubscriptionPoolID:
-    Description: Enter Redhat RHN PoolID
+    Description: Enter your Red Hat Network (RHN) pool ID
     Type: String
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
@@ -273,7 +268,7 @@ Parameters:
     Description: CIDR block for the VPC
     Type: String
   VPCID:
-    Description: ID of your existing VPC for deployment
+    Description: The ID of your existing VPC for deployment.
     Type: AWS::EC2::VPC::Id
   MasterInstanceType:
     Default: m5.2xlarge
@@ -318,11 +313,14 @@ Parameters:
     AllowedValues:
       - m5.4xlarge
       - m5.12xlarge
+      - m5.8xlarge
       - m5.24xlarge
       - m5a.4xlarge
+      - m5a.8xlarge
       - m5a.12xlarge
       - m5a.24xlarge
       - c5.4xlarge
+      - c5.9xlarge
       - c5.12xlarge
       - c5.18xlarge
       - c5.24xlarge
@@ -331,59 +329,58 @@ Parameters:
     Type: String
   NumberOfAZs:  
     Default: 1
-    Description: The number of Availability Zones to be used for the deployment. 3 Availability Zones are needed to avoid a single point of failure when using 3 or more master nodes or etcd nodes.  With less than 3 Availability Zones, one of the AZs will have more master nodes 
+    Description: >-
+      The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to two Availability Zones. For a single IBM Cloud Pak for Data cluster to be highly available, three Availability Zones are needed to avoid a single point of failure when using three, five, or seven master nodes or etcd nodes. With fewer than three Availability Zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority of the etcd instances. Allowed values: 1, 3
     Type: Number
     AllowedValues:
     - 1
     - 3
   NumberOfMaster:
-    Default: '1'
+    Default: '3'
     Description: The desired capacity for the OpenShift Master instances.  Must be an odd number. For a development deployment 1 is sufficient; for production deployments minimum 3 is required.
     Type: String
     AllowedPattern: '^[13579]$|(^[1-9]+[13579]$)'
   NumberOfEtcd:
-    Default: '1'
-    Description: The desired capacity for the OpenShift Etcd instances. Must be an odd number. For a development deployment 1 is sufficient; for production deployments minimum 3 is required.
+    Default: '3'
+    Description: The desired capacity for the OpenShift etcd instances. Must be an odd number. For a development deployment, 1 is sufficient; for production deployments, a minimum of 3 is required.
     Type: String
     AllowedPattern: '^[13579]$|(^[1-9]+[13579]$)'
   NumberOfNodes:
     Default: '3'
-    Description: The desired capacity for the OpenShift node instances.Minimum of 3 nodes required.
+    Description: The desired capacity for the OpenShift node instances. Minimum of 3 nodes required. If the number of node instances exceeds your Red Hat entitlement limits or AWS instance limits, the stack will fail. Choose a number that is within your limits.
     Type: Number
   OutputBucketName:
-    Description: 'OPTIONAL: Bucket Name where the zip file output should be placed,
+    Description: '(Optional) Bucket Name where the zip file output should be placed,
       if left blank a bucket name will be automatically generated.'
     Type: String
     Default: ''
   HostedZoneID:
-    Description: 'OPTIONAL: Route 53 Hosted Zone ID to use. If left blank route 53
-      will not be configured and DNS must be setup manually If you specify this you must also specify DomainName'
+    Description: '(Optional) Route 53 hosted zone ID to use. If left blank, Amazon Route 53 will not be configured, and DNS must be set up manually. If you specify this, you must also specify DomainName.'
     Type: String
     Default: ""
   DomainName:
     Description: >-
-      OPTIONAL: domain name configured for the cluster, if left blank self signed
-      certificates will be used for TLS and the LoadBalancer's auto-generated hostname
+      (Optional) domain name configured for the cluster, if left blank self signed
+      certificates will be used for TLS and the Load Balancer's auto-generated hostname
       will be used for connections from outside the cluster.
     Type: String
     Default: ""
   SubDomainPrefix:
     Default: ''
-    Description: 'OPTIONAL: Subdomain to use, if left blank DomainName will be used
-      without a prefix. If you specify this you must also specify DomainName and HostedZoneID'
+    Description: '(Optional) Subdomain to use. If left blank, DomainName will be used without a prefix. If you specify this, you must also specify DomainName and HostedZoneID.'
     Type: String
   ClusterName:
     Default: ""
-    Description: Custom cluster name for kubernetes.io/cluster/ tags, if left blank will use the stackname suffixed with the region
+    Description: Custom cluster name for kubernetes.io/cluster/tags. If left blank, will use the stack name suffixed with the AWS Region.
     Type: String
   ClusterConsole:
     Default: Enabled
-    Description: Enable the Cluster Console
+    Description: To disable the cluster console, choose Disabled.
     Type: String
     AllowedValues: [ Enabled, Disabled ]
   ICPDVersion:
     Description: >-
-      The version of IBM Cloud Pak for Data to be deployed.  The full version must be provided, e.g., 2.5
+      The version of IBM Cloud Pak for Data to be deployed.  The full version must be provided, e.g., 2.5.
     Type: String
     AllowedValues:
       - 2.5
@@ -399,7 +396,7 @@ Parameters:
     ConstraintDescription: must answer 'I agree'
   Namespace:
     Description: >-
-      The OpenShift project that will be created for deploying Cloud Pak for Data.
+      The OpenShift project that will be created for deploying Cloud Pak for Data. It can be any lowercase string.
     Type: String
     AllowedPattern: '^[a-z0-9_\-]+$'
     Default: "zen"
@@ -449,7 +446,7 @@ Rules:
         - - I agree
         - Ref: LicenseAgreement
       AssertDescription: User must agree to the terms of the license agreement.    
-   
+
 Conditions:
   CustomClusterName: !Not
     - !Equals
@@ -545,6 +542,7 @@ Resources:
             - !Sub 'DV=${DV}'
             - !Sub 'WML=${WML}'
             - !Sub 'WSL=${WSL}'
+            - !Sub 'APIKey=${APIKey}'
 
 
   ICPDInstallationCompletedHandle:

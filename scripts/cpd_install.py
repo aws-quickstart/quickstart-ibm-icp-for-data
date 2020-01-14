@@ -259,6 +259,14 @@ class CPDInstall(object):
 
         if(self.installDV):
             TR.info(methodName,"Start installing DV package")
+            TR.info(methodName,"Delete configmap node-config-compute-infra")
+            delete_cm = "oc delete configmap -n openshift-node node-config-compute-infra"
+            retcode = check_output(['bash','-c', delete_cm]) 
+            TR.info(methodName,"Deleted configmap node-config-compute-infra %s" %retcode)
+            TR.info(methodName,"Create configmap node-config-compute-infra")
+            create_cm = "oc create -f /ibm/node-config-compute-infra.yaml"
+            retcode = check_output(['bash','-c', create_cm]) 
+            TR.info(methodName,"Created configmap node-config-compute-infra %s" %retcode)
             dvstart = Utilities.currentTimeMillis()
             self.installAssemblies("dv","v1.3.0.0",icpdInstallLogFile)
             dvend = Utilities.currentTimeMillis()
@@ -341,8 +349,7 @@ class CPDInstall(object):
         install_cmd = "/ibm/cpd-linux -c aws-efs -r /ibm/repo.yaml -a "+assembly+" -n "+self.namespace+" --version="+version+" --transfer-image-to="+self.docker_registry+" --target-registry-username=unused   --target-registry-password="+self.token+" --accept-all-licenses | tee /ibm/logs/"+assembly+"_install.log"
 
         retcode = call(install_cmd,shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"Execute install command for assembly %s"%retcode)  
-        self.validateInstall(icpdInstallLogFile)      
+        TR.info(methodName,"Execute install command for assembly %s"%retcode)     
 
     def getPassword(self):
         """
@@ -475,7 +482,36 @@ class CPDInstall(object):
     
     def validateInstall(self, icpdInstallLogFile):
         methodName = "validateInstall"
+        count = 3
         TR.info(methodName,"Validate Installation status")
+        TR.info(methodName,"Lite Count is  %s"%count)
+        if(self.installDV):
+            count = count+1
+            TR.info(methodName,"DV Count is  %s"%count)
+        if(self.installWKC and self.installWML and self.installWSL):
+            count = count+21
+            TR.info(methodName,"WKC,WML,WSL Count is  %s"%count)
+        else:    
+            if(self.installWSL and self.installWKC):
+                count =count+19
+                TR.info(methodName,"WSL,WKC Count is  %s"%count)
+            elif(self.installWML and self.installWSL):
+                count =count+15
+                TR.info(methodName,"WML,WSL Count is  %s"%count)
+            elif(self.installWML and self.installWKC):
+                count =count+17
+                TR.info(methodName,"WKC,WML Count is  %s"%count)
+            elif(self.installWKC):
+                count = count+15
+                TR.info(methodName,"WKC Count is  %s"%count)
+            elif(self.installWSL):
+                count = count+13
+                TR.info(methodName,"WSL Count is  %s"%count)
+            elif(self.installWML):
+                count = count+10
+                TR.info(methodName,"WML Count is  %s"%count)
+        
+
         operator_pod = "oc get pods | grep cpd-install-operator | awk '{print $1}'"
         operator_status = "oc get pods | grep cpd-install-operator | awk '{print $3}'"
         validate_cmd = "oc exec -it $(oc get pods | grep cpd-install-operator | awk '{print $1}') -- helm list --tls"
@@ -491,8 +527,9 @@ class CPDInstall(object):
             return   
         install_status = check_output(['bash','-c',validate_cmd])
         TR.info(methodName,"Installation status is %s"%install_status)
-        if(install_status.count("DEPLOYED")<24):
-            #self.rc = 1
+        TR.info(methodName,"Actual Count is %s Deployed count is %s"%(count,install_status.count("DEPLOYED")))
+        if(install_status.count("DEPLOYED")< count):
+            self.rc = 1
             TR.info(methodName,"Installation Deployed count  is %s"%install_status.count("DEPLOYED"))
             return   
 
@@ -571,10 +608,11 @@ class CPDInstall(object):
                 self.namespace = params.get('Namespace')
                 self.cpdbucketName = params.get('ICPDArchiveBucket')
                 self.ICPDInstallationCompletedURL = params.get('ICPDInstallationCompletedURL')
-                self.installWKC= Utilities.toBoolean(params.get('WKC'))
-                self.installWML= Utilities.toBoolean(params.get('WML'))
-                self.installWSL= Utilities.toBoolean(params.get('WSL'))
-                self.installDV= Utilities.toBoolean(params.get('DV'))
+                self.installWKC = Utilities.toBoolean(params.get('WKC'))
+                self.installWML = Utilities.toBoolean(params.get('WML'))
+                self.installWSL = Utilities.toBoolean(params.get('WSL'))
+                self.installDV = Utilities.toBoolean(params.get('DV'))
+                self.apikey = params.get('APIKey')
                 TR.info(methodName, "Retrieve namespace value from Env Variables %s" %self.namespace)
                 self.logExporter = LogExporter(region=self.region,
                                    bucket=self.getOutputBucket(),
@@ -584,11 +622,18 @@ class CPDInstall(object):
                 self.configureEFS()
                 self.getS3Object(bucket=self.cpdbucketName, s3Path="2.5/cpd-linux", destPath="/ibm/cpd-linux")
                 os.chmod("/ibm/cpd-linux", stat.S_IEXEC)	
-                self.getS3Object(bucket=self.cpdbucketName, s3Path="2.5/repo.yaml", destPath="/ibm/repo.yaml")
+                if not self.apikey:
+                    TR.info(methodName, "Downloading repo.yaml from S3 bucket")
+                    os.remove("/ibm/repo.yaml")
+                    self.getS3Object(bucket=self.cpdbucketName, s3Path="2.5/repo.yaml", destPath="/ibm/repo.yaml")
+                else:
+                    TR.info(methodName, "updating repo.yaml with apikey value provided")
+                    self.updateTemplateFile('/ibm/repo.yaml','<APIKEY>',self.apikey)
                 self.installCPD(icpdInstallLogFile)
                 self.validateInstall(icpdInstallLogFile)
                 self.manageUser(icpdInstallLogFile)
-                self.activateLicense(icpdInstallLogFile)
+                if not self.apikey:
+                    self.activateLicense(icpdInstallLogFile)
             #endWith    
             
         except Exception as e:
