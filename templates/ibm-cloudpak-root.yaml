@@ -52,6 +52,11 @@ Metadata:
           - ICPDVersion
           - LicenseAgreement
           - Namespace
+          - WKC
+          - WML
+          - DV
+          - WSL
+          - APIKey
       - Label:
           default: AWS Quick Start configuration
         Parameters:
@@ -124,14 +129,63 @@ Metadata:
         default: Enable the cluster console
       LicenseAgreement:
         default: License agreement
+      WSL:
+        default: Watson Studio Addon
+      WML:
+        default: Watson Machine Learning Addon  
+      WKC:
+        default: Watson Knowledge Catalog Addon  
+      DV:
+        default: Data Virtualization Addon  
+      APIKey:
+        default: IBM Cloud Pak for Data Apikey Value  
       ICPDVersion:
         default: IBM Cloud Pak for Data version
       Namespace:
         default: OpenShift project
 Parameters:
+
+  DV:
+    Description: >-
+       Data Virtualization addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"
+  WML:
+    Description: >-
+       Watson Machine Learning addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"
+  WSL:
+    Description: >-
+       Watson Studio addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"
+  WKC:
+    Description: >-
+       Watson Knowledge Catalog addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"
+  APIKey:
+    Description: >-
+       IBM Cloud Pak for Data Apikey to be used for installation
+    Type: String 
+    NoEcho: 'true'
+    Default: ""            
   NumberOfAZs:
     Description: >-
-      The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to two Availability Zones. For a single IBM Cloud Pak for Data cluster to be highly available, three Availability Zones are needed to avoid a single point of failure when using three, five, or seven master nodes or etcd nodes. With fewer than three Availability Zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority of the etcd instances. Allowed values: 1, 3
+      The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to 2 Availability Zones.  For a single ICP cluster to be highly available, 3 Availability Zones are needed to avoid a single point of failure when using 3, 5 or 7 master nodes or etcd nodes.  With less than 3 Availability Zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority of the etcd instances.
     Type: Number
     Default: 3
     # For now, only 1 or 3 AZs can be used.
@@ -190,11 +244,11 @@ Parameters:
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
       letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
       (-).
-    Default: aws-quickstart
     Description: S3 bucket name for the Quick Start assets. This string can include
       numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
       or end with a hyphen (-).
     Type: String
+    Default: aws-quickstart
   QSS3KeyPrefix:
     AllowedPattern: ^[0-9a-zA-Z-/]*$
     ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
@@ -279,12 +333,15 @@ Parameters:
     Default: m5.4xlarge
     AllowedValues:
       - m5.4xlarge
+      - m5.8xlarge
       - m5.12xlarge
       - m5.24xlarge
       - m5a.4xlarge
+      - m5a.8xlarge
       - m5a.12xlarge
       - m5a.24xlarge
       - c5.4xlarge
+      - c5.9xlarge
       - c5.12xlarge
       - c5.18xlarge
       - c5.24xlarge
@@ -454,6 +511,12 @@ Resources:
         Namespace: !Ref Namespace
         LicenseAgreement: !Ref LicenseAgreement
         ClusterName: !Ref ClusterName
+        WKC: !Ref WKC
+        WML: !Ref WML
+        WSL: !Ref WSL
+        DV: !Ref DV
+        APIKey: !Ref APIKey
+        
 
 Outputs:
   OpenShiftUI:

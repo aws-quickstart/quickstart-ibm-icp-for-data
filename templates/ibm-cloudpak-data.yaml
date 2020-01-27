@@ -59,6 +59,11 @@ Metadata:
           - ICPDVersion
           - LicenseAgreement
           - Namespace
+          - WKC
+          - WML
+          - DV
+          - WSL
+          - APIKey
       - Label:
           default: AWS Quick Start configuration
         Parameters:
@@ -134,8 +139,56 @@ Metadata:
       ICPDVersion:
         default: IBM Cloud Pak for Data version
       Namespace:
-        default: OpenShift project
+        default: OpenShift Project
+      WSL:
+        default: Watson Studio Addon
+      WML:
+        default: Watson Machine Learning Addon  
+      WKC:
+        default: Watson Knowledge Catalog Addon  
+      DV:
+        default: Data Virtualization Addon
+      APIKey:
+        default: IBM Cloud Pak for Data Apikey Value  
 Parameters:
+
+  DV:
+    Description: >-
+       Data Virtualization addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"
+  WML:
+    Description: >-
+       Watson Machine Learning addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"
+  WSL:
+    Description: >-
+       Watson Studio addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"
+  WKC:
+    Description: >-
+       Watson Knowledge Catalog addon to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"
+  APIKey:
+    Description: >-
+       IBM Cloud Pak for Data Apikey to be used for installation
+    Type: String 
+    NoEcho: 'true'
   ApplicationStorageMountPoint:
     Description: The mount point for the EFS volume to be used for application shared storage. The Kubernetes EFS provisioner uses this mount point.
     Type: String
@@ -168,7 +221,6 @@ Parameters:
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
       letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
       (-).
-    Default: aws-quickstart
     Description: S3 bucket name for the Quick Start assets. This string can include
       numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
       or end with a hyphen (-).
@@ -261,11 +313,14 @@ Parameters:
     AllowedValues:
       - m5.4xlarge
       - m5.12xlarge
+      - m5.8xlarge
       - m5.24xlarge
       - m5a.4xlarge
+      - m5a.8xlarge
       - m5a.12xlarge
       - m5a.24xlarge
       - c5.4xlarge
+      - c5.9xlarge
       - c5.12xlarge
       - c5.18xlarge
       - c5.24xlarge
@@ -343,6 +398,7 @@ Parameters:
     Description: >-
       The OpenShift project that will be created for deploying Cloud Pak for Data. It can be any lowercase string.
     Type: String
+    AllowedPattern: '^[a-z0-9_\-]+$'
     Default: "zen"
   
 Mappings:
@@ -482,6 +538,11 @@ Resources:
             - !Sub 'ICPDInstallationCompletedURL=${ICPDInstallationCompletedHandle}'
             - !Sub 'CPD_QS_S3URI=s3://${QSS3BucketName}/${QSS3KeyPrefix}'
             - !Sub 'ICPDVersion=${ICPDVersion}'
+            - !Sub 'WKC=${WKC}'
+            - !Sub 'DV=${DV}'
+            - !Sub 'WML=${WML}'
+            - !Sub 'WSL=${WSL}'
+            - !Sub 'APIKey=${APIKey}'
 
 
   ICPDInstallationCompletedHandle:
