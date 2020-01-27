@@ -1,10 +1,8 @@
-[submodule "submodules/quickstart-ibm-cloud-private"]
-	path = submodules/quickstart-ibm-cloud-private
-	url = ../../aws-quickstart/quickstart-ibm-cloud-private.git
-	branch = master
 [submodule "submodules/quickstart-aws-vpc"]
 	path = submodules/quickstart-aws-vpc
 	url = git@github.com:aws-quickstart/quickstart-aws-vpc.git
+	branch = master
 [submodule "submodules/quickstart-redhat-openshift"]
 	path = submodules/quickstart-redhat-openshift
 	url = git@github.com:aws-quickstart/quickstart-redhat-openshift.git
+	branch = master

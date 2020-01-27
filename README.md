@@ -1,7 +1,7 @@
 # quickstart-ibm-icp-for-data
 ## IBM Cloud Pak for Data on AWS
 
-This Quick Start automatically deploys a multi-master, production instance of IBM Cloud Pak for Data into a new virtual private cloud (VPC) on the Amazon Web Services (AWS) Cloud. A standard deployment takes about 3 hours, and a high availability (HA) deployment takes about 4 hours. 
+This Quick Start automatically deploys a multi-master, production instance of IBM Cloud Pak for Data on a Red Hat OpenShift Container Platform 3.11 cluster on the Amazon Web Services (AWS) Cloud. The cluster is created in a new or existing virtual private cloud (VPC) on Red Hat Enterprise Linux (RHEL) 7.7 instances, using the [Red Hat OpenShift on AWS Quick Start](https://fwd.aws/w6mkA). See the [Red Hat OpenShift Container Platform on the AWS Cloud deployment guide](https://fwd.aws/dwpPW) for details about the underlying OpenShift deployment architecture. A standard deployment takes about 3 hours, and a high availability (HA) deployment takes about 4 hours. 
 
 IBM Cloud Pak for Data is an analytics platform that helps you prepare your data for artificial intelligence (AI). 
 
@@ -9,7 +9,7 @@ IBM Cloud Pak for Data can use AWS services and features, including VPCs, Availa
 
 This Quick Start is for enterprise users who want to connect, catalog, govern, transform, and analyze data, regardless of where the data is.
 
-![Quick Start architecture for IBM Cloud Pak for Data on AWS](https://d1.awsstatic.com/partner-network/QuickStart/datasheets/ibm-cloud-private-for-data-on-aws-arch.0430be0ee5ea77d85078b8a7b64c991665dc41f9.png)
+![Quick Start architecture for IBM Cloud Pak for Data on AWS](https://d1.awsstatic.com/partner-network/QuickStart/datasheets/ibm-cloud-pak-for-data-on-aws-architecture.9381bd4f0600ac64f5d2656568373d4d8a744cf6.png)
 
 For architectural details, best practices, step-by-step instructions, and customization options, see the [deployment guide](https://fwd.aws/AYp9v).
 
