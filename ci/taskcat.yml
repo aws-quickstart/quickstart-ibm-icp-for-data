@@ -41,6 +41,13 @@ tests:
     regions:
     - ap-northeast-2
 
+  1az-aios:
+    parameter_input: cp4d-taskcat-1AZ-aios.json
+    template_file: ibm-cloudpak-root.yaml
+    regions:
+    - eu-west-2
+
+
   1az-wkc-wml:
     parameter_input: cp4d-taskcat-1AZ-wkc-wml.json
     template_file: ibm-cloudpak-root.yaml

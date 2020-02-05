@@ -64,10 +64,6 @@
         "ParameterValue":"zen"
     },
     {
-        "ParameterKey":"APIKey",
-        "ParameterValue":""
-    },
-    {
         "ParameterKey":"DV",
         "ParameterValue": "True"
     },
@@ -82,6 +78,10 @@
     {
         "ParameterKey":"WKC",
         "ParameterValue": "True"
+    },
+    {
+        "ParameterKey":"OSWML",
+        "ParameterValue":"True"
     }
 
 ]

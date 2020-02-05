@@ -63,6 +63,7 @@ Metadata:
           - WML
           - DV
           - WSL
+          - OSWML
           - APIKey
       - Label:
           default: AWS Quick Start configuration
@@ -146,6 +147,8 @@ Metadata:
         default: Watson Machine Learning Addon  
       WKC:
         default: Watson Knowledge Catalog Addon  
+      OSWML:
+        default: Watson Openscale and Watson Machine Learning Addons  
       DV:
         default: Data Virtualization Addon
       APIKey:
@@ -184,6 +187,14 @@ Parameters:
       - "False"
       - "True"
     Default: "False"
+  OSWML:
+    Description: >-
+       Watson Openscale and Watson Machine Learning addons to be installed along with IBM Cloud Pak for Data quickstart
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"  
   APIKey:
     Description: >-
        IBM Cloud Pak for Data Apikey to be used for installation
@@ -387,7 +398,7 @@ Parameters:
     Default: 2.5
   LicenseAgreement:
     Description: >-
-      I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/BdzN6f).
+      I have read and agree to the license terms for IBM Cloud Pak for Data (ibm.biz/BdqRPm).
     Type: String
     Default: '-'
     AllowedValues:
@@ -542,6 +553,7 @@ Resources:
             - !Sub 'DV=${DV}'
             - !Sub 'WML=${WML}'
             - !Sub 'WSL=${WSL}'
+            - !Sub 'OSWML=${OSWML}'
             - !Sub 'APIKey=${APIKey}'
 
 

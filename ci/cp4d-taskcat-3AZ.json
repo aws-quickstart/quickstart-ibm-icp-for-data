@@ -62,9 +62,5 @@
     {
         "ParameterKey":"Namespace",
         "ParameterValue":"zen"
-    },
-    {
-        "ParameterKey":"APIKey",
-        "ParameterValue":""
     }
 ]
