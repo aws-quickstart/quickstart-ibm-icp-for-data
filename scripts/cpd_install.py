@@ -289,6 +289,15 @@ class CPDInstall(object):
             TR.info(methodName,"WKC package installation completed")
             self.printTime(wkcstart, wkcend, "Installing WKC")
 
+        if(self.installOSWML):
+            TR.info(methodName,"Start installing AI Openscale package")
+            aiostart = Utilities.currentTimeMillis()
+            self.installAssemblies("aiopenscale","v2.5.0.0",icpdInstallLogFile)
+            aioend = Utilities.currentTimeMillis()
+            TR.info(methodName,"AI Openscale package installation completed")
+            self.printTime(aiostart, aioend, "Installing AI Openscale")
+
+
 
         TR.info(methodName,"Installed all packages.")
     #endDef    
@@ -346,7 +355,7 @@ class CPDInstall(object):
         retcode = call(apply_cmd,shell=True, stdout=icpdInstallLogFile)
         TR.info(methodName,"Executed apply command for assembly %s"%retcode)
      
-        install_cmd = "/ibm/cpd-linux -c aws-efs -r /ibm/repo.yaml -a "+assembly+" -n "+self.namespace+" --version="+version+" --transfer-image-to="+self.docker_registry+" --target-registry-username=unused   --target-registry-password="+self.token+" --accept-all-licenses | tee /ibm/logs/"+assembly+"_install.log"
+        install_cmd = "/ibm/cpd-linux -c aws-efs -r /ibm/repo.yaml -a "+assembly+" -n "+self.namespace+" --version="+version+" --transfer-image-to="+self.docker_registry+" --target-registry-username=unused   --target-registry-password="+self.token+ " --cluster-pull-prefix=docker-registry.default.svc:5000/"+self.namespace+" --accept-all-licenses | tee /ibm/logs/"+assembly+"_install.log"
 
         retcode = call(install_cmd,shell=True, stdout=icpdInstallLogFile)
         TR.info(methodName,"Execute install command for assembly %s"%retcode)     
@@ -488,6 +497,9 @@ class CPDInstall(object):
         if(self.installDV):
             count = count+1
             TR.info(methodName,"DV Count is  %s"%count)
+        if(self.installOSWML):
+            count = count+1
+            TR.info(methodName,"AI OS Count is  %s"%count)    
         if(self.installWKC and self.installWML and self.installWSL):
             count = count+21
             TR.info(methodName,"WKC,WML,WSL Count is  %s"%count)
@@ -552,7 +564,7 @@ class CPDInstall(object):
         method to activate trial license for cpd installation
         """
         methodName = "activateLicense"
-        self.updateTemplateFile('/ibm/activate-license.sh','<ELB_DNSNAME>',self.hostname)
+        #self.updateTemplateFile('/ibm/activate-license.sh','<ELB_DNSNAME>',self.hostname)
         TR.info(methodName,"Start Activate trial")
         icpdUrl = "https://"+self.hostname
         activatetrial = "sudo python /ibm/activate-trial.py "+icpdUrl+" admin "+self.password+" /ibm/trial.lic"
@@ -609,9 +621,13 @@ class CPDInstall(object):
                 self.cpdbucketName = params.get('ICPDArchiveBucket')
                 self.ICPDInstallationCompletedURL = params.get('ICPDInstallationCompletedURL')
                 self.installWKC = Utilities.toBoolean(params.get('WKC'))
-                self.installWML = Utilities.toBoolean(params.get('WML'))
                 self.installWSL = Utilities.toBoolean(params.get('WSL'))
                 self.installDV = Utilities.toBoolean(params.get('DV'))
+                self.installWML = Utilities.toBoolean(params.get('WML'))
+                self.installOSWML = Utilities.toBoolean(params.get('OSWML'))
+                if(self.installOSWML):
+                    self.installWML=True
+                #endIf    
                 self.apikey = params.get('APIKey')
                 TR.info(methodName, "Retrieve namespace value from Env Variables %s" %self.namespace)
                 self.logExporter = LogExporter(region=self.region,

@@ -1,6 +1,6 @@
 registry:
   - url: cp.icr.io/cp/cpd
-    username: iamapikey
+    username: cp
     apikey: <APIKEY>
     name: base-registry
 fileservers:
