@@ -150,7 +150,7 @@ Parameters:
 
   DV:
     Description: >-
-       Data Virtualization addon to be installed along with IBM Cloud Pak for Data quickstart
+       Data Virtualization addon to be installed along with IBM Cloud Pak for Data Quick Start.
     Type: String
     AllowedValues:
       - "False"
@@ -158,7 +158,7 @@ Parameters:
     Default: "False"
   WML:
     Description: >-
-       Watson Machine Learning addon to be installed along with IBM Cloud Pak for Data quickstart
+       Watson Machine Learning addon to be installed along with IBM Cloud Pak for Data Quick Start.
     Type: String
     AllowedValues:
       - "False"
@@ -166,7 +166,7 @@ Parameters:
     Default: "False"
   WSL:
     Description: >-
-       Watson Studio addon to be installed along with IBM Cloud Pak for Data quickstart
+       Watson Studio addon to be installed along with IBM Cloud Pak for Data Quick Start.
     Type: String
     AllowedValues:
       - "False"
@@ -174,7 +174,7 @@ Parameters:
     Default: "False"
   WKC:
     Description: >-
-       Watson Knowledge Catalog addon to be installed along with IBM Cloud Pak for Data quickstart
+       Watson Knowledge Catalog addon to be installed along with IBM Cloud Pak for Data Quick Start.
     Type: String
     AllowedValues:
       - "False"
@@ -182,7 +182,7 @@ Parameters:
     Default: "False"
   OSWML:
     Description: >-
-       Watson OpenScale and Watson Machine Learning addons to be installed along with IBM Cloud Pak for Data quickstart
+       Watson OpenScale and Watson Machine Learning addons to be installed along with IBM Cloud Pak for Data Quick Start.
     Type: String
     AllowedValues:
       - "False"
@@ -190,7 +190,7 @@ Parameters:
     Default: "False"  
   APIKey:
     Description: >-
-       IBM Cloud Pak for Data Apikey to be used for installation
+       IBM Cloud Pak for Data Apikey to access IBM Container Registry or leave it blank for a 60-day trial installation.
     Type: String 
     NoEcho: 'true'
     Default: ""            
