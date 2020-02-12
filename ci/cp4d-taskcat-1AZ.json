@@ -62,6 +62,26 @@
     {
         "ParameterKey":"Namespace",
         "ParameterValue":"zen"
+    },
+    {
+        "ParameterKey":"DV",
+        "ParameterValue": "True"
+    },
+    {
+        "ParameterKey":"WSL",
+        "ParameterValue": "True"
+    },
+    {
+        "ParameterKey":"WML",
+        "ParameterValue": "True"
+    },
+    {
+        "ParameterKey":"WKC",
+        "ParameterValue": "True"
+    },
+    {
+        "ParameterKey":"OSWML",
+        "ParameterValue":"True"
     }
 
 ]

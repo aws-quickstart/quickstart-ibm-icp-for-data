@@ -18,7 +18,6 @@ def activateTrial(argv):
   access_command = "curl -s -k -X GET " +url+"/v1/preauth/validateAuth -u "+username+":"+password 
   authResult=json.loads(subprocess.check_output(['bash','-c', access_command]).decode('UTF-8').split('\n')[0])
   accessToken=authResult['accessToken']
-  print (accessToken)
   currentTime=int(round(time.time()))
   trialTime=currentTime + (24*60*60*60)
   with open(trial_lic) as f:
