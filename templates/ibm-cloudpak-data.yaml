@@ -142,22 +142,22 @@ Metadata:
       Namespace:
         default: OpenShift Project
       WSL:
-        default: Watson Studio Addon
+        default: Watson Studio service
       WML:
-        default: Watson Machine Learning Addon  
+        default: Watson Machine Learning service
       WKC:
-        default: Watson Knowledge Catalog Addon  
+        default: Watson Knowledge Catalog service
       OSWML:
-        default: Watson Openscale and Watson Machine Learning Addons  
+        default: Watson OpenScale and Watson Machine Learning services
       DV:
-        default: Data Virtualization Addon
+        default: Data Virtualization service
       APIKey:
-        default: IBM Cloud Pak for Data Apikey Value  
+        default: IBM Cloud Pak for Data API key value
 Parameters:
 
   DV:
     Description: >-
-       Data Virtualization addon to be installed along with IBM Cloud Pak for Data Quick Start.
+       Choose True to install the Data Virtualization service.
     Type: String
     AllowedValues:
       - "False"
@@ -165,7 +165,7 @@ Parameters:
     Default: "False"
   WML:
     Description: >-
-       Watson Machine Learning addon to be installed along with IBM Cloud Pak for Data Quick Start.
+       Choose True to install the Watson Machine Learning service.
     Type: String
     AllowedValues:
       - "False"
@@ -173,7 +173,7 @@ Parameters:
     Default: "False"
   WSL:
     Description: >-
-       Watson Studio addon to be installed along with IBM Cloud Pak for Data Quick Start.
+       Choose True to install the Watson Studio service.
     Type: String
     AllowedValues:
       - "False"
@@ -181,7 +181,7 @@ Parameters:
     Default: "False"
   WKC:
     Description: >-
-       Watson Knowledge Catalog addon to be installed along with IBM Cloud Pak for Data Quick Start.
+       Choose True to install the Watson Knowledge Catalog service.
     Type: String
     AllowedValues:
       - "False"
@@ -189,16 +189,16 @@ Parameters:
     Default: "False"
   OSWML:
     Description: >-
-       Watson Openscale and Watson Machine Learning addons to be installed along with IBM Cloud Pak for Data Quick Start.
+       Choose True to install the Watson OpenScale and Watson Machine Learning services.
     Type: String
     AllowedValues:
       - "False"
       - "True"
-    Default: "False"  
+    Default: "False"
   APIKey:
     Description: >-
-      IBM Cloud Pak for Data Apikey to access IBM Container Registry or leave it blank for a 60-day trial installation.
-    Type: String 
+       Enter the IBM Cloud Pak for Data API key to access IBM Container Registry, or leave this parameter blank to use a 60-day trial installation.
+    Type: String
     NoEcho: 'true'
   ApplicationStorageMountPoint:
     Description: The mount point for the EFS volume to be used for application shared storage. The Kubernetes EFS provisioner uses this mount point.
