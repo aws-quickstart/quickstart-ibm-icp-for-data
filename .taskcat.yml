@@ -1,0 +1,245 @@
+project:
+  name: quickstart-ibm-icp-for-data
+  shorten_stack_name: true
+  owner: quickstart-eng@amazon.com
+  package_lambda: false
+  regions:
+  - ap-northeast-1
+  - ap-northeast-2
+  - ap-southeast-1
+  - ap-southeast-2
+  - eu-central-1
+  - eu-north-1
+  - eu-west-1
+  - eu-west-2
+  - eu-west-3
+  - us-east-1
+  - us-east-2
+  - us-west-2
+  s3_bucket: ''
+tests:
+  1az-all:
+    parameters:
+      AvailabilityZones: $[taskcat_genaz_1]
+      NumberOfAZs: '1'
+      KeyPairName: override
+      NumberOfMaster: '1'
+      NumberOfEtcd: '1'
+      NumberOfNodes: '3'
+      AdminPassword: override
+      RedhatSubscriptionPassword: override
+      RedhatSubscriptionUserName: override
+      RedhatSubscriptionPoolID: override
+      ContainerAccessCIDR: override
+      RemoteAccessCIDR: override
+      VPCCIDR: 10.0.0.0/16
+      LicenseAgreement: I agree
+      Namespace: zen
+      DV: True
+      OSWML: True
+      WKC: True
+      WML: True
+      WSL: True
+      QSS3BucketName: $[taskcat_autobucket]
+    regions:  
+    - us-east-1
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.yaml
+
+
+  1az-wkc-wml:
+    parameters:
+      AvailabilityZones: $[taskcat_genaz_1]
+      NumberOfAZs: '1'
+      KeyPairName: override
+      NumberOfMaster: '1'
+      NumberOfEtcd: '1'
+      NumberOfNodes: '3'
+      AdminPassword: override
+      RedhatSubscriptionPassword: override
+      RedhatSubscriptionUserName: override
+      RedhatSubscriptionPoolID: override
+      ContainerAccessCIDR: override
+      RemoteAccessCIDR: override
+      VPCCIDR: 10.0.0.0/16
+      LicenseAgreement: I agree
+      Namespace: zen
+      WKC: True
+      WML: True
+      QSS3BucketName: $[taskcat_autobucket]
+    regions:  
+    - us-west-2
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.yaml
+    
+  1az-wkc-wsl:
+    parameters:
+      AvailabilityZones: $[taskcat_genaz_1]
+      NumberOfAZs: '1'
+      KeyPairName: override
+      NumberOfMaster: '1'
+      NumberOfEtcd: '1'
+      NumberOfNodes: '3'
+      AdminPassword: override
+      RedhatSubscriptionPassword: override
+      RedhatSubscriptionUserName: override
+      RedhatSubscriptionPoolID: override
+      ContainerAccessCIDR: override
+      RemoteAccessCIDR: override
+      VPCCIDR: 10.0.0.0/16
+      LicenseAgreement: I agree
+      Namespace: zen
+      WKC: True
+      WSL: True
+      QSS3BucketName: $[taskcat_autobucket]
+    regions:  
+    - us-east-2
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.yaml
+  
+  1az-aios:
+    parameters:
+      AvailabilityZones: $[taskcat_genaz_1]
+      NumberOfAZs: '1'
+      KeyPairName: override
+      NumberOfMaster: '1'
+      NumberOfEtcd: '1'
+      NumberOfNodes: '3'
+      AdminPassword: override
+      RedhatSubscriptionPassword: override
+      RedhatSubscriptionUserName: override
+      RedhatSubscriptionPoolID: override
+      ContainerAccessCIDR: override
+      RemoteAccessCIDR: override
+      VPCCIDR: 10.0.0.0/16
+      LicenseAgreement: I agree
+      Namespace: zen
+      OSWML: True
+      QSS3BucketName: $[taskcat_autobucket]
+    regions:  
+    - ap-southeast-1
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.yaml  
+
+  1az-wml:
+    parameters:
+      AvailabilityZones: $[taskcat_genaz_1]
+      NumberOfAZs: '1'
+      KeyPairName: override
+      NumberOfMaster: '1'
+      NumberOfEtcd: '1'
+      NumberOfNodes: '3'
+      AdminPassword: override
+      RedhatSubscriptionPassword: override
+      RedhatSubscriptionUserName: override
+      RedhatSubscriptionPoolID: override
+      ContainerAccessCIDR: override
+      RemoteAccessCIDR: override
+      VPCCIDR: 10.0.0.0/16
+      LicenseAgreement: I agree
+      Namespace: zen
+      OSWML: True
+      QSS3BucketName: $[taskcat_autobucket]
+    regions:  
+    - ap-northeast-2
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.yaml  
+  
+  1az-wml-wsl:
+    parameters:
+      AvailabilityZones: $[taskcat_genaz_1]
+      NumberOfAZs: '1'
+      KeyPairName: override
+      NumberOfMaster: '1'
+      NumberOfEtcd: '1'
+      NumberOfNodes: '3'
+      AdminPassword: override
+      RedhatSubscriptionPassword: override
+      RedhatSubscriptionUserName: override
+      RedhatSubscriptionPoolID: override
+      ContainerAccessCIDR: override
+      RemoteAccessCIDR: override
+      VPCCIDR: 10.0.0.0/16
+      LicenseAgreement: I agree
+      Namespace: zen
+      WML: True
+      WSL: True
+      QSS3BucketName: $[taskcat_autobucket]
+    regions:  
+    - eu-west-2
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.yaml 
+  
+  3az-dv:
+    parameters:
+      AvailabilityZones: $[taskcat_genaz_3]
+      NumberOfAZs: '3'
+      KeyPairName: override
+      NumberOfMaster: '3'
+      NumberOfEtcd: '3'
+      NumberOfNodes: '3'
+      AdminPassword: override
+      RedhatSubscriptionPassword: override
+      RedhatSubscriptionUserName: override
+      RedhatSubscriptionPoolID: override
+      ContainerAccessCIDR: override
+      RemoteAccessCIDR: override
+      VPCCIDR: 10.0.0.0/16
+      LicenseAgreement: I agree
+      Namespace: zen
+      DV: True
+      QSS3BucketName: $[taskcat_autobucket]
+    regions:  
+    - ap-northeast-1
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.yaml  
+  
+  3az-wkc:
+    parameters:
+      AvailabilityZones: $[taskcat_genaz_3]
+      NumberOfAZs: '3'
+      KeyPairName: override
+      NumberOfMaster: '3'
+      NumberOfEtcd: '3'
+      NumberOfNodes: '3'
+      AdminPassword: override
+      RedhatSubscriptionPassword: override
+      RedhatSubscriptionUserName: override
+      RedhatSubscriptionPoolID: override
+      ContainerAccessCIDR: override
+      RemoteAccessCIDR: override
+      VPCCIDR: 10.0.0.0/16
+      LicenseAgreement: I agree
+      Namespace: zen
+      WKC: True
+      QSS3BucketName: $[taskcat_autobucket]
+    regions:  
+    - eu-west-1
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.yaml 
+    
+  3az:
+    parameters:
+      AvailabilityZones: $[taskcat_genaz_3]
+      NumberOfAZs: '3'
+      KeyPairName: override
+      NumberOfMaster: '3'
+      NumberOfEtcd: '3'
+      NumberOfNodes: '3'
+      AdminPassword: override
+      RedhatSubscriptionPassword: override
+      RedhatSubscriptionUserName: override
+      RedhatSubscriptionPoolID: override
+      ContainerAccessCIDR: override
+      RemoteAccessCIDR: override
+      VPCCIDR: 10.0.0.0/16
+      LicenseAgreement: I agree
+      Namespace: zen
+      QSS3BucketName: $[taskcat_autobucket]
+    regions:  
+    - ap-southeast-2
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.yaml   
+    
+              
+    
