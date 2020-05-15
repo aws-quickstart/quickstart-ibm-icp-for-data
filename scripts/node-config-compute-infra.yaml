@@ -65,6 +65,6 @@ data:
     volumeDirectory: /var/lib/origin/openshift.local.volumes
 kind: ConfigMap
 metadata:
-  name: node-config-compute-infra-crio
+  name: node-config-compute-infra
   namespace: openshift-node
   
