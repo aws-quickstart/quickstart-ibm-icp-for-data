@@ -259,14 +259,14 @@ class CPDInstall(object):
 
         if(self.installDV):
             TR.info(methodName,"Start installing DV package")
-            TR.info(methodName,"Delete configmap node-config-compute-infra-crio")
-            delete_cm = "oc delete configmap -n openshift-node node-config-compute-infra-crio"
+            TR.info(methodName,"Delete configmap node-config-compute-infra")
+            delete_cm = "oc delete configmap -n openshift-node node-config-compute-infra"
             retcode = check_output(['bash','-c', delete_cm]) 
-            TR.info(methodName,"Deleted configmap node-config-compute-infra-crio %s" %retcode)
-            TR.info(methodName,"Create configmap node-config-compute-infra-crio")
+            TR.info(methodName,"Deleted configmap node-config-compute-infra %s" %retcode)
+            TR.info(methodName,"Create configmap node-config-compute-infra")
             create_cm = "oc create -f /ibm/node-config-compute-infra.yaml"
             retcode = check_output(['bash','-c', create_cm]) 
-            TR.info(methodName,"Created configmap node-config-compute-infra-crio %s" %retcode)
+            TR.info(methodName,"Created configmap node-config-compute-infra %s" %retcode)
             dvstart = Utilities.currentTimeMillis()
             self.installAssemblies("dv","v1.3.0.0",icpdInstallLogFile)
             dvend = Utilities.currentTimeMillis()
