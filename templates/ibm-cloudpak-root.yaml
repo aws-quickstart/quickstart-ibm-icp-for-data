@@ -15,37 +15,38 @@ Metadata:
           - PublicSubnet1CIDR
           - PublicSubnet2CIDR
           - PublicSubnet3CIDR
-          - RemoteAccessCIDR
-          - ContainerAccessCIDR
+          - BootNodeAccessCIDR
       - Label:
           default: DNS configuration
         Parameters:
           - DomainName
-          - HostedZoneID
-          - SubDomainPrefix
       - Label:
           default: Amazon EC2 configuration
         Parameters:
           - KeyPairName
+          - AWSAccessKeyId
+          - AWSSecretAccessKey
       - Label:
           default: OpenShift hosts configuration
         Parameters:
           - NumberOfMaster
-          - NumberOfEtcd
-          - NumberOfNodes
+          - NumberOfCompute
           - MasterInstanceType
-          - EtcdInstanceType
-          - NodesInstanceType
+          - ComputeInstanceType
           - AdminPassword
           - ClusterName
-          - ClusterConsole
-          - ApplicationStorageMountPoint
+          - EnableFips
+      - Label:
+          default: Storage Configuration
+        Parameters:   
+          - StorageType
+          - PortworxSpec
+          - NumberOfOCS
+          - OCSInstanceType
       - Label:
           default: Red Hat subscription information
         Parameters:
-          - RedhatSubscriptionUserName
-          - RedhatSubscriptionPassword
-          - RedhatSubscriptionPoolID
+          - RedhatPullSecret
       - Label:
           default: IBM Cloud Pak for Data configuration
         Parameters:
@@ -56,7 +57,9 @@ Metadata:
           - WML
           - DV
           - WSL
-          - OSWML
+          - OpenScale
+          - CDE
+          - Spark
           - APIKey
       - Label:
           default: AWS Quick Start configuration
@@ -64,9 +67,14 @@ Metadata:
           - QSS3BucketName
           - QSS3BucketRegion
           - QSS3KeyPrefix
-          - OutputBucketName
+          - ICPDDeploymentLogsBucketName
+            
 
     ParameterLabels:
+      AWSAccessKeyId:
+        default: AWS Access Key Id value
+      AWSSecretAccessKey:
+        default: AWS Secret Access Key value  
       KeyPairName:
         default: Key pair name
       PrivateSubnet1CIDR:
@@ -87,70 +95,67 @@ Metadata:
         default: Quick Start S3 bucket region  
       QSS3KeyPrefix:
         default: Quick Start S3 key prefix
-      RemoteAccessCIDR:
-        default: Allowed external access CIDR (OCP UI)
-      ContainerAccessCIDR:
-        default: Allowed external access CIDR (Cloud Pak for Data Router)
+      BootNodeAccessCIDR:
+        default: Allowed external access CIDR for BootNode
       VPCCIDR:
         default: VPC CIDR
       AdminPassword:
-        default: OpenShift UI password
-      RedhatSubscriptionUserName:
-        default: Red Hat subscription user name
-      RedhatSubscriptionPassword:
-        default: Red Hat subscription password
-      RedhatSubscriptionPoolID:
-        default: Red Hat pool ID
+        default: Cloud Pak for Data UI password
+      RedhatPullSecret:
+        default: Red Hat pull Secret
       MasterInstanceType:
         default: Master instance type
-      EtcdInstanceType:
-        default: Etcd instance type
-      NodesInstanceType:
-        default: Nodes instance type
+      ComputeInstanceType:
+        default: Compute instance type
+      OCSInstanceType:
+        default: OCS instance type  
       NumberOfMaster:
-        default: Number of masters
-      NumberOfEtcd:
-        default: Number of etcds
-      NumberOfNodes:
-        default: Number of nodes
-      OutputBucketName:
+        default: Number of masters nodes
+      NumberOfCompute:
+        default: Number of compute nodes
+      NumberOfOCS:
+        default: Number of OCS nodes
+      ICPDDeploymentLogsBucketName:
         default: Output S3 bucket name
       DomainName:
         default: Domain name
-      HostedZoneID:
-        default: Route 53 hosted zone ID
-      SubDomainPrefix:
-        default: Subdomain prefix
-      ApplicationStorageMountPoint:
-        default: Application storage mount point 
       NumberOfAZs:
         default: Number of Availability Zones
       AvailabilityZones:
         default: Availability Zones
       ClusterName:
         default: Cluster name
-      ClusterConsole:
-        default: Enable the cluster console
+      StorageType:
+        default: Storage type for Cluster  
+      PortworxSpec:
+        default: Portworx spec file  
+      EnableFips:
+        default: Enable Fips
       LicenseAgreement:
         default: License agreement
       WSL:
         default: Watson Studio service
       WML:
-        default: Watson Machine Learning service
+        default: Watson Machine Learning service  
       WKC:
-        default: Watson Knowledge Catalog service
+        default: Watson Knowledge Catalog service  
       DV:
         default: Data Virtualization service
-      OSWML:
+      OpenScale:
         default: Watson OpenScale and Watson Machine Learning services
+      CDE:
+        default: Cognos Dashboard service
+      Spark:
+        default: Analytics Engine powered by Apache Spark service   
       APIKey:
-        default: IBM Cloud Pak for Data API key value
+        default: IBM Cloud Pak for Data API key value 
       ICPDVersion:
         default: IBM Cloud Pak for Data version
       Namespace:
         default: OpenShift project
-Parameters:
 
+
+Parameters:
   DV:
     Description: >-
        Choose True to install the Data Virtualization service.
@@ -183,40 +188,63 @@ Parameters:
       - "False"
       - "True"
     Default: "False"
-  OSWML:
+  OpenScale:
     Description: >-
        Choose True to install the Watson OpenScale and Watson Machine Learning services.
     Type: String
     AllowedValues:
       - "False"
       - "True"
-    Default: "False"  
+    Default: "False"
+  CDE:
+    Description: >-
+       Choose True to install the Cognos Dashboard Engine service.
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"
+  Spark:
+    Description: >-
+       Choose True to install the Analytics Engine powered by Apache Spark service.
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"          
   APIKey:
     Description: >-
        Enter the IBM Cloud Pak for Data API key to access IBM Container Registry, or leave this parameter blank to use a 60-day trial installation.
     Type: String 
-    NoEcho: 'true'
-    Default: ""            
+    NoEcho: 'true'   
+            
   NumberOfAZs:
     Description: >-
-      The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to 2 Availability Zones.  For a single ICP cluster to be highly available, 3 Availability Zones are needed to avoid a single point of failure when using 3, 5 or 7 master nodes or etcd nodes.  With less than 3 Availability Zones, one of the AZs will have more master nodes (or etcd nodes) than can be lost without losing a majority of the etcd instances.
+      The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to 2 Availability Zones.  For a single ICPD cluster to be highly available, 3 Availability Zones are needed to avoid a single point of failure when using 3, 5 or 7 master nodes.  With less than 3 Availability Zones, one of the AZs will have more master nodes.
     Type: Number
     Default: 3
     # For now, only 1 or 3 AZs can be used.
     AllowedValues:
       - 1
       - 3
-  ApplicationStorageMountPoint:
-    Description: The mount point for the EFS volume to be used for application shared storage. The Kubernetes EFS provisioner uses this mount point.
-    Type: String
-    Default: /mnt/storage      
   AvailabilityZones:
     Description: The list of Availability Zones to use for the subnets in the VPC. The Quick Start uses one or three Availability Zones and preserves the logical order you specify.
     Type: List<AWS::EC2::AvailabilityZone::Name>
+  AWSAccessKeyId:
+    Description: Value of AWS Access key Id to be used while creating Openshift Cluster. Quickstart will use this value to create all the resources within AWS
+    Type: String
+    NoEcho: 'true'
+
+  AWSSecretAccessKey:
+    Description: Value of AWS Secret Access Key value to be used while creating Openshift Cluster. Quickstart will use this value to create all the resources within AWS
+    Type: String
+    NoEcho: 'true'
+
   KeyPairName:
     Description: The name of an existing public/private key pair, which allows you
       to securely connect to your instance after it launches.
     Type: AWS::EC2::KeyPair::KeyName
+
   PrivateSubnet1CIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
@@ -262,47 +290,34 @@ Parameters:
       numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
       or end with a hyphen (-).
     Type: String
-    Default: aws-quickstart
   QSS3BucketRegion:
-    Default: 'us-east-1'
+    Default: 'us-east-2'
     Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
-    Type: String  
+    Type: String   
   QSS3KeyPrefix:
     AllowedPattern: ^[0-9a-zA-Z-/]*$
     ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
       uppercase letters, hyphens (-), and forward slash (/).
-    Default: quickstart-ibm-icp-for-data/
+    Default: quickstart-ibm-icp-for-data/  
     Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
       can include numbers, lowercase letters, uppercase letters, hyphens (-), and
       forward slash (/).
     Type: String
-  RemoteAccessCIDR:
+  BootNodeAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access the OCP console. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
-    Type: String
-  ContainerAccessCIDR:
-    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access Cloud Pak for Data. We recommend that you set this value to a trusted IP range.
+    Description: The CIDR IP range that is permitted to access BootNode instance. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
     Type: String
   AdminPassword:
-    Description: The password for the OpenShift Admin UI and the Cloud Pak for Data web client. The password must contain at least 8 characters, including letters (with a minimum of one capital letter), numbers, and symbols.
+    Description: The password for the Cloud Pak for Data web client. The password must contain at least 8 characters, including letters (with a minimum of one capital letter), numbers, and symbols.
     Type: String
     MinLength: '8'
     AllowedPattern: ^[^ \\']+$
     NoEcho: 'true'
-  RedhatSubscriptionUserName:
-    Description: Your Red Hat Network (RHN) user name, from step 1 of the deployment guide.
+  RedhatPullSecret:
+    Description: S3 path of OpenShift Installer Provisioned Infrastructure pull secret
     Type: String
-  RedhatSubscriptionPassword:
-    NoEcho: 'true'
-    Description: Your Red Hat Network (RHN) password, from step 1 of the deployment guide.
-    Type: String
-    AllowedPattern: ^[^ \\']+$
-  RedhatSubscriptionPoolID:
-    Description: Your Red Hat Network (RHN) subscription pool ID, from step 1 of the deployment guide.
-    Type: String
+
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
@@ -310,7 +325,7 @@ Parameters:
     Description: CIDR block for the VPC
     Type: String
   MasterInstanceType:
-    Default: m5.2xlarge
+    Default: m5.xlarge
     AllowedValues:
       - m5.xlarge
       - m5.2xlarge
@@ -319,35 +334,25 @@ Parameters:
     ConstraintDescription: Must contain valid instance type
     Description: The EC2 instance type for the OpenShift master instances.
     Type: String
-  EtcdInstanceType:
-    Default: m5.xlarge
+  OCSInstanceType:
+    Default: m4.4xlarge
     AllowedValues:
-      - t3.xlarge
-      - t3.2xlarge
-      - m5.xlarge
-      - m5.2xlarge
-      - m5.4xlarge
-      - m5.12xlarge
-      - c5.large
-      - c5.xlarge
-      - c5.2xlarge
-      - c5.4xlarge
-      - c5.9xlarge
-      - t2.large
-      - t2.xlarge
-      - m4.xlarge
-      - m4.2xlarge
       - m4.4xlarge
+      - m4.8xlarge
+      - m5.8xlarge
+      - m5.12xlarge
+      - c5.8xlarge
+      - c5.12xlarge
+      - c5.9xlarge
+      - r5.4xlarge
+      - r5.8xlarge
+      - r5.12xlarge
       - m4.10xlarge
-      - c4.large
-      - c4.xlarge
-      - c4.2xlarge
-      - c4.4xlarge
       - c4.8xlarge
     ConstraintDescription: Must contain valid instance type
-    Description: The EC2 instance type for the OpenShift etcd instances.
+    Description: Update this value if Storage type selected is OCS. The EC2 instance type for the OpenShift Container Storage instances.
     Type: String
-  NodesInstanceType:
+  ComputeInstanceType:
     Default: m5.4xlarge
     AllowedValues:
       - m5.4xlarge
@@ -363,62 +368,69 @@ Parameters:
       - c5.12xlarge
       - c5.18xlarge
       - c5.24xlarge
+      - r5.4xlarge
+      - r5.9xlarge
+      - r5.12xlarge
+      - r5.18xlarge
+      - r5.24xlarge
     ConstraintDescription: Must contain valid instance type
-    Description: The EC2 instance type for the OpenShift node instances.
+    Description: The EC2 instance type for the OpenShift compute instances.
     Type: String
   NumberOfMaster:
     Default: '3'
     Description: The desired capacity for the OpenShift master instances. Must be an odd number. For a development deployment, 1 is sufficient; for production deployments, a minimum of 3 is required.
     Type: String
     AllowedPattern: '^[13579]$|(^[1-9]+[13579]$)'
-  NumberOfEtcd:
+  NumberOfOCS:
     Default: '3'
-    Description: The desired capacity for the OpenShift etcd instances. Must be an odd number. For a development deployment, 1 is sufficient; for production deployments, a minimum of 3 is required.
+    Description: Update this value if Storage type selected is OCS. The desired capacity for the OpenShift container storage instances.  Minimum of 3 is required.
     Type: String
-    AllowedPattern: '^[13579]$|(^[1-9]+[13579]$)'
-  NumberOfNodes:
+    AllowedPattern: '^[3579]$|(^[3-9]+[3579]$)'
+  NumberOfCompute:
     Default: '3'
-    Description: The desired capacity for the OpenShift node instances. Minimum of 3 nodes required. If the number of node instances exceeds your Red Hat entitlement limits or AWS instance limits, the stack will fail. Choose a number that is within your limits.
+    Description: The desired capacity for the OpenShift compute instances. Minimum of 3 nodes required. If the number of compute instances exceeds your Red Hat entitlement limits or AWS instance limits, the stack will fail. Choose a number that is within your limits.
     Type: Number
-  OutputBucketName:
-    Description: 'OPTIONAL: Bucket Name where the zip file output should be placed,
-      if left blank a bucket name will be automatically generated.'
+  ICPDDeploymentLogsBucketName:
+    Description: 'Existing Bucket Name where the zip file output should be placed.'
     Type: String
-    Default: ''
-  HostedZoneID:
-    Description: '(Optional) Route 53 hosted zone ID to use. If left blank, Amazon Route 53 will not be configured, and DNS must be set up manually. If you specify this, you must also specify DomainName.'
-    Type: String
-    Default: ""
+
   DomainName:
-    Description: >-
-      (Optional) domain name configured for the cluster, if left blank self signed
-      certificates will be used for TLS and the Load Balancer's auto-generated hostname
-      will be used for connections from outside the cluster.
+    Description: 'AWS Route53 base domain configured for your OpenShift Container Platform cluster. Name must consist of lower case alphanumeric characters and must start and end with an alphanumeric character.'
     Type: String
-    Default: ""
-  SubDomainPrefix:
-    Default: ''
-    Description: '(Optional) Subdomain to use. If left blank, DomainName will be used without a prefix. If you specify this, you must also specify DomainName and HostedZoneID.'
-    Type: String
+
   ClusterName:
-    Default: ""
-    Description: cluster name for kubernetes.io/cluster/tags. If left blank, will use the stack name suffixed with the AWS Region.
+    Description: cluster name for kubernetes.io/cluster/tags.
     Type: String
-  ClusterConsole:
-    Default: Enabled
-    Description: To disable the cluster console, choose Disabled.
-    Type: String
-    AllowedValues: [ Enabled, Disabled ]
-  ICPDVersion:
-    Description: >-
-      The version of Cloud Pak for Data to be deployed. Currently only v2.5 is supported.
+    AllowedPattern: ^[0-9a-z-]*$
+  StorageType:
+    Description: Select either EFS, Portworx or Openshift Container Storage as default Storage class.  
     Type: String
     AllowedValues:
-      - 2.5
-    Default: 2.5
+      - "OCS"
+      - "Portworx"
+      - "EFS"
+    Default: "OCS"   
+  PortworxSpec:
+    Description: Update this value if Storage type selected is Portworx. S3 path of Portworx Spec.
+    Type: String
+
+  EnableFips:
+    Description: Enable Fips for Openshift
+    Type: String
+    AllowedValues:
+      - "False"
+      - "True"
+    Default: "False"
+
+  ICPDVersion:
+    Description: The version of Cloud Pak for Data to be deployed. Currently only v3.0.1 is supported.
+    Type: String
+    AllowedValues:
+      - 3.0.1
+    Default: 3.0.1
   LicenseAgreement:
     Description: >-
-      I have read and agree to the license terms for IBM Cloud Pak for Data (ibm.biz/BdqRPm).
+      I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/BdqyB2).
     Type: String
     Default: '-' 
     AllowedValues:
@@ -430,14 +442,7 @@ Parameters:
       The OpenShift project that will be created for deploying Cloud Pak for Data. It can be any lowercase string.
     Type: String
     Default: "zen"
-  
-Mappings:
-  VPCTemplateMap:
-    OneNode: 
-      TemplatePath: templates/aws-vpc.yaml
-    ThreeNode:
-      TemplatePath: submodules/quickstart-aws-vpc/templates/aws-vpc.template
-
+ 
 Rules:
   LicenseAgreementRule:
     Assertions:
@@ -446,6 +451,7 @@ Rules:
         - - I agree
         - Ref: LicenseAgreement
       AssertDescription: User must agree to the terms of the license agreement.    
+   
 
 Conditions:
   3AZCondition: !Equals [!Ref NumberOfAZs, 3]
@@ -458,19 +464,17 @@ Resources:
       TemplateURL: !If
           - 3AZCondition
           - !Sub
-            - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}${TemplatePath}
-            - TemplatePath: !FindInMap [VPCTemplateMap, ThreeNode, TemplatePath] 
-              S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+            - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template
+            - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
           - !Sub
-            - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}${TemplatePath}
-            - TemplatePath: !FindInMap [VPCTemplateMap, OneNode, TemplatePath] 
-              S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+            - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/aws-vpc.yaml
+            - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion] 
       Parameters:
         AvailabilityZones: !Join [ ',', !Ref 'AvailabilityZones']
         KeyPairName: !Ref 'KeyPairName'
-        NumberOfAZs: !Ref NumberOfAZs
+        NumberOfAZs: !Ref  NumberOfAZs
         PrivateSubnet1ACIDR: !Ref 'PrivateSubnet1CIDR'
         PrivateSubnet2ACIDR: !Ref 'PrivateSubnet2CIDR'
         PrivateSubnet3ACIDR: !Ref 'PrivateSubnet3CIDR'
@@ -490,17 +494,19 @@ Resources:
         - >- 
           https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/ibm-cloudpak-data.yaml
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-          S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]   
-
+          S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
       Parameters:
         NumberOfAZs: !Ref NumberOfAZs
+        AvailabilityZones: !Join [ ',', !Ref 'AvailabilityZones']
         MasterInstanceType: !Ref 'MasterInstanceType'
-        NodesInstanceType: !Ref 'NodesInstanceType'
-        EtcdInstanceType: !Ref 'EtcdInstanceType'
+        ComputeInstanceType: !Ref 'ComputeInstanceType'
+        OCSInstanceType: !Ref 'OCSInstanceType'
         NumberOfMaster: !Ref 'NumberOfMaster'
-        NumberOfEtcd: !Ref 'NumberOfEtcd'
-        NumberOfNodes: !Ref 'NumberOfNodes'
+        NumberOfOCS: !Ref 'NumberOfOCS'
+        NumberOfCompute: !Ref 'NumberOfCompute'
         KeyPairName: !Ref 'KeyPairName'
+        AWSSecretAccessKey: !Ref 'AWSSecretAccessKey'
+        AWSAccessKeyId: !Ref 'AWSAccessKeyId'
         PrivateSubnet1ID: !GetAtt 'VPCStack.Outputs.PrivateSubnet1AID'
         PrivateSubnet2ID: !If
           - 3AZCondition
@@ -519,39 +525,44 @@ Resources:
           - 3AZCondition
           - !GetAtt 'VPCStack.Outputs.PublicSubnet3ID'
           - ""
-        RemoteAccessCIDR: !Ref 'RemoteAccessCIDR'
-        ContainerAccessCIDR: !Ref 'ContainerAccessCIDR'
+        BootNodeAccessCIDR: !Ref 'BootNodeAccessCIDR'
         QSS3BucketName: !Ref 'QSS3BucketName'
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
         AdminPassword: !Ref 'AdminPassword'
-        RedhatSubscriptionUserName: !Ref 'RedhatSubscriptionUserName'
-        RedhatSubscriptionPassword: !Ref 'RedhatSubscriptionPassword'
-        RedhatSubscriptionPoolID: !Ref 'RedhatSubscriptionPoolID'
-        OutputBucketName: !Ref 'OutputBucketName'
+        RedhatPullSecret: !Ref 'RedhatPullSecret'
+        ICPDDeploymentLogsBucketName: !Ref 'ICPDDeploymentLogsBucketName'
         VPCCIDR: !Ref 'VPCCIDR'
         VPCID: !GetAtt 'VPCStack.Outputs.VPCID'
-        HostedZoneID: !Ref 'HostedZoneID'
         DomainName: !Ref 'DomainName'
-        SubDomainPrefix: !Ref 'SubDomainPrefix'
-        ClusterConsole: !Ref ClusterConsole
-        ApplicationStorageMountPoint: !Ref ApplicationStorageMountPoint
         ICPDVersion: !Ref ICPDVersion
         Namespace: !Ref Namespace
         LicenseAgreement: !Ref LicenseAgreement
         ClusterName: !Ref ClusterName
+        StorageType: !Ref StorageType
+        EnableFips: !Ref EnableFips
+        PortworxSpec: !Ref PortworxSpec
         WKC: !Ref WKC
         WML: !Ref WML
         WSL: !Ref WSL
         DV: !Ref DV
-        OSWML: !Ref OSWML
+        OpenScale: !Ref OpenScale
+        CDE: !Ref CDE
+        Spark: !Ref Spark
         APIKey: !Ref APIKey
-        
+
 
 Outputs:
+  BootstrapPublicIp:
+    Description: The bootstrap node public IP address.
+    Value: !GetAtt 'CloudPakDataStack.Outputs.BootstrapPublicIp'
   OpenShiftUI:
     Description: The URL OpenShiftUI
-    Value: !GetAtt 'CloudPakDataStack.Outputs.OpenShiftUI'
+    Value: !GetAtt 'CloudPakDataStack.Outputs.OpenshiftURLValue'
   ICPDWebClientURL:
     Description: Use this ELB to expose ports to the internet
-    Value: !GetAtt CloudPakDataStack.Outputs.ICPDWebClientURL
+    Value: !GetAtt 'CloudPakDataStack.Outputs.ICPDWebClientURL'
+  OpenshiftPassword:
+    Description: OpenshiftPassword
+    Value: !GetAtt 'CloudPakDataStack.Outputs.OpenshiftPassword'
+    
