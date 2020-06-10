@@ -1,0 +1,10 @@
+AdminPassword: 
+BootNodeAccessCIDR: 
+KeyPairName: 
+DomainName: 
+APIKey: 
+AWSAccessKeyId: 
+AWSSecretAccessKey: 
+RedhatPullSecret: 
+PortworxSpec: 
+ICPDDeploymentLogsBucketName: 
