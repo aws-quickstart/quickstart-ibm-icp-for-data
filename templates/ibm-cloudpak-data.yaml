@@ -290,7 +290,7 @@ Parameters:
     AllowedPattern: ^[^ \\']+$
     NoEcho: 'true'
   RedhatPullSecret:
-    Description: Your Red Hat Network (RHN) pull secret
+    Description: Your Red Hat Network (RHN) pull secret(e.g., s3://my-bucket/path/to/portworxspec.yaml).
     Type: String
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
@@ -400,7 +400,7 @@ Parameters:
       - "EFS"
     Default: "OCS"  
   PortworxSpec:
-    Description: Update this value if Storage type selected is Portworx. S3 path of Portworx Spec.
+    Description: Update this value if Storage type selected is Portworx. S3 path of Portworx Spec(e.g., s3://my-bucket/path/to/portworxspec.yaml).
     Type: String
   EnableFips:
     Description: Enable Fips for Openshift
@@ -613,7 +613,7 @@ Resources:
                 Resource:
                   - '*' 
 
-  BootstrapIamRole:
+  BootNodeIamRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -630,7 +630,7 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - arn:aws:iam::aws:policy/AWSCloudFormationReadOnlyAccess
       Policies:
-      - PolicyName: bootstrap-policy
+      - PolicyName: bootnode-policy
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -683,17 +683,17 @@ Resources:
       Type: String
       Value: "PlaceHolder"
 
-  BootstrapInstanceProfile:
+  BootnodeInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
       Path: "/"
       Roles:
-      - Ref: "BootstrapIamRole"
+      - Ref: "BootNodeIamRole"
 
-  BootstrapSecurityGroup:
+  BootnodeSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Cluster Bootstrap Security Group
+      GroupDescription: Cluster Bootnode Security Group
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: 22
@@ -701,17 +701,17 @@ Resources:
         CidrIp: !Ref BootNodeAccessCIDR
       VpcId: !Ref VPCID
 
-  BootstrapInstance:
+  BootnodeInstance:
     Type: AWS::EC2::Instance
     Metadata:
       AWS::CloudFormation::Init:
         configSets:
           Required:
             - StackPropertiesFile
-            - ICPDBootstrapScripts
+            - ICPDBootnodeScripts
 
             
-        ICPDBootstrapScripts:
+        ICPDBootnodeScripts:
           sources:
             /root: !Sub
              - https://${ScriptBucketName}.s3.amazonaws.com/${KeyPrefix}
@@ -743,14 +743,14 @@ Resources:
           Ebs:
             VolumeSize: 500
             VolumeType: gp2    
-      IamInstanceProfile: !Ref BootstrapInstanceProfile
+      IamInstanceProfile: !Ref BootnodeInstanceProfile
       Tags:
         - Key: Name
-          Value: BootStrap
+          Value: BootNode
       InstanceType: i3.large
       NetworkInterfaces:
       - GroupSet:
-        - !Ref BootstrapSecurityGroup
+        - !Ref BootnodeSecurityGroup
         AssociatePublicIpAddress: true
         DeviceIndex: '0'
         DeleteOnTermination: true
@@ -770,7 +770,7 @@ Resources:
             qs_bootstrap_pip || qs_err " pip bootstrap failed "
             qs_aws-cfn-bootstrap || qs_err "cfn bootstrap failed"
             pip install awscli  &> /var/log/userdata.awscli_install.log || qs_err " awscli install failed "
-            /usr/bin/cfn-init -v --stack ${AWS::StackName} --resource BootstrapInstance --configsets Required --region ${AWS::Region}
+            /usr/bin/cfn-init -v --stack ${AWS::StackName} --resource BootnodeInstance --configsets Required --region ${AWS::Region}
             export CPD_QS_S3URI=s3://${QSS3BucketName}/${QSS3KeyPrefix}
             export AWS_REGION=${AWS::Region}
             export AWS_STACKID=${AWS::StackId}
@@ -850,7 +850,7 @@ Resources:
       Environment:
         Variables:
           Region: !Ref AWS::Region
-          BootNode: !Ref BootstrapInstance
+          BootNode: !Ref BootnodeInstance
           Storage: !Ref StorageType
           StackName: !Ref AWS::StackName
       Handler: index.handler
@@ -861,7 +861,7 @@ Resources:
   Cleanup :
     Type: Custom::Cleanup
     Properties:
-      DependsOn: BootstrapInstance
+      DependsOn: BootnodeInstance
       ServiceToken: !GetAtt 'CleanUpLambda.Arn'
  
   ICPDInstallationCompletedHandle:
@@ -875,13 +875,13 @@ Resources:
       Timeout: '30000'  
 
 Outputs:
-  BootstrapInstanceId:
-    Description: Bootstrap Instance ID.
-    Value: !Ref BootstrapInstance
+  BootnodeInstanceId:
+    Description: Bootnode Instance ID.
+    Value: !Ref BootnodeInstance
 
-  BootstrapPublicIp:
-    Description: The bootstrap node public IP address.
-    Value: !GetAtt BootstrapInstance.PublicIp
+  BootnodePublicIp:
+    Description: The boot node public IP address.
+    Value: !GetAtt BootnodeInstance.PublicIp
 
   OpenshiftURLValue:
     Description: Openshift Password Secret Manager Arn

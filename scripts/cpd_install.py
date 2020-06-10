@@ -1248,7 +1248,7 @@ class CPDInstall(object):
                 TR.info(methodName,"Pull secret  %s" %secret)  
                 self.pullSecret = "/ibm/pull-secret"
                 #self.getS3Object(bucket=secret[0], s3Path=secret[1], destPath=self.pullSecret)
-                s3_cp_cmd = "aws s3 cp s3://"+self.RedhatPullSecret+" "+self.pullSecret
+                s3_cp_cmd = "aws s3 cp "+self.RedhatPullSecret+" "+self.pullSecret
                 TR.info(methodName,"s3 cp cmd %s"%s3_cp_cmd)
                 call(s3_cp_cmd, shell=True,stdout=icpdInstallLogFile)
                 self.getSecret(icpdInstallLogFile)
@@ -1280,7 +1280,7 @@ class CPDInstall(object):
                     TR.info(methodName,"spec  %s" %spec)
                     self.spec = "/ibm/templates/px/px-spec.yaml"
                     #self.getS3Object(bucket=spec[0], s3Path=spec[1], destPath=self.spec)
-                    s3_cp_cmd = "aws s3 cp s3://"+self.PortworxSpec+" "+self.spec
+                    s3_cp_cmd = "aws s3 cp "+self.PortworxSpec+" "+self.spec
                     TR.info(methodName,"s3 cp cmd %s"%s3_cp_cmd)
                     call(s3_cp_cmd, shell=True,stdout=icpdInstallLogFile)
                     self.configurePx(icpdInstallLogFile)

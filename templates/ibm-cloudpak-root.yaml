@@ -315,7 +315,7 @@ Parameters:
     AllowedPattern: ^[^ \\']+$
     NoEcho: 'true'
   RedhatPullSecret:
-    Description: S3 path of OpenShift Installer Provisioned Infrastructure pull secret
+    Description: S3 path of OpenShift Installer Provisioned Infrastructure pull secret(e.g., s3://my-bucket/path/to/pull-secret).
     Type: String
 
   VPCCIDR:
@@ -411,7 +411,7 @@ Parameters:
       - "EFS"
     Default: "OCS"   
   PortworxSpec:
-    Description: Update this value if Storage type selected is Portworx. S3 path of Portworx Spec.
+    Description: Update this value if Storage type selected is Portworx. S3 path of Portworx Spec (e.g., s3://my-bucket/path/to/portworxspec.yaml).
     Type: String
 
   EnableFips:
@@ -553,9 +553,9 @@ Resources:
 
 
 Outputs:
-  BootstrapPublicIp:
-    Description: The bootstrap node public IP address.
-    Value: !GetAtt 'CloudPakDataStack.Outputs.BootstrapPublicIp'
+  BootnodePublicIp:
+    Description: The boot node public IP address.
+    Value: !GetAtt 'CloudPakDataStack.Outputs.BootnodePublicIp'
   OpenShiftUI:
     Description: The URL OpenShiftUI
     Value: !GetAtt 'CloudPakDataStack.Outputs.OpenshiftURLValue'
