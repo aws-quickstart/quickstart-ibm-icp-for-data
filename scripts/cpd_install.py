@@ -172,7 +172,7 @@ class CPDInstall(object):
         TR.info(methodName, "updating repo.yaml with apikey value provided")
         
         #TODO change this later
-        #self.updateTemplateFile(self.repoFile, '${apikeyusername}',"bff@us.ibm.com")
+        self.updateTemplateFile(self.repoFile, '${apikeyusername}',self.APIUsername)
         self.updateTemplateFile(self.repoFile ,'${apikey}',self.apiKey)
       
         default_route = "oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}'"
