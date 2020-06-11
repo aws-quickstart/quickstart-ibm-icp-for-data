@@ -60,6 +60,7 @@ Metadata:
           - OpenScale
           - CDE
           - Spark
+          - APIUsername
           - APIKey
       - Label:
           default: AWS Quick Start configuration
@@ -146,9 +147,11 @@ Metadata:
       CDE:
         default: Cognos Dashboard service
       Spark:
-        default: Analytics Engine powered by Apache Spark service   
+        default: Analytics Engine powered by Apache Spark service
+      APIUsername:
+        default: IBM Cloud Pak for Data Username value to access IBM Container Registry
       APIKey:
-        default: IBM Cloud Pak for Data API key value 
+        default: IBM Cloud Pak for Data API key value to access IBM Container Registry
       ICPDVersion:
         default: IBM Cloud Pak for Data version
       Namespace:
@@ -211,10 +214,15 @@ Parameters:
     AllowedValues:
       - "False"
       - "True"
-    Default: "False"          
+    Default: "False"
+  APIUsername:
+    Description: >-
+       Enter the IBM Cloud Pak for Data Username to access IBM Container Registry.
+    Type: String
+    Default: "cp"  
   APIKey:
     Description: >-
-       Enter the IBM Cloud Pak for Data API key to access IBM Container Registry, or leave this parameter blank to use a 60-day trial installation.
+       Enter the IBM Cloud Pak for Data API key to access IBM Container Registry.
     Type: String 
     NoEcho: 'true'   
             
@@ -550,6 +558,7 @@ Resources:
         CDE: !Ref CDE
         Spark: !Ref Spark
         APIKey: !Ref APIKey
+        APIUsername: !Ref APIUsername
 
 
 Outputs:
@@ -560,7 +569,7 @@ Outputs:
     Description: The URL OpenShiftUI
     Value: !GetAtt 'CloudPakDataStack.Outputs.OpenshiftURLValue'
   ICPDWebClientURL:
-    Description: Use this ELB to expose ports to the internet
+    Description: CloudPakForData 
     Value: !GetAtt 'CloudPakDataStack.Outputs.ICPDWebClientURL'
   OpenshiftPassword:
     Description: OpenshiftPassword

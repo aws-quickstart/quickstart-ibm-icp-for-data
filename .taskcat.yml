@@ -43,6 +43,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -72,6 +73,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -99,6 +101,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -126,6 +129,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -156,6 +160,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -183,6 +188,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -212,6 +218,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -242,6 +249,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -269,6 +277,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -299,6 +308,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -326,6 +336,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -354,6 +365,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
@@ -384,6 +396,7 @@ tests:
       DomainName: override
       AdminPassword: override
       APIKey: override
+      APIUsername: override
       AWSAccessKeyId: override
       AWSSecretAccessKey: override
       KeyPairName: override
