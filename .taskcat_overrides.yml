@@ -2,7 +2,8 @@ AdminPassword:
 BootNodeAccessCIDR: 
 KeyPairName: 
 DomainName: 
-APIKey: 
+APIKey:
+APIUsername:
 AWSAccessKeyId: 
 AWSSecretAccessKey: 
 RedhatPullSecret: 
