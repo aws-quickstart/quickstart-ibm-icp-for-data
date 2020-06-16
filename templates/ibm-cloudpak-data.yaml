@@ -32,8 +32,6 @@ Metadata:
           default: Amazon EC2 configuration
         Parameters:
           - KeyPairName
-          - AWSAccessKeyId
-          - AWSSecretAccessKey
       - Label:
           default: OpenShift hosts configuration
         Parameters:
@@ -79,10 +77,6 @@ Metadata:
           - ICPDDeploymentLogsBucketName
 
     ParameterLabels:
-      AWSAccessKeyId:
-        default: AWS Access Key Id value
-      AWSSecretAccessKey:
-        default: AWS Secret Access Key value
       KeyPairName:
         default: Key pair name
       PrivateSubnet1ID:
@@ -233,14 +227,6 @@ Parameters:
     Description: >-
        Enter the IBM Cloud Pak for Data API key to access IBM Container Registry.
     Type: String 
-    NoEcho: 'true'
-  AWSAccessKeyId:
-    Description: Value of AWS Access key Id to be used while creating Openshift Cluster. Quickstart will use this value to create all the resources within AWS
-    Type: String
-    NoEcho: 'true'
-  AWSSecretAccessKey:
-    Description: Value of AWS Secret Access Key value to be used while creating Openshift Cluster. Quickstart will use this value to create all the resources within AWS
-    Type: String
     NoEcho: 'true'
   KeyPairName:
     Description: The name of an existing public/private key pair, which allows you
@@ -556,10 +542,18 @@ Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 
 Resources:
-  AWSCredentialSecret:
-    Type: "AWS::SecretsManager::Secret"
-    Properties: 
-      SecretString: !Sub '{"aws_secret_access_key":"${AWSSecretAccessKey}", "aws_access_key_id":"${AWSAccessKeyId}"}'
+  CPDIAMUser:
+    Type: 'AWS::IAM::User'
+    Properties:
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  CPDIAMUserAccessKey:
+    Type: 'AWS::IAM::AccessKey'
+    Properties:
+      UserName: !Ref CPDIAMUser
+
+
   CPDSecret:
     Type: "AWS::SecretsManager::Secret"
     Properties:
@@ -709,6 +703,13 @@ Resources:
         CidrIp: !Ref BootNodeAccessCIDR
       VpcId: !Ref VPCID
 
+  AWSCredentialSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      SecretString: !Sub 
+        - '{"aws_secret_access_key":"${CPDIAMUserAccessKey}, "aws_access_key_id":"${CPDIAMUserSecret}"}'
+        - {CPDIAMUserAccessKey: !Ref CPDIAMUserAccessKey, CPDIAMUserSecret: !GetAtt [CPDIAMUserAccessKey, SecretAccessKey]}
+
   BootnodeInstance:
     Type: AWS::EC2::Instance
     Metadata:
@@ -739,10 +740,16 @@ Resources:
                 region=${AWS::Region}
                 
             /root/.aws/credentials:
-              content: !Sub |  
-                [default]
-                aws_access_key_id=${AWSAccessKeyId}
-                aws_secret_access_key=${AWSSecretAccessKey}
+              content: 
+                !Sub 
+                - |  
+                  [default]
+                  aws_access_key_id=${CPDIAMUserAccessKey}
+                  aws_secret_access_key=${CPDIAMUserSecret}
+                - 
+                  CPDIAMUserAccessKey: !Ref CPDIAMUserAccessKey 
+                  CPDIAMUserSecret: !GetAtt [CPDIAMUserAccessKey, SecretAccessKey]
+
     Properties:
       KeyName: 'cikey'
       ImageId: !FindInMap [AWSAMIRegionMap, !Ref "AWS::Region", RHEL76HVM]
@@ -806,7 +813,6 @@ Resources:
   CleanUpLambda:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: "Cleanup"
       Code:
         ZipFile: |
           import boto3
