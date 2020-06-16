@@ -1,18 +1,19 @@
 #!/usr/bin/python
-import sys, os.path, time, stat, socket
+import sys, os.path, time, stat, socket, base64,json
 import boto3
 import shutil
 import requests
 import yapl.Utilities as Utilities
-from subprocess import call,check_output, check_call, CalledProcessError
-from os import chmod
+from subprocess import call,check_output, check_call, CalledProcessError, Popen, PIPE
+from os import chmod, environ
 from botocore.exceptions import ClientError
 from yapl.Trace import Trace, Level
-from yapl.AWSConfigureEFS import ConfigureEFS
 from yapl.LogExporter import LogExporter
 from yapl.Exceptions import MissingArgumentException
 
 TR = Trace(__name__)
+StackParameters = {}
+StackParameterNames = []
 class CPDInstall(object):
     ArgsSignature = {
                     '--region': 'string',
@@ -121,157 +122,143 @@ class CPDInstall(object):
         
         return result
 
-    def configureEFS(self):
+    def __getattr__(self,attributeName):
         """
-        Configure an EFS volume and configure all worker nodes to be able to use 
-        the EFS storage provisioner.
+        Support for attributes that are defined in the StackParameterNames list
+        and with values in the StackParameters dictionary.  
         """
-        methodName = "configureEFS"
-        
-        TR.info(methodName,"STARTED configuration of EFS on all worker nodes")
-        
-        # Configure EFS storage on all of the worker nodes.
-        playbookPath = os.path.join(self.home,"playbooks","configure-efs-mount.yaml")
-        varTemplatePath = os.path.join(self.home,"playbooks","efs-var-template.yaml")
-        manifestTemplatePath = os.path.join(self.home,"config","efs","manifest-template.yaml")
-        rbacTemplatePath = os.path.join(self.home,"config","efs","rbac-template.yaml")
-        serviceAccountPath = os.path.join(self.home,"config","efs","service-account.yaml")
-
-        TR.info(methodName,"Invoking: oc project default")
-    
-        retcode = call(["oc", "project", "default"])
-        if (retcode != 0):
-            raise Exception("Error calling oc. Return code: %s" % retcode)
+        attributeValue = None
+        if (attributeName in StackParameterNames):
+            attributeValue = StackParameters.get(attributeName)
+        else:
+            raise AttributeError("%s is not a StackParameterName" % attributeName)
         #endIf
+  
+        return attributeValue
+    #endDef
 
-        TR.info(methodName,"Configure EFS")
-
-        
-        configEFS = ConfigureEFS(region=self.region,
-                                stackId=self.stackId,
-                                playbookPath=playbookPath,
-                                varTemplatePath=varTemplatePath,
-                                manifestTemplatePath=manifestTemplatePath,
-                                rbacTemplatePath=rbacTemplatePath,
-                                serviceAccountPath=serviceAccountPath)
-        configEFS.configureEFS()
-        TR.info(methodName,"COMPLETED configuration of EFS on all worker nodes.")
+    def __setattr__(self,attributeName,attributeValue):
+        """
+        Support for attributes that are defined in the StackParameterNames list
+        and with values in the StackParameters dictionary.
       
-    #endDef   
+        NOTE: The StackParameters are intended to be read-only.  It's not 
+        likely they would be set in the Bootstrap instance once they are 
+        initialized in getStackParameters().
+        """
+        if (attributeName in StackParameterNames):
+            StackParameters[attributeName] = attributeValue
+        else:
+            object.__setattr__(self, attributeName, attributeValue)
+        #endIf
+    #endDef
+   
+ 
     def installCPD(self,icpdInstallLogFile):
         """
-        Installs pre-requsites for cpd installation by running mkfifo and install-sem playbooks
-        prepares oc cluster with required user and roles
-        copies certificates from node instance to ansible server and configures internal docker registry to push images
         creates a OC project with user defined name
         Downloads binary file from S3 and extracts it to /ibm folder
-        installs wkc wml and wsl package by pushing images to local registry and using local registry.
+        installs user selected services using transfer method
 
         """
 
         methodName = "installCPD"
-        check_cmd = "checkmodule -M -m -o mkfifo.mod mkfifo.te"
-        call(check_cmd,shell=True, stdout=icpdInstallLogFile)
-
-        package_cmd = "semodule_package -o mkfifo.pp -m mkfifo.mod"
-        call(package_cmd,shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"ansible-playbook: install-mkfifo.yaml started, find log here %s" % (os.path.join(self.logsHome,"install-mkfifo.log")))
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/cpd-linux", destPath="/ibm/cpd-linux")
+        os.chmod("/ibm/cpd-linux", stat.S_IEXEC)	
+        self.repoFile = "/ibm/repo.yaml"
         
-        retcode = call('ansible-playbook /ibm/playbooks/install-mkfifo.yaml >> %s 2>&1' %(os.path.join(self.logsHome,"install-mkfifo.log")), shell=True, stdout=icpdInstallLogFile)
-        if (retcode != 0):
-            TR.error(methodName,"Error calling ansible-playbook install-mkfifo.yaml. Return code: %s" % retcode)
-            raise Exception("Error calling ansible-playbook install-mkfifo.yaml. Return code: %s" % retcode)
-        else:
-            TR.info(methodName,"ansible-playbook: install-mkfifo.yaml completed.")
         
-        retcode = call('ansible-playbook /ibm/playbooks/install-sem.yaml >> %s 2>&1' %(os.path.join(self.logsHome,"install-sem.log")), shell=True, stdout=icpdInstallLogFile)
-        if (retcode != 0):
-            TR.error(methodName,"Error calling ansible-playbook install-sem.yaml. Return code: %s" % retcode)
-            raise Exception("Error calling ansible-playbook install-sem.yaml. Return code: %s" % retcode)
-        else:
-            TR.info(methodName,"ansible-playbook:install-sem.yaml completed.")
-
-        retlogin = check_output(['bash','-c', 'oc login -u system:admin'])
-        TR.info(methodName,"Logged in as system:admin with retcode %s" % retlogin)
-
-        retproj = check_output(['bash','-c', 'oc project default'])
-        TR.info(methodName,"Switched to default project %s" % retproj)
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/repo.yaml", destPath=self.repoFile)
+        TR.info(methodName, "updating repo.yaml with apikey value provided")
         
-        registry_cmd = "oc get route | grep 'docker-registry'| awk {'print $2'}"
-        registry_url = check_output(['bash','-c', registry_cmd]).rstrip("\n\r")
-        TR.info(methodName,"Get url from docker-registry route %s" % registry_url)
-        
-        self.docker_registry = registry_url+":443/"+self.namespace
-        TR.info(methodName," registry url %s" % self.docker_registry)
+        #TODO change this later
+        self.updateTemplateFile(self.repoFile, '${apikeyusername}',self.APIUsername)
+        self.updateTemplateFile(self.repoFile ,'${apikey}',self.apiKey)
+      
+        default_route = "oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}'"
+        TR.info(methodName,"Get default route  %s"%default_route)
+        try:
+            self.regsitry = check_output(['bash','-c', default_route]) 
+            TR.info(methodName,"Completed %s command with return value %s" %(default_route,self.regsitry))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
-        retcode = call('oc adm policy add-cluster-role-to-user cluster-admin admin',shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"Added cluster admin role to admin user %s"%retcode)
+        self.ocpassword = self.readFileContent("/ibm/installDir/auth/kubeadmin-password").rstrip("\n\r")
+        try:
+            oc_login = "oc login -u kubeadmin -p "+self.ocpassword
+            retcode = call(oc_login,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"Log in to OC with admin user %s"%retcode)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
-        oc_login = "oc login -u admin -p "+self.getPassword()
-        retcode = call(oc_login,shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"Log in to OC with admin user %s"%retcode)
-
-        oc_new_project ="oc new-project "+self.namespace
-        retcode = call(oc_new_project,shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"Create new project with user defined project name %s,retcode=%s" %(self.namespace,retcode))
-
-        nodeIP = self.getNodeIP()
-        add_to_hosts = "echo "+nodeIP+" "+registry_url+" >> /etc/hosts"
-        retcode = call(add_to_hosts,shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"add entry to host file %s"%add_to_hosts)
-
-        copycerts = "scp -r root@"+nodeIP+":/etc/docker/certs.d/docker-registry.default.svc:5000 /etc/docker/certs.d/"+registry_url+":443"
-        retcode = call(copycerts,shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"Copy certs from compute node %s"%retcode)
+        oc_new_project ="oc new-project "+self.Namespace
+        try:
+            retcode = call(oc_new_project,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"Create new project with user defined project name %s,retcode=%s" %(self.Namespace,retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
         self.token = self.getToken(icpdInstallLogFile)
-        # self.updateTemplateFile('/ibm/local_repo.yaml', '<REGISTRYURL>', self.docker_registry)
-        # self.updateTemplateFile('/ibm/local_repo.yaml', '<PASSWORD>', self.token)
-        # TR.info(methodName,"Update local repo file with sa token")
-
-        # TR.info(methodName,"Download install package from S3 bucket %s" %self.cpdbucketName)
-        # s3start =Utilities.currentTimeMillis()    
-        # self.getS3Object(bucket=self.cpdbucketName, s3Path="2.5/cpd.tar", destPath='/tmp/cpd.tar')
-        # s3end = Utilities.currentTimeMillis()
-        # TR.info(methodName,"Downloaded install package from S3 bucket %s" %self.cpdbucketName)
-        # self.printTime(s3start,s3end, "S3 download of cpd tar")
-
-        # TR.info(methodName,"Extract install package")
-        # call('tar -xvf /tmp/cpd.tar -C /ibm/',shell=True, stdout=icpdInstallLogFile)
-        # extractend = Utilities.currentTimeMillis()
-        # TR.info(methodName,"Extracted install package")
-        # self.printTime(s3end, extractend, "Extracting cpd tar")
+        fs_group_cmd = "oc describe project "+self.Namespace+" | grep sa.scc.uid-range | cut -d= -f2"
+        TR.info(methodName," FS group cmd %s"%fs_group_cmd)
+        try:
+            fs_value =  check_output(['bash','-c',fs_group_cmd])
+            self.fsGroup = fs_value.split('/')[0]
+            TR.info(methodName,"FS Group retrieved %s %s for command %s"%(self.fsGroup, fs_value, fs_group_cmd))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        if(self.StorageType=='OCS'):
+            self.storageClass = "ocs-storagecluster-cephfs"
+            self.storageOverrideFile = "/ibm/override_ocs.yaml"
+            self.storageOverride = " -o"+self.storageOverrideFile
+        elif(self.StorageType=='Portworx'):    
+            self.storageClass = "portworx-shared-gp3"
+            self.storageOverrideFile = "/ibm/override_px.yaml"
+            self.storageOverride = " -o"+self.storageOverrideFile
+        elif(self.StorageType=='EFS'):
+            self.storageClass = "aws-efs"
+            self.storageOverride = ""
+        if(self.StorageType!='EFS'):    
+            self.updateTemplateFile(self.storageOverrideFile,'${FS_GROUPVALUE}',self.fsGroup)
+            self.updateTemplateFile(self.storageOverrideFile,'${fips}',self.EnableFips)
         litestart = Utilities.currentTimeMillis()
         TR.info(methodName,"Start installing Lite package")
         self.installAssemblies("lite","v2.5.0.0",icpdInstallLogFile)
         liteend = Utilities.currentTimeMillis()
         self.printTime(litestart, liteend, "Installing Lite")
-        self.configureCPDRoute(icpdInstallLogFile)
 
+        get_cpd_route_cmd = "oc get route -n "+self.Namespace+ " | grep '"+self.Namespace+"' | awk '{print $2}'"
+        TR.info(methodName, "Get CPD URL")
+        try:
+            self.cpdURL = check_output(['bash','-c', get_cpd_route_cmd]) 
+            TR.info(methodName, "CPD URL retrieved %s"%self.cpdURL)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
+        if(self.installSpark):
+            TR.info(methodName,"Start installing Spark AE package")
+            sparkstart = Utilities.currentTimeMillis()
+            self.installAssemblies("spark","v2.5.0.0",icpdInstallLogFile)
+            sparkend = Utilities.currentTimeMillis()
+            TR.info(methodName,"Spark AE  package installation completed")
+            self.printTime(sparkstart, sparkend, "Installing Spark AE")   
+
+        if(self.installDV):
+            TR.info(methodName,"Start installing DV package")
+            dvstart = Utilities.currentTimeMillis()
+            self.installAssemblies("dv","v1.3.0.0",icpdInstallLogFile)
+            dvend = Utilities.currentTimeMillis()
+            TR.info(methodName,"DV package installation completed")
+            self.printTime(dvstart, dvend, "Installing DV")    
+        
         if(self.installWSL):
+
             TR.info(methodName,"Start installing WSL package")
             wslstart = Utilities.currentTimeMillis()
             self.installAssemblies("wsl","2.1.0",icpdInstallLogFile)
             wslend = Utilities.currentTimeMillis()
             TR.info(methodName,"WSL package installation completed")
             self.printTime(wslstart, wslend, "Installing WSL")
-
-        if(self.installDV):
-            TR.info(methodName,"Start installing DV package")
-            TR.info(methodName,"Delete configmap node-config-compute-infra")
-            delete_cm = "oc delete configmap -n openshift-node node-config-compute-infra"
-            retcode = check_output(['bash','-c', delete_cm]) 
-            TR.info(methodName,"Deleted configmap node-config-compute-infra %s" %retcode)
-            TR.info(methodName,"Create configmap node-config-compute-infra")
-            create_cm = "oc create -f /ibm/node-config-compute-infra.yaml"
-            retcode = check_output(['bash','-c', create_cm]) 
-            TR.info(methodName,"Created configmap node-config-compute-infra %s" %retcode)
-            dvstart = Utilities.currentTimeMillis()
-            self.installAssemblies("dv","v1.3.0.0",icpdInstallLogFile)
-            dvend = Utilities.currentTimeMillis()
-            TR.info(methodName,"DV package installation completed")
-            self.printTime(dvstart, dvend, "Installing DV")
         
         if(self.installWML):
             TR.info(methodName,"Start installing WML package")
@@ -295,8 +282,17 @@ class CPDInstall(object):
             self.installAssemblies("aiopenscale","v2.5.0.0",icpdInstallLogFile)
             aioend = Utilities.currentTimeMillis()
             TR.info(methodName,"AI Openscale package installation completed")
-            self.printTime(aiostart, aioend, "Installing AI Openscale")
+            self.printTime(aiostart, aioend, "Installing AI Openscale")    
 
+        if(self.installCDE):
+            TR.info(methodName,"Start installing Cognos Dashboard package")
+            cdestart = Utilities.currentTimeMillis()
+            self.installAssemblies("cde","v2.5.0.0",icpdInstallLogFile)
+            cdeend = Utilities.currentTimeMillis()
+            TR.info(methodName,"Cognos Dashboard package installation completed")
+            self.printTime(cdestart, cdeend, "Installing Cognos Dashboard")  
+
+               
 
 
         TR.info(methodName,"Installed all packages.")
@@ -319,13 +315,19 @@ class CPDInstall(object):
         methodName = "getToken"
         create_sa_cmd = "oc create serviceaccount cpdtoken"
         TR.info(methodName,"Create service account cpdtoken %s"%create_sa_cmd)
-        retcode = call(create_sa_cmd,shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"Created service account cpdtoken %s"%retcode)
+        try:
+            retcode = call(create_sa_cmd,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"Created service account cpdtoken %s"%retcode)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
-        addrole_cmd = "oc policy add-role-to-user admin system:serviceaccount:"+self.namespace+":cpdtoken"
+        addrole_cmd = "oc policy add-role-to-user admin system:serviceaccount:"+self.Namespace+":cpdtoken"
         TR.info(methodName," Add role to service account %s"%addrole_cmd)
-        retcode = call(addrole_cmd,shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"Role added to service account %s"%retcode)
+        try:
+            retcode = call(addrole_cmd,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"Role added to service account %s"%retcode)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
         get_token_cmd = "oc serviceaccounts get-token cpdtoken"
         TR.info(methodName,"Retrieve token from service account %s"%get_token_cmd)
@@ -341,7 +343,13 @@ class CPDInstall(object):
         updated_file.write(source_file)
         updated_file.close()
     #endDef    
-    def installAssemblies(self,assembly,version,icpdInstallLogFile):
+    def readFileContent(self,source):
+        file = open(source,mode='r')
+        content = file.read()
+        file.close()
+        return content.rstrip()
+
+    def installAssemblies(self, assembly, version, icpdInstallLogFile):
         """
         method to install assemlies
         for each assembly this method will execute adm command to apply all prerequistes
@@ -349,72 +357,27 @@ class CPDInstall(object):
         Installation will be done for the assembly using local registry
         """
         methodName = "installAssemblies"
-        
-        apply_cmd = "/ibm/cpd-linux adm -r /ibm/repo.yaml -a "+assembly+"  -n "+self.namespace+" --accept-all-licenses --apply | tee /ibm/logs/"+assembly+"_apply.log"
+
+        registry = self.regsitry+"/"+self.Namespace
+        apply_cmd = "/ibm/cpd-linux adm -r /ibm/repo.yaml -a "+assembly+"  -n "+self.Namespace+" --accept-all-licenses --apply | tee /ibm/logs/"+assembly+"_apply.log"
         TR.info(methodName,"Execute apply command for assembly %s"%apply_cmd)
-        retcode = call(apply_cmd,shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"Executed apply command for assembly %s"%retcode)
-     
-        install_cmd = "/ibm/cpd-linux -c aws-efs -r /ibm/repo.yaml -a "+assembly+" -n "+self.namespace+" --version="+version+" --transfer-image-to="+self.docker_registry+" --target-registry-username=unused   --target-registry-password="+self.token+ " --cluster-pull-prefix=docker-registry.default.svc:5000/"+self.namespace+" --accept-all-licenses | tee /ibm/logs/"+assembly+"_install.log"
+        try:
+            retcode = call(apply_cmd,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"Executed apply command for assembly %s returned %s"%(assembly,retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
-        retcode = call(install_cmd,shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"Execute install command for assembly %s"%retcode)     
 
-    def getPassword(self):
-        """
-        method to get Password value from Secrets ARN
-        """
-        methodName = "getPassword"
-        TR.info(methodName,"describe_stack_resource to get password")
-        passwordSecrets = self.cf.describe_stack_resource(StackName=self.stackName,LogicalResourceId='OpenShiftPasswordSecret')
-        resourceDetail = passwordSecrets['StackResourceDetail']
-        value = self.secretsmanager.get_secret_value(SecretId=resourceDetail['PhysicalResourceId'])
-        self.password =  value["SecretString"]
-        TR.info(methodName,"retrived password from secrets")
-        return self.password
+        # TODO see if we need to add --version="+version+"  later on
 
-    def getContainerELBDNS(self):
-        """
-        method to get Container ELB DNS Name from stack resource
-        """
-        methodName = "getContainerELBDNS"
-        TR.info(methodName,"describe_stack_resource to get containerELB")
-        containerELB =  self.cf.describe_stack_resource(StackName=self.stackName,LogicalResourceId='ContainerAccessELB')
-        resourceDetail = containerELB['StackResourceDetail']
-        elb = self.elb.describe_load_balancers(LoadBalancerNames=[resourceDetail['PhysicalResourceId']])
-        TR.info(methodName,"Retrived containerELB %s" %elb.get('LoadBalancerDescriptions')[0].get('DNSName').lower())
-        return elb.get('LoadBalancerDescriptions')[0].get('DNSName').lower()
-
-    #endDef    
-
-    def getOutputBucket(self):
-        """
-        method to get Output bucket name, either user defined or autogenerated value from stack resource
-        """
-        methodName = "getOutputBucket"
-        TR.info(methodName,"describe_stack_resource to get OutputBucket")
-        bucket =  self.cf.describe_stack_resource(StackName=self.stackName,LogicalResourceId='OutputBucket')
-        resourceDetail = bucket['StackResourceDetail']
-        TR.info(methodName,"OutputBucket = %s"%resourceDetail['PhysicalResourceId'])
-        return resourceDetail['PhysicalResourceId']
-    #endDef    
-    def getNodeIP(self):
-        """
-        method to get Node IP value of one of the compute nodes
-        First obtain Compute ASG resource and then fetch the first instance from the list of instances from ASG
-        """
-        methodName = "getNodeIP"
-        TR.info(methodName,"describe_stack_resource to get Node IP")
-        nodeASG = self.cf.describe_stack_resource(StackName=self.stackName,LogicalResourceId='OpenShiftNodeASG')
-        resourceDetail = nodeASG['StackResourceDetail']
-        grpName = list()
-        grpName.append(resourceDetail['PhysicalResourceId'])
-        asgs = self.autoScaling.describe_auto_scaling_groups(AutoScalingGroupNames=grpName)['AutoScalingGroups']
-        instances = asgs[0]['Instances']
-        instance = self.ec2.Instance(instances[0]['InstanceId'])
-        TR.info(methodName,"Retrieved instance detail %s"%instance.private_ip_address)
-        return instance.private_ip_address        
-#endIf
+        install_cmd = "/ibm/cpd-linux -c "+self.storageClass+" "+self.storageOverride+" -r /ibm/repo.yaml -a "+assembly+" -n "+self.Namespace+" --transfer-image-to="+registry+" --target-registry-username=kubeadmin  --target-registry-password="+self.token+" --cluster-pull-prefix image-registry.openshift-image-registry.svc:5000/"+self.Namespace+" --accept-all-licenses --insecure-skip-tls-verify | tee /ibm/logs/"+assembly+"_install.log"
+        try:     
+            retcode = call(install_cmd,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"Execute install command for assembly %s returned %s"%(assembly,retcode))  
+        except CalledProcessError as e:
+            TR.error(methodName,"Exception while installing service %s with message %s" %(assembly,e))
+            self.rc = 1
+ 
 
     def getS3Object(self, bucket=None, s3Path=None, destPath=None):
         """
@@ -467,62 +430,37 @@ class CPDInstall(object):
         
         return destPath
     #endDef
-    def configureCPDRoute(self, icpdInstallLogFile):
-        """
-        method to delete existing route created with default values and update the route template with ELB DNS name
-        and create route resource using the template yaml
-        """
-        methodName = "configureCPDRoute"
-        TR.info(methodName,"Delete exists route")
-        delete_cmd = 'oc delete route '+self.namespace+'-cpd'
-        retcode = check_output(['bash','-c', delete_cmd]) 
-        TR.info(methodName,"Delete exists route %s"%retcode)
-        TR.info(methodName,"Get container DNS name")
-        self.hostname = self.getContainerELBDNS()
-        TR.info(methodName,"container DNS name retrieved %s"%self.hostname)
-
-        TR.info(methodName,"Update route template with hostname")
-        self.updateTemplateFile('/ibm/route.yaml','<ELB_DNSNAME>',self.hostname)
-        self.updateTemplateFile('/ibm/route.yaml','<NAMESPACE>',self.namespace)
-        TR.info(methodName,"Create route with template file")
-        retcode = check_output(['bash','-c', 'oc create -f /ibm/route.yaml']) 
-        TR.info(methodName,"Created route with template file %s"%retcode)
-    #endDef    
     
     def validateInstall(self, icpdInstallLogFile):
+        """
+            This method is used to validate the installation at the end. At times some services fails and it is not reported. 
+            We use this method to check if cpd operator is up and running. We will then get the helm list of deployed services and validate for each of the services selected by user. IF the count adds up to the defined count then installation is successful. Else  will be flagged it as failure back to cloud Formation.
+        """
+
         methodName = "validateInstall"
         count = 3
         TR.info(methodName,"Validate Installation status")
-        TR.info(methodName,"Lite Count is  %s"%count)
         if(self.installDV):
             count = count+1
-            TR.info(methodName,"DV Count is  %s"%count)
         if(self.installOSWML):
+            count = count+1    
+        if(self.installSpark):
+            count = count+1    
+        if(self.installWKC):
+            count = count+6
+        if(self.installCDE):
             count = count+1
-            TR.info(methodName,"AI OS Count is  %s"%count)    
-        if(self.installWKC and self.installWML and self.installWSL):
-            count = count+21
-            TR.info(methodName,"WKC,WML,WSL Count is  %s"%count)
-        else:    
-            if(self.installWSL and self.installWKC):
-                count =count+19
-                TR.info(methodName,"WSL,WKC Count is  %s"%count)
-            elif(self.installWML and self.installWSL):
-                count =count+15
-                TR.info(methodName,"WML,WSL Count is  %s"%count)
-            elif(self.installWML and self.installWKC):
-                count =count+17
-                TR.info(methodName,"WKC,WML Count is  %s"%count)
-            elif(self.installWKC):
-                count = count+15
-                TR.info(methodName,"WKC Count is  %s"%count)
-            elif(self.installWSL):
-                count = count+13
-                TR.info(methodName,"WSL Count is  %s"%count)
-            elif(self.installWML):
-                count = count+10
-                TR.info(methodName,"WML Count is  %s"%count)
-        
+        if(self.installWML):
+            count = count+2
+        if(self.installWSL):
+            count = count+4            
+
+        # CCS Count
+        if(self.installCDE or self.installWKC or self.installWSL or self.installWML):
+            count = count+8
+        # DR count    
+        if(self.installWSL or self.installWKC):
+            count = count+1                
 
         operator_pod = "oc get pods | grep cpd-install-operator | awk '{print $1}'"
         operator_status = "oc get pods | grep cpd-install-operator | awk '{print $3}'"
@@ -553,43 +491,729 @@ class CPDInstall(object):
         Note: CPD password will be same as Openshift Cluster password
         """
         methodName = "manageUser"  
-        manageUser = "sudo python /ibm/manage_admin_user.py "+self.namespace+" admin "+self.password
+        manageUser = "sudo python /ibm/manage_admin_user.py "+self.Namespace+" admin "+self.password
         TR.info(methodName,"Start manageUser")    
-        call(manageUser, shell=True, stdout=icpdInstallLogFile)
-        TR.info(methodName,"End manageUser")    
-    #endDef
-    #     
-    def activateLicense(self, icpdInstallLogFile):
-        """
-        method to activate trial license for cpd installation
-        """
-        methodName = "activateLicense"
-        #self.updateTemplateFile('/ibm/activate-license.sh','<ELB_DNSNAME>',self.hostname)
-        TR.info(methodName,"Start Activate trial")
-        icpdUrl = "https://"+self.hostname
-        activatetrial = "sudo python /ibm/activate-trial.py "+icpdUrl+" admin "+self.password+" /ibm/trial.lic"
         try:
-            call(activatetrial, shell=True, stdout=icpdInstallLogFile)
+            call(manageUser, shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"End manageUser")    
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-        TR.info(methodName,"End Activate trial")
-        TR.info(methodName,"IBM Cloud Pak for Data installation completed.")
-    #endDef    
+                
+    # #endDef
+    # #     
+    # def activateLicense(self, icpdInstallLogFile):
+    #     """
+    #     method to activate trial license for cpd installation
+    #     """
+    #     methodName = "activateLicense"
+    #     self.updateTemplateFile('/ibm/activate-license.sh','<ELB_DNSNAME>',self.hostname)
+    #     TR.info(methodName,"Start Activate trial")
+    #     icpdUrl = "https://"+self.hostname
+    #     activatetrial = "sudo python /ibm/activate-trial.py "+icpdUrl+" admin "+self.password+" /ibm/trial.lic"
+    #     try:
+    #         call(activatetrial, shell=True, stdout=icpdInstallLogFile)
+    #     except CalledProcessError as e:
+    #         TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+    #     TR.info(methodName,"End Activate trial")
+    #     TR.info(methodName,"IBM Cloud Pak for Data installation completed.")
+    # #endDef    
 
     def updateStatus(self, status):
         methodName = "updateStatus"
         TR.info(methodName," Update Status of installation")
-        data = "AWS_STACKNAME="+self.stackName+",Status="+status
+        data = "301_AWS_STACKNAME="+self.stackName+",Status="+status
         updateStatus = "curl -X POST https://un6laaf4v0.execute-api.us-west-2.amazonaws.com/testtracker --data "+data
-        call(updateStatus, shell=True)
-        TR.info(methodName,"Updated status with data %s"%data)
+        try:
+            call(updateStatus, shell=True)
+            TR.info(methodName,"Updated status with data %s"%data)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+    #endDef    
+    
+    def configureEFS(self):
+        """
+        Configure an EFS volume and configure all worker nodes to be able to use 
+        the EFS storage provisioner.
+        """
+        methodName = "configureEFS"
+        
+        TR.info(methodName,"STARTED configuration of EFS")
+        # Create the EFS provisioner service account
+
+        """
+        oc create -f efs-configmap.yaml -n default
+        oc create serviceaccount efs-provisioner
+        oc create -f  efs-rbac-template.yaml
+        oc create -f efs-storageclass.yaml
+        oc create -f efs-provisioner.yaml
+        oc create -f efs-pvc.yaml
+        """
+    
+    #    self.updateTemplateFile(workerocs,'${az1}', self.zones[0])
+        self.updateTemplateFile("/ibm/templates/efs/efs-configmap.yaml",'${file-system-id}',self.EFSID)
+        self.updateTemplateFile("/ibm/templates/efs/efs-configmap.yaml",'${aws-region}',self.region)
+        self.updateTemplateFile("/ibm/templates/efs/efs-configmap.yaml",'${efsdnsname}',self.EFSDNSName)
+
+        self.updateTemplateFile("/ibm/templates/efs/efs-provisioner.yaml",'${file-system-id}',self.EFSID)
+        self.updateTemplateFile("/ibm/templates/efs/efs-provisioner.yaml",'${aws-region}',self.region)
+
+        TR.info(methodName,"Invoking: oc create -f efs-configmap.yaml -n default")
+        cm_cmd = "oc create -f /ibm/templates/efs/efs-configmap.yaml -n default"
+        retcode = call(cm_cmd, shell=True)
+        if (retcode != 0):
+            TR.info(methodName,"Invoking: oc create -f efs-configmap.yaml -n default %s" %retcode)
+            raise Exception("Error calling oc. Return code: %s" % retcode)
+        #endIf
+
+        TR.info(methodName,"Invoking: oc create serviceaccount efs-provisioner")
+        sa_cmd = "oc create serviceaccount efs-provisioner"
+        retcode = call(sa_cmd, shell=True)
+        if (retcode != 0):
+            raise Exception("Error calling oc. Return code: %s" % retcode)
+        #endIf
+
+        TR.info(methodName,"Invoking: oc create -f  efs-rbac-template.yaml")
+        rbac_cmd = "oc create -f  /ibm/templates/efs/efs-rbac-template.yaml"
+        retcode = call(rbac_cmd, shell=True)
+        if (retcode != 0):
+            raise Exception("Error calling oc. Return code: %s" % retcode)
+        #endIf
+
+        TR.info(methodName,"Invoking: oc create -f efs-storageclass.yaml")
+        sc_cmd = "oc create -f /ibm/templates/efs/efs-storageclass.yaml"
+        retcode = call(sc_cmd, shell=True)
+        if (retcode != 0):
+            raise Exception("Error calling oc. Return code: %s" % retcode)
+        #endIf
+        
+        TR.info(methodName,"Invoking: oc create -f efs-provisioner.yaml")
+        prov_cmd = "oc create -f /ibm/templates/efs/efs-provisioner.yaml"
+        retcode = call(prov_cmd, shell=True)
+        if (retcode != 0):
+            raise Exception("Error calling oc. Return code: %s" % retcode)
+        #endIf
+        
+        TR.info(methodName,"Invoking: oc create -f efs-pvc.yaml")
+        pvc_cmd = "oc create -f /ibm/templates/efs/efs-pvc.yaml"
+        retcode = call(pvc_cmd, shell=True)
+        if (retcode != 0):
+            raise Exception("Error calling oc. Return code: %s" % retcode)
+        #endIf                
+        
+        TR.info(methodName,"COMPLETED configuration of EFS.")
+      
+    #endDef   
+    
+    def configureOCS(self,icpdInstallLogFile):
+        """
+        This method reads user preferences from stack parameters and configures OCS as storage classs accordingly.
+        Depending on 1 or 3 AZ appropriate template file is used to create machinesets.
+        """
+        methodName = "configureOCS"
+        TR.info(methodName,"  Start configuration of OCS for CPD")
+        workerocs = "/ibm/templates/ocs/workerocs.yaml"
+        workerocs_1az = "/ibm/templates/ocs/workerocs1AZ.yaml"
+        if(len(self.zones)==1):
+            shutil.copyfile(workerocs_1az,workerocs)
+        self.updateTemplateFile(workerocs,'${az1}', self.zones[0])
+        self.updateTemplateFile(workerocs,'${ami_id}', self.amiID)
+        self.updateTemplateFile(workerocs,'${instance-type}', self.OCSInstanceType)
+        self.updateTemplateFile(workerocs,'${instance-count}', self.NumberOfOCS)
+        self.updateTemplateFile(workerocs,'${region}', self.region)
+        self.updateTemplateFile(workerocs,'${cluster-name}', self.ClusterName)
+        self.updateTemplateFile(workerocs, 'CLUSTERID', self.clusterID)
+        self.updateTemplateFile(workerocs,'${subnet-1}',self.PrivateSubnet1ID)
+        
+
+        if(len(self.zones)>1):
+            self.updateTemplateFile(workerocs,'${az2}', self.zones[1])
+            self.updateTemplateFile(workerocs,'${az3}', self.zones[2])
+            self.updateTemplateFile(workerocs,'${subnet-2}',self.PrivateSubnet2ID)
+            self.updateTemplateFile(workerocs,'${subnet-3}',self.PrivateSubnet3ID)
+
+        create_ocs_nodes_cmd = "oc create -f "+workerocs
+        TR.info(methodName,"Create OCS nodes")
+        try:
+            retcode = check_output(['bash','-c', create_ocs_nodes_cmd])
+            time.sleep(300)
+            TR.info(methodName,"Created OCS nodes %s" %retcode)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        
+        ocs_nodes = []
+        get_ocs_nodes = "oc get nodes --show-labels | grep storage-node |cut -d' ' -f1 "
+        try:
+            ocs_nodes = check_output(['bash','-c',get_ocs_nodes])
+            nodes = ocs_nodes.split("\n")
+            TR.info(methodName,"OCS_NODES %s"%nodes)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        i =0
+        while i < len(nodes)-1:
+            TR.info(methodName,"Labeling for OCS node  %s " %nodes[i])
+            label_cmd = "oc label nodes "+nodes[i]+" cluster.ocs.openshift.io/openshift-storage=''"
+            try: 
+                retcode = check_output(['bash','-c', label_cmd])
+                TR.info(methodName,"Label for OCS node  %s returned %s" %(nodes[i],retcode))
+            except CalledProcessError as e:
+                TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+            i += 1
+
+
+        deploy_olm_cmd = "oc create -f /ibm/templates/ocs/deploy-with-olm.yaml"
+        TR.info(methodName,"Deploy OLM")
+        try:
+            retcode = check_output(['bash','-c', deploy_olm_cmd]) 
+            time.sleep(300)
+            TR.info(methodName,"Deployed OLM %s" %retcode)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        create_storage_cluster_cmd = "oc create -f /ibm/templates/ocs/ocs-storagecluster.yaml"
+        TR.info(methodName,"Create Storage Cluster")
+        try:
+            retcode = check_output(['bash','-c', create_storage_cluster_cmd]) 
+            time.sleep(600)
+            TR.info(methodName,"Created Storage Cluster %s" %retcode)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        install_ceph_tool_cmd = "curl -s https://raw.githubusercontent.com/rook/rook/release-1.1/cluster/examples/kubernetes/ceph/toolbox.yaml|sed 's/namespace: rook-ceph/namespace: openshift-storage/g'| oc apply -f -"
+        TR.info(methodName,"Install ceph toolkit")
+        try:
+            retcode = check_output(['bash','-c', install_ceph_tool_cmd]) 
+            TR.info(methodName,"Installed ceph toolkit %s" %retcode)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output)) 
+        TR.info(methodName,"Configuration of OCS for CPD completed")
     #endDef    
 
+    def preparePXInstall(self,icpdInstallLogFile):
+        """
+        This method does all required background work like creating policy required to spin up EBS volumes, updating security group with portworx specific ports.
+        """
+        methodName = "preparePXInstall"
+        TR.info(methodName,"Pre requisite for Portworx Installation")
 
+        
+        """
+        #INST_PROFILE_NAME=`aws ec2 describe-instances --query 'Reservations[*].Instances[*].[IamInstanceProfile.Arn]' --output text | cut -d ':' -f 6 | cut -d '/' -f 2 | grep worker* | uniq`
+        """
+        TR.info(methodName,"Get INST_PROFILE_NAME")
+        tag_value = self.clusterID+"-worker*"
+        TR.info(methodName,"Tag value of worker to look for %s"%tag_value)
+        response = self.ec2.describe_instances(Filters=[{'Name': 'tag:Name','Values': [tag_value]}])
+        TR.info(methodName,"response %s"%response)
+        reservation = response['Reservations']
+        TR.info(methodName,"reservation %s"%reservation)
+        for item in reservation:
+            instances = item['Instances']
+            TR.info(methodName,"instances %s"%instances)
+            for instance in instances:
+                if 'IamInstanceProfile' in instance:
+                    instanceProfile = instance['IamInstanceProfile']['Arn'].split("/")[1]
+                    TR.info(methodName,"instanceProfile %s"%instanceProfile)
+
+        TR.info(methodName,"Instance profile retrieved %s"%instanceProfile)
+        #ROLE_NAME=`aws iam get-instance-profile --instance-profile-name $INST_PROFILE_NAME --query 'InstanceProfile.Roles[*].[RoleName]' --output text`        
+        TR.info(methodName,"Get Role name")
+        iamresponse = self.iam.get_instance_profile(InstanceProfileName=instanceProfile)
+        rolename = iamresponse['InstanceProfile']['Roles'][0]['RoleName']
+        TR.info(methodName,"Role name retrieved %s"%rolename)
+        #POLICY_ARN=`aws iam create-policy --policy-name portworx-policy-${VAR} --policy-document file://policy.json --query 'Policy.Arn' --output text`
+
+        policycontent = {'Version': '2012-10-17', 'Statement': [{'Action': ['ec2:AttachVolume', 'ec2:ModifyVolume', 'ec2:DetachVolume', 'ec2:CreateTags', 'ec2:CreateVolume', 'ec2:DeleteTags', 'ec2:DeleteVolume', 'ec2:DescribeTags', 'ec2:DescribeVolumeAttribute', 'ec2:DescribeVolumesModifications', 'ec2:DescribeVolumeStatus', 'ec2:DescribeVolumes', 'ec2:DescribeInstances'], 'Resource': ['*'], 'Effect': 'Allow'}]}
+        TR.info(methodName,"Get policy_arn")
+        policyName = "portworx-policy-"+self.ClusterName
+        policy = self.iam.create_policy(PolicyName=policyName,PolicyDocument=json.dumps(policycontent))
+        policy_arn = policy['Policy']['Arn']
+        destroy_sh = "/ibm/destroy.sh"
+        self.updateTemplateFile(destroy_sh,'$ROLE_NAME',rolename)
+        self.updateTemplateFile(destroy_sh,'$POLICY_ARN',policy_arn)
+        TR.info(methodName,"Policy_arn retrieved %s"%policy_arn)
+        # aws iam attach-role-policy --role-name $ROLE_NAME --policy-arn $POLICY_ARN
+        TR.info(methodName,"Attach IAM policy")
+        response = self.iam.attach_role_policy(RoleName=rolename,PolicyArn=policy_arn)
+        TR.info(methodName,"Attached role policy returned %s"%response)
+        """
+        WORKER_TAG=`aws ec2 describe-security-groups --query 'SecurityGroups[*].Tags[*][Value]' --output text | grep worker`
+        MASTER_TAG=`aws ec2 describe-security-groups --query 'SecurityGroups[*].Tags[*][Value]' --output text | grep master`
+        WORKER_GROUP_ID=`aws ec2 describe-security-groups --filters Name=tag:Name,Values=$WORKER_TAG --query "SecurityGroups[*].{Name:GroupId}" --output text`
+        MASTER_GROUP_ID=`aws ec2 describe-security-groups --filters Name=tag:Name,Values=$MASTER_TAG --query "SecurityGroups[*].{Name:GroupId}" --output text`
+        """
+        TR.info(methodName,"Retrieve tags and group id from security groups")
+        ret = self.ec2.describe_security_groups()
+        worker_sg_value = self.clusterID+"-worker-sg"
+        master_sg_value = self.clusterID+"-master-sg"
+        sec_groups = ret['SecurityGroups']
+        for sg in sec_groups:
+            if 'Tags' in sg:
+                tags = sg['Tags']
+                for tag in tags:
+                    if worker_sg_value in tag['Value']:
+                        worker_tag = tag['Value']
+                    elif master_sg_value in tag['Value']:
+                        master_tag = tag['Value']
+
+        worker_group = self.ec2.describe_security_groups(Filters=[{'Name':'tag:Name','Values':[worker_tag]}])
+        sec_groups = worker_group['SecurityGroups']
+        for sg in sec_groups:
+            worker_group_id = sg['GroupId']
+        master_group = self.ec2.describe_security_groups(Filters=[{'Name':'tag:Name','Values':[master_tag]}])
+        sec_groups = master_group['SecurityGroups']
+        for sg in sec_groups:
+            master_group_id = sg['GroupId']
+
+        TR.info(methodName,"Retrieved worker tag %s master tag %s and  worker group id %s  master group id %s from security groups"%(worker_tag,master_tag,worker_group_id,master_group_id))
+        """
+        aws ec2 authorize-security-group-ingress --group-id $WORKER_GROUP_ID --protocol tcp --port 17001-17020 --source-group $MASTER_GROUP_ID
+        aws ec2 authorize-security-group-ingress --group-id $WORKER_GROUP_ID --protocol tcp --port 17001-17020 --source-group $WORKER_GROUP_ID
+        aws ec2 authorize-security-group-ingress --group-id $WORKER_GROUP_ID --protocol tcp --port 111 --source-group $MASTER_GROUP_ID
+        aws ec2 authorize-security-group-ingress --group-id $WORKER_GROUP_ID --protocol tcp --port 111 --source-group $WORKER_GROUP_ID
+        aws ec2 authorize-security-group-ingress --group-id $WORKER_GROUP_ID --protocol tcp --port 2049 --source-group $MASTER_GROUP_ID
+        aws ec2 authorize-security-group-ingress --group-id $WORKER_GROUP_ID --protocol tcp --port 2049 --source-group $WORKER_GROUP_ID
+        aws ec2 authorize-security-group-ingress --group-id $WORKER_GROUP_ID --protocol tcp --port 20048 --source-group $MASTER_GROUP_ID
+        aws ec2 authorize-security-group-ingress --group-id $WORKER_GROUP_ID --protocol tcp --port 20048 --source-group $WORKER_GROUP_ID 
+        """  
+        TR.info(methodName,"Start authorize-security-group-ingress")
+        self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':17001,'ToPort':17020,'UserIdGroupPairs':[{'GroupId':master_group_id}]}])
+        self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':17001,'ToPort':17020,'UserIdGroupPairs':[{'GroupId':worker_group_id}]}])
+        self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':111,'ToPort':111,'UserIdGroupPairs':[{'GroupId':worker_group_id}]}])
+        self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':111,'ToPort':111,'UserIdGroupPairs':[{'GroupId':master_group_id}]}])
+        self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':2049,'ToPort':2049,'UserIdGroupPairs':[{'GroupId':worker_group_id}]}])
+        self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':2049,'ToPort':2049,'UserIdGroupPairs':[{'GroupId':master_group_id}]}])
+        self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':20048,'ToPort':20048,'UserIdGroupPairs':[{'GroupId':worker_group_id}]}])
+        self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':20048,'ToPort':20048,'UserIdGroupPairs':[{'GroupId':master_group_id}]}])
+        TR.info(methodName,"End authorize-security-group-ingress")
+        TR.info(methodName,"Done Pre requisite for Portworx Installation")
+    #endDef    
+
+    def updateScc(self,icpdInstallLogFile):
+        """
+            This method is used to update the SCC required for portworx installation.
+        """
+        methodName = "updateScc"
+        TR.info(methodName,"Start Updating SCC for Portworx Installation")
+        """
+        oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:px-account
+        oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:portworx-pvc-controller-account
+        oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:px-lh-account
+        oc adm policy add-scc-to-user anyuid system:serviceaccount:kube-system:px-lh-account
+        oc adm policy add-scc-to-user anyuid system:serviceaccount:default:default
+        oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:px-csi-account
+        """
+        list = ["px-account","portworx-pvc-controller-account","px-lh-account","px-csi-account"]
+        oc_adm_cmd = "oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:"
+        for scc in list:
+            cmd = oc_adm_cmd+scc
+            TR.info(methodName,"Run get_nodes command %s"%cmd)
+            try:
+                retcode = check_output(['bash','-c', cmd]) 
+                TR.info(methodName,"Completed %s command with return value %s" %(cmd,retcode))
+            except CalledProcessError as e:
+                TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+
+        cmd = "oc adm policy add-scc-to-user anyuid system:serviceaccount:default:default"
+        try:
+            retcode = check_output(['bash','-c', cmd])
+            TR.info(methodName,"Completed %s command with return value %s" %(cmd,retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        cmd = "oc adm policy add-scc-to-user anyuid system:serviceaccount:kube-system:px-lh-account"
+        try:
+            retcode = check_output(['bash','-c', cmd]) 
+            TR.info(methodName,"Completed %s command with return value %s" %(cmd,retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        TR.info(methodName,"Done Updating SCC for Portworx Installation")
+    #endDef    
+
+    def labelNodes(self,icpdInstallLogFile):
+        methodName = "labelNodes"
+        TR.info(methodName,"  Start Label nodes for Portworx Installation")
+        """
+        WORKER_NODES=`oc get nodes | grep worker | awk '{print $1}'`
+        for wnode in ${WORKER_NODES[@]}; do
+        oc label nodes $wnode node-role.kubernetes.io/compute=true
+        done
+        """
+
+        get_nodes = "oc get nodes | grep worker | awk '{print $1}'"
+        TR.info(methodName,"Run get_nodes command %s"%get_nodes)
+        try:
+            worker_nodes = check_output(['bash','-c', get_nodes]) 
+            TR.info(methodName,"Completed %s command with return value %s" %(get_nodes,worker_nodes))
+            nodes = worker_nodes.split("\n")
+            TR.info(methodName,"worker nodes %s"%nodes)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        i =0
+        while i < len(nodes)-1:
+            TR.info(methodName,"Labeling for worker node  %s " %nodes[i])
+            label_cmd = "oc label nodes "+nodes[i]+" node-role.kubernetes.io/compute=true"
+            try:
+                retcode = check_output(['bash','-c', label_cmd])
+                TR.info(methodName,"Label for Worker node  %s returned %s" %(nodes[i],retcode))
+            except CalledProcessError as e:
+                TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+            i += 1
+
+        TR.info(methodName,"Done Label nodes for Portworx Installation")
+        
+    #endDef
+
+    def setpxVolumePermission(self,icpdInstallLogFile):
+        """
+        This method sets delete of termination permission to the volumes created by portworx on the worker nodes.
+        """
+        methodName = "setpxVolumePermission"
+        TR.info(methodName,"Start setpxVolumePermission")
+        """
+        WORKER_INSTANCE_ID=`aws ec2 describe-instances --filters 'Name=tag:Name,Values=*worker*' --output text --query 'Reservations[*].Instances[*].InstanceId'`
+        DEVICE_NAME=`aws ec2 describe-instances --filters 'Name=tag:Name,Values=*worker*' --output text --query 'Reservations[*].Instances[*].BlockDeviceMappings[*].DeviceName' | uniq`
+        for winstance in ${WORKER_INSTANCE_ID[@]}; do
+        for device in ${DEVICE_NAME[@]}; do
+        aws ec2 modify-instance-attribute --instance-id $winstance --block-device-mappings "[{\"DeviceName\": \"$device\",\"Ebs\":{\"DeleteOnTermination\":true}}]"
+        done
+        done
+        """
+        tag_value=self.clusterID+"-worker*"
+        response = self.ec2.describe_instances(Filters=[{'Name': 'tag:Name','Values': [tag_value,]}])
+        reservation = response['Reservations']
+        for item in reservation:
+            instances = item['Instances']
+            for instance in instances:
+                deviceMappings = instance['BlockDeviceMappings']
+                for device in deviceMappings:
+                    resp = self.ec2.modify_instance_attribute(InstanceId=instance['InstanceId'],BlockDeviceMappings=[{'DeviceName': device['DeviceName'],'Ebs': {'DeleteOnTermination': True}}])
+                    TR.info(methodName,"Modified instance attribute for instance %s device name %s returned %s"%(instance['InstanceId'],device['DeviceName'],resp))
+                #endFor
+            #endFor
+        #endFor
+        TR.info(methodName,"Completed setpxVolumePermission")    
+    #endDef    
+
+    def configurePx(self, icpdInstallLogFile):
+        methodName = "configurePx"
+        TR.info(methodName,"  Start configuration of Portworx for CPD")
+        default_route = "oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}'"
+        TR.info(methodName,"Get default route  %s"%default_route)
+        try:
+            self.ocr = check_output(['bash','-c', default_route]) 
+            TR.info(methodName,"Completed %s command with return value %s" %(default_route,self.ocr))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+
+        create_secret_cmd = "oc create secret docker-registry regcred --docker-server="+self.ocr+"  --docker-username=kubeadmin --docker-password="+self.ocpassword+" -n kube-system"
+        TR.info(methodName,"Create OC secret for PX installation  %s"%create_secret_cmd)
+        try:
+            retcode = check_output(['bash','-c', create_secret_cmd]) 
+            TR.info(methodName,"Completed %s command with return value %s" %(create_secret_cmd,retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+
+        self.preparePXInstall(icpdInstallLogFile)
+        time.sleep(30)
+        self.updateScc(icpdInstallLogFile)
+        time.sleep(30)
+        self.labelNodes(icpdInstallLogFile)
+        time.sleep(30)
+        label_cmd = "oc get nodes --show-labels  | grep 'node-role.kubernetes.io/compute=true'"
+        TR.info(methodName,"Run label_cmd command %s"%label_cmd)
+        try:
+            retcode = check_output(['bash','-c', label_cmd]) 
+            TR.info(methodName,"Completed %s command with return value %s" %(label_cmd,retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        time.sleep(30)
+        px_install_cmd = "oc apply -f /ibm/templates/px/px-install.yaml"
+        TR.info(methodName,"Run px-install command %s"%px_install_cmd)
+        try:
+            retcode = check_output(['bash','-c', px_install_cmd]) 
+            TR.info(methodName,"Completed %s command with return value %s" %(px_install_cmd,retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        time.sleep(180)
+        
+        px_spec_cmd = "oc create -f /ibm/templates/px/px-spec.yaml"
+        TR.info(methodName,"Run px-spec command %s"%px_spec_cmd)
+        try:
+            retcode = check_output(['bash','-c', px_spec_cmd]) 
+            TR.info(methodName,"Completed %s command with return value %s" %(px_spec_cmd,retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        time.sleep(300)
+
+        create_px_sc = "oc create -f /ibm/templates/px/px-storageclasses.yaml"
+        TR.info(methodName,"Run px sc command %s"%create_px_sc)
+        try:
+            retcode = check_output(['bash','-c', create_px_sc]) 
+            TR.info(methodName,"Completed %s command with return value %s" %(create_px_sc,retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        
+        self.setpxVolumePermission(icpdInstallLogFile)
+
+        TR.info(methodName,"Configuration of Portworx for CPD completed")
+    #endDef    
+
+    def installOCP(self, icpdInstallLogFile):
+        methodName = "installOCP"
+        TR.info(methodName,"  Start installation of Openshift Container Platform")
+
+        installConfigFile = "/ibm/installDir/install-config.yaml"
+        autoScalerFile = "/ibm/templates/cpd/machine-autoscaler.yaml"
+        healthcheckFile = "/ibm/templates/cpd/health-check.yaml"
+
+        
+        icf_1az = "/ibm/installDir/install-config-1AZ.yaml"
+        icf_3az = "/ibm/installDir/install-config-3AZ.yaml"
+        
+        asf_1az = "/ibm/templates/cpd/machine-autoscaler-1AZ.yaml"
+        asf_3az = "/ibm/templates/cpd/machine-autoscaler-3AZ.yaml"
+        
+        hc_1az = "/ibm/templates/cpd/health-check-1AZ.yaml"
+        hc_3az = "/ibm/templates/cpd/health-check-3AZ.yaml"
+
+        if(len(self.zones)==1):
+            shutil.copyfile(icf_1az,installConfigFile)
+            shutil.copyfile(asf_1az,autoScalerFile)
+            shutil.copyfile(hc_1az, healthcheckFile)
+        else:
+            shutil.copyfile(icf_3az,installConfigFile)
+            shutil.copyfile(asf_3az,autoScalerFile)
+            shutil.copyfile(hc_3az, healthcheckFile)
+        
+
+        self.updateTemplateFile(installConfigFile,'${az1}',self.zones[0])
+        self.updateTemplateFile(installConfigFile,'${baseDomain}',self.DomainName)
+        self.updateTemplateFile(installConfigFile,'${master-instance-type}',self.MasterInstanceType)
+        self.updateTemplateFile(installConfigFile,'${worker-instance-type}',self.ComputeInstanceType)
+        self.updateTemplateFile(installConfigFile,'${worker-instance-count}',self.NumberOfCompute)
+        self.updateTemplateFile(installConfigFile,'${master-instance-count}',self.NumberOfMaster)
+        self.updateTemplateFile(installConfigFile,'${region}',self.region)
+        self.updateTemplateFile(installConfigFile,'${subnet-1}',self.PrivateSubnet1ID)
+        self.updateTemplateFile(installConfigFile,'${subnet-2}',self.PublicSubnet1ID)
+        self.updateTemplateFile(installConfigFile,'${pullSecret}',self.readFileContent(self.pullSecret))
+        self.updateTemplateFile(installConfigFile,'${sshKey}',self.readFileContent("/root/.ssh/id_rsa.pub"))
+        self.updateTemplateFile(installConfigFile,'${clustername}',self.ClusterName)
+        self.updateTemplateFile(installConfigFile, '${FIPS}',self.EnableFips)
+        self.updateTemplateFile(autoScalerFile, '${az1}', self.zones[0])
+        self.updateTemplateFile(healthcheckFile, '${az1}', self.zones[0])
+
+
+        if(len(self.zones)>1):
+            self.updateTemplateFile(installConfigFile,'${az2}',self.zones[1])
+            self.updateTemplateFile(installConfigFile,'${az3}',self.zones[2])
+            self.updateTemplateFile(installConfigFile,'${subnet-3}',self.PrivateSubnet2ID)
+            self.updateTemplateFile(installConfigFile,'${subnet-4}',self.PrivateSubnet3ID)
+            self.updateTemplateFile(installConfigFile,'${subnet-5}',self.PublicSubnet2ID)
+            self.updateTemplateFile(installConfigFile,'${subnet-6}',self.PublicSubnet3ID)
+
+            self.updateTemplateFile(autoScalerFile, '${az2}', self.zones[1])
+            self.updateTemplateFile(autoScalerFile, '${az3}', self.zones[2])
+            self.updateTemplateFile(healthcheckFile, '${az2}', self.zones[1])
+            self.updateTemplateFile(healthcheckFile, '${az3}', self.zones[2])
+        
+        TR.info(methodName,"Download Openshift Container Platform")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/openshift-install", destPath="/ibm/openshift-install")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/oc", destPath="/usr/bin/oc")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/kubectl", destPath="/usr/bin/kubectl")
+        os.chmod("/usr/bin/oc", stat.S_IEXEC)
+        os.chmod("/usr/bin/kubectl", stat.S_IEXEC)	
+        TR.info(methodName,"Initiating installation of Openshift Container Platform")
+        os.chmod("/ibm/openshift-install", stat.S_IEXEC)
+        install_ocp = "sudo ./openshift-install create cluster --dir=/ibm/installDir --log-level=debug"
+        TR.info(methodName,"Output File name: %s"%icpdInstallLogFile)
+        try:
+            process = Popen(install_ocp,shell=True,stdout=icpdInstallLogFile,stderr=icpdInstallLogFile,close_fds=True)
+            stdoutdata,stderrdata=process.communicate()
+        except CalledProcessError as e:
+            TR.error(methodName, "ERROR return code: %s, Exception: %s" % (e.returncode, e), e)
+            raise e    
+        TR.info(methodName,"Installation of Openshift Container Platform %s %s" %(stdoutdata,stderrdata))
+        time.sleep(30)
+        destDir = "/root/.kube"
+        if (not os.path.exists(destDir)):
+            os.makedirs(destDir)
+        shutil.copyfile("/ibm/installDir/auth/kubeconfig","/root/.kube/config")
+        
+        self.ocpassword = self.readFileContent("/ibm/installDir/auth/kubeadmin-password").rstrip("\n\r")
+        self.logincmd = "oc login -u kubeadmin -p "+self.ocpassword
+        try:
+            call(self.logincmd, shell=True,stdout=icpdInstallLogFile)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        
+        get_clusterId = r"oc get machineset -n openshift-machine-api -o jsonpath='{.items[0].metadata.labels.machine\.openshift\.io/cluster-api-cluster}'"
+        TR.info(methodName,"get_clusterId %s"%get_clusterId)
+        try:
+            self.clusterID = check_output(['bash','-c',get_clusterId])
+            TR.info(methodName,"self.clusterID %s"%self.clusterID)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        
+        self.updateTemplateFile(autoScalerFile, 'CLUSTERID', self.clusterID)
+        create_machine_as_cmd = "oc create -f "+autoScalerFile
+        TR.info(methodName,"Create of Machine auto scaler")
+        try:
+            retcode = check_output(['bash','-c', create_machine_as_cmd]) 
+            TR.info(methodName,"Created Machine auto scaler %s" %retcode)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+
+        self.updateTemplateFile(healthcheckFile, 'CLUSTERID', self.clusterID)
+        create_healthcheck_cmd = "oc create -f "+healthcheckFile
+        TR.info(methodName,"Create of Health check")
+        try:
+            retcode = check_output(['bash','-c', create_healthcheck_cmd]) 
+            TR.info(methodName,"Created Health check %s" %retcode)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+
+        TR.info(methodName,"Create OCP registry")
+
+        registry_mc = "/ibm/templates/cpd/insecure-registry.yaml"
+        registries  = "/ibm/templates/cpd/registries.conf"
+        crio_conf   = "/ibm/templates/cpd/crio.conf"
+        crio_mc     = "/ibm/templates/cpd/crio-mc.yaml"
+        
+        route = "default-route-openshift-image-registry.apps."+self.ClusterName+"."+self.DomainName
+        self.updateTemplateFile(registries, '${registry-route}', route)
+        
+        config_data = base64.b64encode(self.readFileContent(registries))
+        self.updateTemplateFile(registry_mc, '${config-data}', config_data)
+        
+        crio_config_data = base64.b64encode(self.readFileContent(crio_conf))
+        self.updateTemplateFile(crio_mc, '${crio-config-data}', crio_config_data)
+
+        route_cmd = "oc patch configs.imageregistry.operator.openshift.io/cluster --type merge -p '{\"spec\":{\"defaultRoute\":true,\"replicas\":"+self.NumberOfAZs+"}}'"
+        TR.info(methodName,"Creating route with command %s"%route_cmd)
+        try:
+            retcode = check_output(['bash','-c', route_cmd]) 
+            TR.info(methodName,"Created route with command %s returned %s"%(route_cmd,retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        destDir = "/etc/containers/"
+        if (not os.path.exists(destDir)):
+            os.makedirs(destDir)
+        shutil.copyfile(registries,"/etc/containers/registries.conf")
+        create_registry = "oc create -f "+registry_mc
+        create_crio_mc  = "oc create -f "+crio_mc
+
+        TR.info(methodName,"Creating registry mc with command %s"%create_registry)
+        try:
+            reg_retcode = check_output(['bash','-c', create_registry]) 
+            TR.info(methodName,"Creating crio mc with command %s"%create_crio_mc)
+            
+            crio_retcode = check_output(['bash','-c', create_crio_mc]) 
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        TR.info(methodName,"Created regsitry with command %s returned %s"%(create_registry,reg_retcode))
+        TR.info(methodName,"Created Crio mc with command %s returned %s"%(create_crio_mc,crio_retcode))
+        
+        create_cluster_as_cmd = "oc create -f /ibm/templates/cpd/cluster-autoscaler.yaml"
+        TR.info(methodName,"Create of Cluster auto scaler")
+        try:
+            retcode = check_output(['bash','-c', create_cluster_as_cmd]) 
+            TR.info(methodName,"Created Cluster auto scaler %s" %retcode)    
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        """
+        "oc create -f ${local.ocptemplates}/wkc-sysctl-mc.yaml",
+        "oc create -f ${local.ocptemplates}/security-limits-mc.yaml",
+        """
+        sysctl_cmd =  "oc create -f /ibm/templates/cpd/wkc-sysctl-mc.yaml"
+        TR.info(methodName,"Create SystemCtl Machine config")
+        try:
+            retcode = check_output(['bash','-c', sysctl_cmd]) 
+            TR.info(methodName,"Created  SystemCtl Machine config %s" %retcode) 
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+
+        secLimits_cmd =  "oc create -f /ibm/templates/cpd/security-limits-mc.yaml"
+        TR.info(methodName,"Create Security Limits Machine config")
+        try:
+            retcode = check_output(['bash','-c', secLimits_cmd]) 
+            TR.info(methodName,"Created  Security Limits Machine config %s" %retcode)  
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))  
+        time.sleep(600)
+
+        oc_route_cmd = "oc get route console -n openshift-console | grep 'console' | awk '{print $2}'"
+        TR.info(methodName, "Get OC URL")
+        try:
+            self.openshiftURL = check_output(['bash','-c', oc_route_cmd]) 
+            TR.info(methodName, "OC URL retrieved %s"%self.openshiftURL)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+
+        TR.info(methodName,"  Completed installation of Openshift Container Platform")
+    #endDef   
+
+    def __init(self, stackId, stackName, icpdInstallLogFile):
+        methodName = "_init"
+        global StackParameters, StackParameterNames
+        boto3.setup_default_session(region_name=self.region)
+        self.cfnResource = boto3.resource('cloudformation', region_name=self.region)
+        self.cf = boto3.client('cloudformation', region_name=self.region)
+        self.ec2 = boto3.client('ec2', region_name=self.region)
+        self.s3 = boto3.client('s3', region_name=self.region)
+        self.iam = boto3.client('iam',region_name=self.region)
+        self.secretsmanager = boto3.client('secretsmanager', region_name=self.region)
+        self.ssm = boto3.client('ssm', region_name=self.region)
+
+        StackParameters = self.getStackParameters(stackId)
+        StackParameterNames = StackParameters.keys()
+        TR.info(methodName,"self.stackParameters %s" % StackParameters)
+        TR.info(methodName,"self.stackParameterNames %s" % StackParameterNames)
+        self.logExporter = LogExporter(region=self.region,
+                            bucket=self.ICPDDeploymentLogsBucketName,
+                            keyPrefix=stackName,
+                            fqdn=socket.getfqdn()
+                            )                    
+        TR.info(methodName,"Create ssh keys")
+        command = "ssh-keygen -P {}  -f /root/.ssh/id_rsa".format("''")
+        try:
+            call(command,shell=True,stdout=icpdInstallLogFile)
+            TR.info(methodName,"Created ssh keys")
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+    
+    def getSecret(self, icpdInstallLogFile):
+        methodName = "getSecret"
+        TR.info(methodName,"Start Get secrets %s"%self.cpdSecret)
+        get_secret_value_response = self.secretsmanager.get_secret_value(SecretId=self.cpdSecret)
+        if 'SecretString' in get_secret_value_response:
+            secret = get_secret_value_response['SecretString']
+            secretDict = json.loads(secret)
+            #TR.info(methodName,"Secret %s"%secret)
+            self.password = secretDict['adminPassword']
+            #TR.info(methodName,"password %s"%self.password)
+            self.apiKey = secretDict['apikey']
+            #TR.info(methodName,"apiKey %s"%self.apiKey)
+        TR.info(methodName,"End Get secrets")
+    #endDef    
+
+    def updateSecret(self, icpdInstallLogFile):
+        methodName = "updateSecret"
+        TR.info(methodName,"Start updateSecret %s"%self.ocpSecret)
+        secret_update = '{"ocpPassword":'+self.ocpassword+'}'
+        response = self.secretsmanager.update_secret(SecretId=self.ocpSecret,SecretString=secret_update)
+        TR.info(methodName,"Updated secret for %s with response %s"%(self.ocpSecret, response))
+        TR.info(methodName,"End updateSecret")
+    #endDef
+    #     
+    def exportResults(self, name, parameterValue ,icpdInstallLogFile):
+        methodName = "exportResults"
+        TR.info(methodName,"Start export results")
+        self.ssm.put_parameter(Name=name,
+                           Value=parameterValue,
+                           Type='String',
+                           Overwrite=True)
+        TR.info(methodName,"Value: %s put to: %s." % (parameterValue,name))
+    #endDef    
     def main(self,argv):
         methodName = "main"
         self.rc = 0
-        params = {}
         try:
             beginTime = Utilities.currentTimeMillis()
             cmdLineArgs = Utilities.getInputArgs(self.ArgsSignature,argv[1:])
@@ -605,51 +1229,75 @@ class CPDInstall(object):
             with open(logFilePath,"a+") as icpdInstallLogFile:  
                 self.stackId = cmdLineArgs.get('stackid')
                 self.stackName = cmdLineArgs.get('stack-name')
-                self.cfnResource = boto3.resource('cloudformation', region_name=self.region)
-                self.cf = boto3.client('cloudformation', region_name=self.region)
-                self.ec2 = boto3.resource('ec2', region_name=self.region)
-                self.s3 = boto3.client('s3', region_name=self.region)
-                self.elb = boto3.client('elb',region_name=self.region)
-                self.secretsmanager = boto3.client('secretsmanager', region_name=self.region)
-                self.autoScaling = boto3.client('autoscaling', region_name=self.region)
-                self.stackParameters = self.getStackParameters(self.stackId)
-                self.stackParameterNames = self.stackParameters.keys()
-            
-                list = self.stackParameters.get("AnsibleAdditionalEnvironmentVariables").split(",")
-                params.update((dict(item.split("=", 1) for item  in list)))
-                self.namespace = params.get('Namespace')
-                self.cpdbucketName = params.get('ICPDArchiveBucket')
-                self.ICPDInstallationCompletedURL = params.get('ICPDInstallationCompletedURL')
-                self.installWKC = Utilities.toBoolean(params.get('WKC'))
-                self.installWSL = Utilities.toBoolean(params.get('WSL'))
-                self.installDV = Utilities.toBoolean(params.get('DV'))
-                self.installWML = Utilities.toBoolean(params.get('WML'))
-                self.installOSWML = Utilities.toBoolean(params.get('OSWML'))
+                self.amiID = environ.get('AMI_ID')
+                self.cpdSecret = environ.get('CPD_SECRET')
+                self.ocpSecret = environ.get('OCP_SECRET')
+                self.cpdbucketName = environ.get('ICPDArchiveBucket')
+                self.ICPDInstallationCompletedURL = environ.get('ICPDInstallationCompletedURL')
+                TR.info(methodName, "amiID %s "% self.amiID)
+                TR.info(methodName, "cpdbucketName %s "% self.cpdbucketName)
+                TR.info(methodName, "ICPDInstallationCompletedURL %s "% self.ICPDInstallationCompletedURL)
+                TR.info(methodName, "cpdSecret %s "% self.cpdSecret)
+                TR.info(methodName, "ocpSecret %s "% self.ocpSecret)
+                self.__init(self.stackId,self.stackName, icpdInstallLogFile)
+                self.zones = Utilities.splitString(self.AvailabilityZones)
+                TR.info(methodName," AZ values %s" % self.zones)
+                TR.info(methodName,"RedhatPullSecret %s" %self.RedhatPullSecret)
+               
+                secret = self.RedhatPullSecret.split('/',1)
+                TR.info(methodName,"Pull secret  %s" %secret)  
+                self.pullSecret = "/ibm/pull-secret"
+                #self.getS3Object(bucket=secret[0], s3Path=secret[1], destPath=self.pullSecret)
+                s3_cp_cmd = "aws s3 cp "+self.RedhatPullSecret+" "+self.pullSecret
+                TR.info(methodName,"s3 cp cmd %s"%s3_cp_cmd)
+                call(s3_cp_cmd, shell=True,stdout=icpdInstallLogFile)
+                self.getSecret(icpdInstallLogFile)
+                
+                ocpstart = Utilities.currentTimeMillis()
+                self.installOCP(icpdInstallLogFile)
+                ocpend = Utilities.currentTimeMillis()
+                self.printTime(ocpstart, ocpend, "Installing OCP")
+
+                self.installWKC = Utilities.toBoolean(self.WKC)
+                self.installWSL = Utilities.toBoolean(self.WSL)
+                self.installDV = Utilities.toBoolean(self.DV)
+                self.installWML = Utilities.toBoolean(self.WML)
+                self.installOSWML = Utilities.toBoolean(self.OpenScale)
+                self.installCDE = Utilities.toBoolean(self.CDE)
+                self.installSpark= Utilities.toBoolean(self.Spark)
+                #self.EnableFips = Utilities.toBoolean(self.EnableFips)
+
                 if(self.installOSWML):
                     self.installWML=True
-                #endIf    
-                self.apikey = params.get('APIKey')
-                TR.info(methodName, "Retrieve namespace value from Env Variables %s" %self.namespace)
-                self.logExporter = LogExporter(region=self.region,
-                                   bucket=self.getOutputBucket(),
-                                   keyPrefix='logs/%s' % self.stackName,
-                                   fqdn=socket.getfqdn()
-                                   )  
-                self.configureEFS()
-                self.getS3Object(bucket=self.cpdbucketName, s3Path="2.5/cpd-linux", destPath="/ibm/cpd-linux")
-                os.chmod("/ibm/cpd-linux", stat.S_IEXEC)	
-                if not self.apikey:
-                    TR.info(methodName, "Downloading repo.yaml from S3 bucket")
-                    os.remove("/ibm/repo.yaml")
-                    self.getS3Object(bucket=self.cpdbucketName, s3Path="2.5/repo.yaml", destPath="/ibm/repo.yaml")
-                else:
-                    TR.info(methodName, "updating repo.yaml with apikey value provided")
-                    self.updateTemplateFile('/ibm/repo.yaml','<APIKEY>',self.apikey)
+
+                
+                storagestart = Utilities.currentTimeMillis()
+                if(self.StorageType=='OCS'):
+                    self.configureOCS(icpdInstallLogFile)
+                elif(self.StorageType=='Portworx'):
+                    TR.info(methodName,"PortworxSpec %s" %self.PortworxSpec)
+                    spec = self.PortworxSpec.split('/',1)
+                    TR.info(methodName,"spec  %s" %spec)
+                    self.spec = "/ibm/templates/px/px-spec.yaml"
+                    #self.getS3Object(bucket=spec[0], s3Path=spec[1], destPath=self.spec)
+                    s3_cp_cmd = "aws s3 cp "+self.PortworxSpec+" "+self.spec
+                    TR.info(methodName,"s3 cp cmd %s"%s3_cp_cmd)
+                    call(s3_cp_cmd, shell=True,stdout=icpdInstallLogFile)
+                    self.configurePx(icpdInstallLogFile)
+                elif(self.StorageType=='EFS'):
+                    self.EFSDNSName = environ.get('EFSDNSName')
+                    self.EFSID = environ.get('EFSID')   
+                    self.configureEFS()
+
+                storageend = Utilities.currentTimeMillis()
+                self.printTime(storagestart, storageend, "Installing storage")    
+
                 self.installCPD(icpdInstallLogFile)
                 self.validateInstall(icpdInstallLogFile)
                 self.manageUser(icpdInstallLogFile)
-                if not self.apikey:
-                    self.activateLicense(icpdInstallLogFile)
+                self.updateSecret(icpdInstallLogFile)
+                self.exportResults(self.stackName+"-OpenshiftURL", "https://"+self.openshiftURL, icpdInstallLogFile)
+                self.exportResults(self.stackName+"-CPDURL", "https://"+self.cpdURL, icpdInstallLogFile)
             #endWith    
             
         except Exception as e:
@@ -674,17 +1322,16 @@ class CPDInstall(object):
             success = 'true'
             status = 'SUCCESS'
             TR.info(methodName,"SUCCESS END CPD Install AWS ICPD Quickstart.  Elapsed time (hh:mm:ss): %d:%02d:%02d" % (eth,etm,ets))
+            # TODO update this later
             self.updateStatus(status)
-            os.remove("/ibm/trial.lic")
-            #os.remove("/ibm/repo.yaml")
         else:
             success = 'false'
-            status = 'FAILURE: Check logs in S3 log bucket or on the AnsibleConfigServer node EC2 instance in /ibm/logs/icpd_install.log and /ibm/logs/post_install.log'
+            status = 'FAILURE: Check logs in S3 log bucket or on the Boot node EC2 instance in /ibm/logs/icpd_install.log and /ibm/logs/post_install.log'
             TR.info(methodName,"FAILED END CPD Install AWS ICPD Quickstart.  Elapsed time (hh:mm:ss): %d:%02d:%02d" % (eth,etm,ets))
+            # # TODO update this later
             self.updateStatus(status)
-            os.remove("/ibm/trial.lic")
-            #os.remove("/ibm/repo.yaml")
-            #endIf 
+           
+        #endIf 
         try:
             data = "%s: IBM Cloud Pak installation elapsed time: %d:%02d:%02d" % (status,eth,etm,ets)    
             check_call(['cfn-signal', 
