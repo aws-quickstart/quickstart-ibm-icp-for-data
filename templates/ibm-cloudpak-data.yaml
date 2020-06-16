@@ -899,14 +899,14 @@ Outputs:
     Value: !GetAtt BootnodeInstance.PublicIp
 
   OpenshiftURLValue:
-    Description: Openshift Password Secret Manager Arn
+    Description: The URL for the OpenShift UI.
     Value: !GetAtt OpenshiftURL.Value  
   
   ICPDWebClientURL :
-    Description: Openshift Password Secret Manager Arn
+    Description: CloudPak for Data web client URL.
     Value: !GetAtt CPDURL.Value
   
   OpenshiftPassword:
-    Description: OpenshiftPassword
+    Description: OpenShift password secret.
     Value: !Ref OpenshiftSecret  
   

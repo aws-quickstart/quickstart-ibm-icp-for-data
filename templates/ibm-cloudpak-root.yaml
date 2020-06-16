@@ -549,12 +549,12 @@ Outputs:
     Description: The boot node public IP address.
     Value: !GetAtt 'CloudPakDataStack.Outputs.BootnodePublicIp'
   OpenShiftUI:
-    Description: The URL OpenShiftUI
+    Description: The URL for the OpenShift UI.
     Value: !GetAtt 'CloudPakDataStack.Outputs.OpenshiftURLValue'
   ICPDWebClientURL:
-    Description: CloudPakForData 
+    Description: CloudPak for Data web client URL.
     Value: !GetAtt 'CloudPakDataStack.Outputs.ICPDWebClientURL'
   OpenshiftPassword:
-    Description: OpenshiftPassword
+    Description: OpenShift password secret.
     Value: !GetAtt 'CloudPakDataStack.Outputs.OpenshiftPassword'
     
