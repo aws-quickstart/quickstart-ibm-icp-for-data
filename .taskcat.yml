@@ -44,8 +44,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -74,8 +72,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -102,8 +98,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -130,8 +124,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -161,8 +153,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -189,8 +179,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -219,8 +207,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -250,8 +236,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -278,8 +262,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -309,8 +291,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -337,8 +317,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -366,8 +344,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
@@ -397,8 +373,6 @@ tests:
       AdminPassword: override
       APIKey: override
       APIUsername: override
-      AWSAccessKeyId: override
-      AWSSecretAccessKey: override
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
