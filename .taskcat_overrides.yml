@@ -4,8 +4,6 @@ KeyPairName:
 DomainName: 
 APIKey:
 APIUsername:
-AWSAccessKeyId: 
-AWSSecretAccessKey: 
 RedhatPullSecret: 
 PortworxSpec: 
 ICPDDeploymentLogsBucketName: 
