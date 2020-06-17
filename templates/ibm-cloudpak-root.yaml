@@ -406,6 +406,7 @@ Parameters:
   PortworxSpec:
     Description: Update this value if Storage type selected is Portworx. S3 path of Portworx Spec (e.g., s3://my-bucket/path/to/portworxspec.yaml).
     Type: String
+    Default: ""
 
   EnableFips:
     Description: Enable Fips for Openshift

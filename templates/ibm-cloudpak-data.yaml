@@ -222,6 +222,7 @@ Parameters:
     Description: >-
        The IBM Cloud Pak for Data user name to access IBM Container Registry.
     Type: String
+    Default: "cp"
   APIKey:
     Description: >-
        The IBM Cloud Pak for Data API key to access IBM Container Registry.
@@ -395,6 +396,7 @@ Parameters:
   PortworxSpec:
     Description: Update this value if Storage type selected is Portworx. S3 path of Portworx Spec(e.g., s3://my-bucket/path/to/portworxspec.yaml).
     Type: String
+    Default: ""
   EnableFips:
     Description: Enable Fips for Openshift
     Type: String
