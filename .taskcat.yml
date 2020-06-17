@@ -27,7 +27,7 @@ tests:
 
   1AZ-wkc-ocs:
     parameters:
-      WKC: True
+      WKC: 'True'
       OCSInstanceType: r5.4xlarge
       NumberOfAZs: '1'
       AvailabilityZones: $[taskcat_genaz_1]
@@ -54,8 +54,8 @@ tests:
 
   1AZ-wsl-c4-efs:
     parameters:
-      WSL: True
-      EnableFips: True
+      WSL: 'True'
+      EnableFips: 'True'
       StorageType: 'EFS'
       NumberOfAZs: '1'
       AvailabilityZones: $[taskcat_genaz_1]
@@ -82,7 +82,7 @@ tests:
 
   1AZ-wml-px:
     parameters:
-      WML: True
+      WML: 'True'
       NumberOfAZs: '1'
       AvailabilityZones: $[taskcat_genaz_1]
       VPCCIDR: 10.0.0.0/16
@@ -110,7 +110,7 @@ tests:
 
   3AZ-os-ocs:
     parameters:
-      OpenScale: True
+      OpenScale: 'True'
       NumberOfAZs: '3'
       AvailabilityZones: $[taskcat_genaz_3]
       VPCCIDR: 10.0.0.0/16
@@ -135,9 +135,9 @@ tests:
 
   3AZ-wml-dv-px:
     parameters:
-      WML: True
-      DV: True
-      EnableFips: True
+      WML: 'True'
+      DV: 'True'
+      EnableFips: 'True'
       NumberOfAZs: '3'
       AvailabilityZones: $[taskcat_genaz_3]
       VPCCIDR: 10.0.0.0/16
@@ -164,7 +164,7 @@ tests:
 
   3AZ-wsl-px:
     parameters:
-      WSL: True
+      WSL: 'True'
       NumberOfAZs: '3'
       AvailabilityZones: $[taskcat_genaz_3]
       VPCCIDR: 10.0.0.0/16
@@ -191,8 +191,8 @@ tests:
 
   3AZ-wkc-px:
     parameters:
-      WKC: True
-      EnableFips: True
+      WKC: 'True'
+      EnableFips: 'True'
       AvailabilityZones: $[taskcat_genaz_3]
       VPCCIDR: 10.0.0.0/16
       ComputeInstanceType: r5.4xlarge
@@ -218,10 +218,10 @@ tests:
 
   3AZ-dv-cde-spark-efs:
     parameters:
-      DV: True
-      CDE: True
-      Spark: True
-      EnableFips: True
+      DV: 'True'
+      CDE: 'True'
+      Spark: 'True'
+      EnableFips: 'True'
       AvailabilityZones: $[taskcat_genaz_3]
       VPCCIDR: 10.0.0.0/16
       ComputeInstanceType: c5.4xlarge
@@ -247,8 +247,8 @@ tests:
 
   3AZ-wkc-wsl-px:
     parameters:
-      WKC: True
-      WSL: True
+      WKC: 'True'
+      WSL: 'True'
       AvailabilityZones: $[taskcat_genaz_3]
       VPCCIDR: 10.0.0.0/16
       LicenseAgreement: I agree
@@ -273,8 +273,8 @@ tests:
 
   1AZ-wsl-os-ocs:
     parameters:
-      WSL: True
-      OpenScale: True
+      WSL: 'True'
+      OpenScale: 'True'
       OCSInstanceType: r5.4xlarge
       NumberOfAZs: '1'
       AvailabilityZones: $[taskcat_genaz_1]
@@ -301,9 +301,9 @@ tests:
 
   3AZ-wkc-spark-efs:
     parameters:
-      WKC: True
-      Spark: True
-      EnableFips: True
+      WKC: 'True'
+      Spark: 'True'
+      EnableFips: 'True'
       AvailabilityZones: $[taskcat_genaz_3]
       VPCCIDR: 10.0.0.0/16
       LicenseAgreement: I agree
@@ -328,8 +328,8 @@ tests:
 
   3AZ-wkc-dv-px:
     parameters:
-      DV: True
-      WKC: True
+      DV: 'True'
+      WKC: 'True'
       AvailabilityZones: $[taskcat_genaz_3]
       VPCCIDR: 10.0.0.0/16
       ComputeInstanceType: r5.4xlarge
@@ -355,8 +355,8 @@ tests:
 
   3AZ-wkc-cde-px:
     parameters:
-      WKC: True
-      CDE: True
+      WKC: 'True'
+      CDE: 'True'
       NumberOfAZs: '3'
       NumberOfMaster: '3'
       OCSInstanceType: r5.4xlarge
