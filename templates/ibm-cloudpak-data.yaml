@@ -720,14 +720,6 @@ Resources:
         configSets:
           Required:
             - StackPropertiesFile
-            - ICPDBootnodeScripts
-
-            
-        ICPDBootnodeScripts:
-          sources:
-            /root: !Sub
-             - https://${ScriptBucketName}.s3.amazonaws.com/${KeyPrefix}
-             - { ScriptBucketName: !Ref QSS3BucketName, KeyPrefix: !Ref QSS3KeyPrefix}
 
         StackPropertiesFile:
           files:
