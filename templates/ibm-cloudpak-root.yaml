@@ -48,18 +48,18 @@ Metadata:
       - Label:
           default: IBM Cloud Pak for Data configuration
         Parameters:
-          - ICPDVersion
           - LicenseAgreement
+          - ICPDVersion
+          - APIUsername
+          - APIKey
           - Namespace
           - WKC
           - WML
           - DV
           - WSL
           - OpenScale
-          - CDE
           - Spark
-          - APIUsername
-          - APIKey
+          - CDE
       - Label:
           default: AWS Quick Start configuration
         Parameters:
@@ -91,13 +91,13 @@ Metadata:
       QSS3KeyPrefix:
         default: Quick Start S3 key prefix
       BootNodeAccessCIDR:
-        default: Allowed external access CIDR for BootNode
+        default: Boot node external access CIDR
       VPCCIDR:
         default: VPC CIDR
       AdminPassword:
         default: Cloud Pak for Data UI password
       RedhatPullSecret:
-        default: Red Hat pull Secret
+        default: Red Hat pull secret
       MasterInstanceType:
         default: Master instance type
       ComputeInstanceType:
@@ -105,7 +105,7 @@ Metadata:
       OCSInstanceType:
         default: OCS instance type  
       NumberOfMaster:
-        default: Number of masters nodes
+        default: Number of master nodes
       NumberOfCompute:
         default: Number of compute nodes
       NumberOfOCS:
@@ -121,7 +121,7 @@ Metadata:
       ClusterName:
         default: Cluster name
       StorageType:
-        default: Storage type for Cluster  
+        default: Cluster storage type
       PortworxSpec:
         default: Portworx spec file  
       EnableFips:
@@ -143,9 +143,9 @@ Metadata:
       Spark:
         default: Analytics Engine powered by Apache Spark service
       APIUsername:
-        default: IBM Cloud Pak for Data Username value to access IBM Container Registry
+        default: IBM Cloud Pak for Data API user name
       APIKey:
-        default: IBM Cloud Pak for Data API key value to access IBM Container Registry
+        default: IBM Cloud Pak for Data API key
       ICPDVersion:
         default: IBM Cloud Pak for Data version
       Namespace:
@@ -211,12 +211,12 @@ Parameters:
     Default: "False"
   APIUsername:
     Description: >-
-       Enter the IBM Cloud Pak for Data Username to access IBM Container Registry.
+       The IBM Cloud Pak for Data user name to access IBM Container Registry.
     Type: String
     Default: "cp"  
   APIKey:
     Description: >-
-       Enter the IBM Cloud Pak for Data API key to access IBM Container Registry.
+       The IBM Cloud Pak for Data API key to access IBM Container Registry.
     Type: String 
     NoEcho: 'true'   
             
@@ -284,7 +284,7 @@ Parameters:
       or end with a hyphen (-).
     Type: String
   QSS3BucketRegion:
-    Default: 'us-east-2'
+    Default: 'us-east-1'
     Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
     Type: String   
   QSS3KeyPrefix:
@@ -299,7 +299,7 @@ Parameters:
   BootNodeAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access BootNode instance. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
+    Description: The CIDR IP range that is permitted to access boot node instance. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
     Type: String
   AdminPassword:
     Description: The password for the Cloud Pak for Data web client. The password must contain at least 8 characters, including letters (with a minimum of one capital letter), numbers, and symbols.
@@ -388,11 +388,11 @@ Parameters:
     Type: String
 
   DomainName:
-    Description: 'AWS Route53 base domain configured for your OpenShift Container Platform cluster. Name must consist of lower case alphanumeric characters and must start and end with an alphanumeric character.'
+    Description: 'Amazon Route 53 base domain configured for your OpenShift Container Platform cluster. Name must consist of lower case alphanumeric characters and must start and end with an alphanumeric character.'
     Type: String
 
   ClusterName:
-    Description: cluster name for kubernetes.io/cluster/tags.
+    Description: Custom cluster name for kubernetes.io/cluster/tags.
     Type: String
     AllowedPattern: ^[0-9a-z-]*$
   StorageType:
@@ -406,6 +406,7 @@ Parameters:
   PortworxSpec:
     Description: Update this value if Storage type selected is Portworx. S3 path of Portworx Spec (e.g., s3://my-bucket/path/to/portworxspec.yaml).
     Type: String
+    Default: ""
 
   EnableFips:
     Description: Enable Fips for Openshift
@@ -549,12 +550,12 @@ Outputs:
     Description: The boot node public IP address.
     Value: !GetAtt 'CloudPakDataStack.Outputs.BootnodePublicIp'
   OpenShiftUI:
-    Description: The URL OpenShiftUI
+    Description: The URL for the OpenShift UI.
     Value: !GetAtt 'CloudPakDataStack.Outputs.OpenshiftURLValue'
   ICPDWebClientURL:
-    Description: CloudPakForData 
+    Description: CloudPak for Data web client URL.
     Value: !GetAtt 'CloudPakDataStack.Outputs.ICPDWebClientURL'
   OpenshiftPassword:
-    Description: OpenshiftPassword
+    Description: OpenShift password secret.
     Value: !GetAtt 'CloudPakDataStack.Outputs.OpenshiftPassword'
     

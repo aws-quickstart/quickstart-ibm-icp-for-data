@@ -1,9 +1,0 @@
-AdminPassword: 
-BootNodeAccessCIDR: 
-KeyPairName: 
-DomainName: 
-APIKey:
-APIUsername:
-RedhatPullSecret: 
-PortworxSpec: 
-ICPDDeploymentLogsBucketName: 
