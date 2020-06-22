@@ -170,7 +170,7 @@ tests:
       VPCCIDR: 10.0.0.0/16
       LicenseAgreement: I agree
       ClusterName: $[taskcat_random-string]
-      StorageType: Portworx
+      StorageType: EFS
       Namespace: zen
       ICPDDeploymentLogsBucketName: override
       QSS3BucketName: $[taskcat_autobucket]
@@ -182,7 +182,6 @@ tests:
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
-      PortworxSpec: override
     regions:  
     - eu-north-1
     s3_bucket: ''
@@ -245,7 +244,7 @@ tests:
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.yaml 
 
-  3AZ-wkc-wsl-px:
+  3AZ-wkc-wsl-efs:
     parameters:
       WKC: 'True'
       WSL: 'True'
@@ -253,7 +252,7 @@ tests:
       VPCCIDR: 10.0.0.0/16
       LicenseAgreement: I agree
       ClusterName: $[taskcat_random-string]
-      StorageType: Portworx
+      StorageType: EFS
       Namespace: zen
       ICPDDeploymentLogsBucketName: override
       QSS3BucketName: $[taskcat_autobucket]
@@ -265,7 +264,6 @@ tests:
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
-      PortworxSpec: override
     regions:  
     - eu-west-1
     s3_bucket: ''
@@ -353,14 +351,13 @@ tests:
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.yaml
 
-  3AZ-wkc-cde-px:
+  3AZ-wkc-cde-ocs:
     parameters:
       WKC: 'True'
       CDE: 'True'
       NumberOfAZs: '3'
       NumberOfMaster: '3'
       OCSInstanceType: r5.4xlarge
-      StorageType: 'Portworx'
       AvailabilityZones: $[taskcat_genaz_3]
       VPCCIDR: 10.0.0.0/16
       LicenseAgreement: I agree
@@ -376,7 +373,6 @@ tests:
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
-      PortworxSpec: override
     regions:  
     - us-east-1
     s3_bucket: ''

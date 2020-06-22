@@ -199,14 +199,6 @@ class CPDInstall(object):
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
         self.token = self.getToken(icpdInstallLogFile)
-        fs_group_cmd = "oc describe project "+self.Namespace+" | grep sa.scc.uid-range | cut -d= -f2"
-        TR.info(methodName," FS group cmd %s"%fs_group_cmd)
-        try:
-            fs_value =  check_output(['bash','-c',fs_group_cmd])
-            self.fsGroup = fs_value.split('/')[0]
-            TR.info(methodName,"FS Group retrieved %s %s for command %s"%(self.fsGroup, fs_value, fs_group_cmd))
-        except CalledProcessError as e:
-            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
         if(self.StorageType=='OCS'):
             self.storageClass = "ocs-storagecluster-cephfs"
             self.storageOverrideFile = "/ibm/override_ocs.yaml"
@@ -218,12 +210,9 @@ class CPDInstall(object):
         elif(self.StorageType=='EFS'):
             self.storageClass = "aws-efs"
             self.storageOverride = ""
-        if(self.StorageType!='EFS'):    
-            self.updateTemplateFile(self.storageOverrideFile,'${FS_GROUPVALUE}',self.fsGroup)
-            self.updateTemplateFile(self.storageOverrideFile,'${fips}',self.EnableFips)
         litestart = Utilities.currentTimeMillis()
         TR.info(methodName,"Start installing Lite package")
-        self.installAssemblies("lite","v2.5.0.0",icpdInstallLogFile)
+        self.installAssemblies("lite",icpdInstallLogFile)
         liteend = Utilities.currentTimeMillis()
         self.printTime(litestart, liteend, "Installing Lite")
 
@@ -238,7 +227,7 @@ class CPDInstall(object):
         if(self.installSpark):
             TR.info(methodName,"Start installing Spark AE package")
             sparkstart = Utilities.currentTimeMillis()
-            self.installAssemblies("spark","v2.5.0.0",icpdInstallLogFile)
+            self.installAssemblies("spark",icpdInstallLogFile)
             sparkend = Utilities.currentTimeMillis()
             TR.info(methodName,"Spark AE  package installation completed")
             self.printTime(sparkstart, sparkend, "Installing Spark AE")   
@@ -246,7 +235,7 @@ class CPDInstall(object):
         if(self.installDV):
             TR.info(methodName,"Start installing DV package")
             dvstart = Utilities.currentTimeMillis()
-            self.installAssemblies("dv","v1.3.0.0",icpdInstallLogFile)
+            self.installAssemblies("dv",icpdInstallLogFile)
             dvend = Utilities.currentTimeMillis()
             TR.info(methodName,"DV package installation completed")
             self.printTime(dvstart, dvend, "Installing DV")    
@@ -255,7 +244,7 @@ class CPDInstall(object):
 
             TR.info(methodName,"Start installing WSL package")
             wslstart = Utilities.currentTimeMillis()
-            self.installAssemblies("wsl","2.1.0",icpdInstallLogFile)
+            self.installAssemblies("wsl",icpdInstallLogFile)
             wslend = Utilities.currentTimeMillis()
             TR.info(methodName,"WSL package installation completed")
             self.printTime(wslstart, wslend, "Installing WSL")
@@ -263,7 +252,7 @@ class CPDInstall(object):
         if(self.installWML):
             TR.info(methodName,"Start installing WML package")
             wmlstart = Utilities.currentTimeMillis()
-            self.installAssemblies("wml","2.1.0.0",icpdInstallLogFile)
+            self.installAssemblies("wml",icpdInstallLogFile)
             wmlend = Utilities.currentTimeMillis()
             TR.info(methodName,"WML package installation completed")
             self.printTime(wmlstart, wmlend, "Installing WML")
@@ -271,7 +260,7 @@ class CPDInstall(object):
         if(self.installWKC):
             TR.info(methodName,"Start installing WKC package")
             wkcstart = Utilities.currentTimeMillis()
-            self.installAssemblies("wkc","3.0.333",icpdInstallLogFile)
+            self.installAssemblies("wkc",icpdInstallLogFile)
             wkcend = Utilities.currentTimeMillis()
             TR.info(methodName,"WKC package installation completed")
             self.printTime(wkcstart, wkcend, "Installing WKC")
@@ -279,7 +268,7 @@ class CPDInstall(object):
         if(self.installOSWML):
             TR.info(methodName,"Start installing AI Openscale package")
             aiostart = Utilities.currentTimeMillis()
-            self.installAssemblies("aiopenscale","v2.5.0.0",icpdInstallLogFile)
+            self.installAssemblies("aiopenscale",icpdInstallLogFile)
             aioend = Utilities.currentTimeMillis()
             TR.info(methodName,"AI Openscale package installation completed")
             self.printTime(aiostart, aioend, "Installing AI Openscale")    
@@ -287,7 +276,7 @@ class CPDInstall(object):
         if(self.installCDE):
             TR.info(methodName,"Start installing Cognos Dashboard package")
             cdestart = Utilities.currentTimeMillis()
-            self.installAssemblies("cde","v2.5.0.0",icpdInstallLogFile)
+            self.installAssemblies("cde",icpdInstallLogFile)
             cdeend = Utilities.currentTimeMillis()
             TR.info(methodName,"Cognos Dashboard package installation completed")
             self.printTime(cdestart, cdeend, "Installing Cognos Dashboard")  
@@ -349,7 +338,7 @@ class CPDInstall(object):
         file.close()
         return content.rstrip()
 
-    def installAssemblies(self, assembly, version, icpdInstallLogFile):
+    def installAssemblies(self, assembly, icpdInstallLogFile):
         """
         method to install assemlies
         for each assembly this method will execute adm command to apply all prerequistes
@@ -365,10 +354,7 @@ class CPDInstall(object):
             retcode = call(apply_cmd,shell=True, stdout=icpdInstallLogFile)
             TR.info(methodName,"Executed apply command for assembly %s returned %s"%(assembly,retcode))
         except CalledProcessError as e:
-            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
-
-
-        # TODO see if we need to add --version="+version+"  later on
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
         install_cmd = "/ibm/cpd-linux -c "+self.storageClass+" "+self.storageOverride+" -r /ibm/repo.yaml -a "+assembly+" -n "+self.Namespace+" --transfer-image-to="+registry+" --target-registry-username=kubeadmin  --target-registry-password="+self.token+" --cluster-pull-prefix image-registry.openshift-image-registry.svc:5000/"+self.Namespace+" --accept-all-licenses --insecure-skip-tls-verify | tee /ibm/logs/"+assembly+"_install.log"
         try:     

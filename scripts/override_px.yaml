@@ -45,13 +45,13 @@ xmetarepoVolumeInfo:
   support4kDevice: true
   volumeClaim:
     accessMode: ReadWriteOnce
-    storageClassName: "portworx-db2-sc"
+    storageClassName: "portworx-db2-rwo-sc"
     overrideStorageClass: true
 
 wdp-db2:
   support4kDevice: true
   dataVolume:
-    storageClassName: "portworx-db2-sc"
+    storageClassName: "portworx-db2-rwo-sc"
     overrideStorageClass: true
 
 ibm-wml-prod:
@@ -61,10 +61,4 @@ ibm-wml-prod:
     fsGroup: "4000"
   wmlRuntimeManager:
     storageclass_name: portworx-shared-gp3 
-
-cde:
-  securityContext:
-    fsGroup: 1000320999
-
-icp4d:
-  isFipsEnabled: ${fips}    
+ 
