@@ -29,7 +29,7 @@ solr:
   volumeClaim:
     overrideStorageClass: true
     storageClassName: "portworx-solr-sc"
-    accessMode: ReadWriteMany
+    accessMode: ReadWriteOnce
 
 shared-services:
   kafka:
