@@ -29,7 +29,6 @@ solr:
   volumeClaim:
     overrideStorageClass: true
     storageClassName: "portworx-solr-sc"
-    accessMode: ReadWriteOnce
 
 shared-services:
   kafka:
@@ -44,7 +43,6 @@ shared-services:
 xmetarepoVolumeInfo:
   support4kDevice: true
   volumeClaim:
-    accessMode: ReadWriteOnce
     storageClassName: "portworx-db2-rwo-sc"
     overrideStorageClass: true
 
