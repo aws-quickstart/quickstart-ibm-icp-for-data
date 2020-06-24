@@ -16,5 +16,5 @@ spec:
     enabled: true
     delayAfterAdd: "3m"
     delayAfterDelete: "2m"
-    delayAfterFailure: "30s"
-    unneededTime: "60s"
+    delayAfterFailure: "3m"
+    unneededTime: "300m"
