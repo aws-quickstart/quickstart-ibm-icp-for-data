@@ -52,34 +52,6 @@ tests:
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.yaml
 
-  1AZ-wsl-c4-efs:
-    parameters:
-      WSL: 'True'
-      EnableFips: 'True'
-      StorageType: 'EFS'
-      NumberOfAZs: '1'
-      AvailabilityZones: $[taskcat_genaz_1]
-      VPCCIDR: 10.0.0.0/16
-      ComputeInstanceType: c5.4xlarge
-      NumberOfMaster: '1'
-      LicenseAgreement: I agree
-      ClusterName: $[taskcat_random-string]
-      Namespace: cpdtest
-      ICPDDeploymentLogsBucketName: override
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
-      DomainName: override
-      AdminPassword: override
-      APIKey: override
-      APIUsername: override
-      KeyPairName: override
-      BootNodeAccessCIDR: override
-      RedhatPullSecret: override
-    regions:  
-    - sa-east-1
-    s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml
-
   1AZ-wml-px:
     parameters:
       WML: 'True'
@@ -107,31 +79,29 @@ tests:
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.yaml
 
-
-  3AZ-os-ocs:
-    parameters:
-      OpenScale: 'True'
-      NumberOfAZs: '3'
-      AvailabilityZones: $[taskcat_genaz_3]
-      VPCCIDR: 10.0.0.0/16
-      LicenseAgreement: I agree
-      ClusterName: $[taskcat_random-string]
-      Namespace: zen
-      ICPDDeploymentLogsBucketName: override
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
-      DomainName: override
-      AdminPassword: override
-      APIKey: override
-      APIUsername: override
-      KeyPairName: override
-      BootNodeAccessCIDR: override
-      RedhatPullSecret: override
-    regions:  
-    - ap-southeast-1
-    s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml
- 
+#  3AZ-os-ocs:
+#    parameters:
+#      OpenScale: 'True'
+#      NumberOfAZs: '3'
+#      AvailabilityZones: $[taskcat_genaz_3]
+#      VPCCIDR: 10.0.0.0/16
+#      LicenseAgreement: I agree
+#      ClusterName: $[taskcat_random-string]
+#      Namespace: zen
+#      ICPDDeploymentLogsBucketName: override
+#      QSS3BucketName: $[taskcat_autobucket]
+#      QSS3BucketRegion: $[taskcat_current_region]
+#      DomainName: override
+#      AdminPassword: override
+#      APIKey: override
+#      APIUsername: override
+#      KeyPairName: override
+#      BootNodeAccessCIDR: override
+#      RedhatPullSecret: override
+#    regions:
+#    - ap-southeast-1
+#    s3_bucket: ''
+#    template: templates/ibm-cloudpak-root.yaml
 
   3AZ-wml-dv-px:
     parameters:
@@ -161,32 +131,6 @@ tests:
     - ap-northeast-2
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.yaml   
-
-  3AZ-wsl-px:
-    parameters:
-      WSL: 'True'
-      NumberOfAZs: '3'
-      AvailabilityZones: $[taskcat_genaz_3]
-      VPCCIDR: 10.0.0.0/16
-      LicenseAgreement: I agree
-      ClusterName: $[taskcat_random-string]
-      StorageType: EFS
-      Namespace: zen
-      ICPDDeploymentLogsBucketName: override
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
-      DomainName: override
-      AdminPassword: override
-      APIKey: override
-      APIUsername: override
-      KeyPairName: override
-      BootNodeAccessCIDR: override
-      RedhatPullSecret: override
-    regions:  
-    - eu-north-1
-    s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml
-
 
   3AZ-wkc-px:
     parameters:
@@ -244,58 +188,58 @@ tests:
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.yaml 
 
-  3AZ-wkc-wsl-efs:
-    parameters:
-      WKC: 'True'
-      WSL: 'True'
-      AvailabilityZones: $[taskcat_genaz_3]
-      VPCCIDR: 10.0.0.0/16
-      LicenseAgreement: I agree
-      ClusterName: $[taskcat_random-string]
-      StorageType: EFS
-      Namespace: zen
-      ICPDDeploymentLogsBucketName: override
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
-      DomainName: override
-      AdminPassword: override
-      APIKey: override
-      APIUsername: override
-      KeyPairName: override
-      BootNodeAccessCIDR: override
-      RedhatPullSecret: override
-    regions:  
-    - eu-west-1
-    s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml
+#  3AZ-wkc-wsl-efs:
+#    parameters:
+#      WKC: 'True'
+#      WSL: 'True'
+#      AvailabilityZones: $[taskcat_genaz_3]
+#      VPCCIDR: 10.0.0.0/16
+#      LicenseAgreement: I agree
+#      ClusterName: $[taskcat_random-string]
+#      StorageType: EFS
+#      Namespace: zen
+#      ICPDDeploymentLogsBucketName: override
+#      QSS3BucketName: $[taskcat_autobucket]
+#      QSS3BucketRegion: $[taskcat_current_region]
+#      DomainName: override
+#      AdminPassword: override
+#      APIKey: override
+#      APIUsername: override
+#      KeyPairName: override
+#      BootNodeAccessCIDR: override
+#      RedhatPullSecret: override
+#    regions:
+#    - eu-west-1
+#    s3_bucket: ''
+#    template: templates/ibm-cloudpak-root.yaml
 
-  1AZ-wsl-os-ocs:
-    parameters:
-      WSL: 'True'
-      OpenScale: 'True'
-      OCSInstanceType: r5.4xlarge
-      NumberOfAZs: '1'
-      AvailabilityZones: $[taskcat_genaz_1]
-      VPCCIDR: 10.0.0.0/16
-      ComputeInstanceType: r5.4xlarge
-      NumberOfMaster: '1'
-      LicenseAgreement: I agree
-      ClusterName: $[taskcat_random-string]
-      Namespace: zen
-      ICPDDeploymentLogsBucketName: override
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
-      DomainName: override
-      AdminPassword: override
-      APIKey: override
-      APIUsername: override
-      KeyPairName: override
-      BootNodeAccessCIDR: override
-      RedhatPullSecret: override
-    regions:  
-    - us-west-1
-    s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml
+#  1AZ-wsl-os-ocs:
+#    parameters:
+#      WSL: 'True'
+#      OpenScale: 'True'
+#      OCSInstanceType: r5.4xlarge
+#      NumberOfAZs: '1'
+#      AvailabilityZones: $[taskcat_genaz_1]
+#      VPCCIDR: 10.0.0.0/16
+#      ComputeInstanceType: r5.4xlarge
+#      NumberOfMaster: '1'
+#      LicenseAgreement: I agree
+#      ClusterName: $[taskcat_random-string]
+#      Namespace: zen
+#      ICPDDeploymentLogsBucketName: override
+#      QSS3BucketName: $[taskcat_autobucket]
+#      QSS3BucketRegion: $[taskcat_current_region]
+#      DomainName: override
+#      AdminPassword: override
+#      APIKey: override
+#      APIUsername: override
+#      KeyPairName: override
+#      BootNodeAccessCIDR: override
+#      RedhatPullSecret: override
+#    regions:
+#    - us-west-1
+#    s3_bucket: ''
+#    template: templates/ibm-cloudpak-root.yaml
 
   3AZ-wkc-spark-efs:
     parameters:
