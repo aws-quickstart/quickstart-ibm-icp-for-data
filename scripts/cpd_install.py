@@ -191,6 +191,17 @@ class CPDInstall(object):
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
+
+        # oc set env deployment/image-registry -n openshift-image-registry REGISTRY_STORAGE_S3_CHUNKSIZE=104857600
+
+        set_s3_storage_limit = "oc set env deployment/image-registry -n openshift-image-registry REGISTRY_STORAGE_S3_CHUNKSIZE=104857600"
+        try:
+            retcode = call(set_s3_storage_limit,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"set_s3_storage_limit %s retcode=%s" %(set_s3_storage_limit,retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))  
+
+
         oc_new_project ="oc new-project "+self.Namespace
         try:
             retcode = call(oc_new_project,shell=True, stdout=icpdInstallLogFile)
@@ -982,6 +993,7 @@ class CPDInstall(object):
         self.updateTemplateFile(installConfigFile,'${sshKey}',self.readFileContent("/root/.ssh/id_rsa.pub"))
         self.updateTemplateFile(installConfigFile,'${clustername}',self.ClusterName)
         self.updateTemplateFile(installConfigFile, '${FIPS}',self.EnableFips)
+        self.updateTemplateFile(installConfigFile, '${machine-cidr}', self.VPCCIDR)
         self.updateTemplateFile(autoScalerFile, '${az1}', self.zones[0])
         self.updateTemplateFile(healthcheckFile, '${az1}', self.zones[0])
 

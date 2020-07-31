@@ -747,7 +747,7 @@ Resources:
                   CPDIAMUserSecret: !GetAtt [CPDIAMUserAccessKey, SecretAccessKey]
 
     Properties:
-      KeyName: 'cikey'
+      KeyName: !Ref 'KeyPairName'
       ImageId: !FindInMap [AWSAMIRegionMap, !Ref "AWS::Region", RHEL76HVM]
       BlockDeviceMappings:
         - DeviceName: /dev/sda1
