@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Template for an IBM Cloud Pak for Data deployment with existing VPC. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template. (qs-1pek09fje)
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Parameters for deploying into an existing VPC"
+    Order: "2"
   AWSAMIRegionMap:
     Filters:
       RHEL76HVM:
