@@ -34,7 +34,7 @@ metadata:
   name: ${clustername}
 networking:
   clusterNetwork:
-  - cidr: ${cluster-cidr}
+  - cidr: 10.128.0.0/14
     hostPrefix: 23
   machineCIDR: ${machine-cidr}
   networkType: OpenShiftSDN
@@ -54,4 +54,3 @@ pullSecret: '${pullSecret}'
 fips: ${FIPS}
 sshKey: |
   ${sshKey}
-publish: ${PrivateCluster}  

@@ -27,7 +27,6 @@ class CPDInstall(object):
     def __init__(self):
         """
         Constructor
-
         NOTE: Some instance variable initialization happens in self._init() which is 
         invoked early in main() at some point after _getStackParameters().
         """
@@ -40,16 +39,12 @@ class CPDInstall(object):
         """
         Return the value from the args dictionary that may be specified with any of the
         argument names in the list of synonyms.
-
         The synonyms argument may be a Jython list of strings or it may be a string representation
         of a list of names with a comma or space separating each name.
-
         The args is a dictionary with the keyword value pairs that are the arguments
         that may have one of the names in the synonyms list.
-
         If the args dictionary does not include the option that may be named by any
         of the given synonyms then the given default value is returned.
-
         NOTE: This method has to be careful to make explicit checks for value being None
         rather than something that is just logically false.  If value gets assigned 0 from
         the get on the args (command line args) dictionary, that appears as false in a
@@ -79,11 +74,9 @@ class CPDInstall(object):
     def _configureTraceAndLogging(self,traceArgs):
         """
         Return a tuple with the trace spec and logFile if trace is set based on given traceArgs.
-
         traceArgs is a dictionary with the trace configuration specified.
             loglevel|trace <tracespec>
             logfile|logFile <pathname>
-
         If trace is specified in the trace arguments then set up the trace.
         If a log file is specified, then set up the log file as well.
         If trace is specified and no log file is specified, then the log file is
@@ -159,16 +152,15 @@ class CPDInstall(object):
         creates a OC project with user defined name
         Downloads binary file from S3 and extracts it to /ibm folder
         installs user selected services using transfer method
-
         """
 
         methodName = "installCPD"
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/cpd-linux", destPath="/ibm/cpd-linux")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/cpd-linux", destPath="/ibm/cpd-linux")
         os.chmod("/ibm/cpd-linux", stat.S_IEXEC)	
         self.repoFile = "/ibm/repo.yaml"
         
         
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/repo.yaml", destPath=self.repoFile)
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/repo.yaml", destPath=self.repoFile)
         TR.info(methodName, "updating repo.yaml with apikey value provided")
         
         #TODO change this later
@@ -234,8 +226,7 @@ class CPDInstall(object):
             TR.info(methodName, "CPD URL retrieved %s"%self.cpdURL)
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
-        self.manageUser(icpdInstallLogFile)
-        
+
         if(self.installSpark):
             TR.info(methodName,"Start installing Spark AE package")
             sparkstart = Utilities.currentTimeMillis()
@@ -519,7 +510,7 @@ class CPDInstall(object):
     def updateStatus(self, status):
         methodName = "updateStatus"
         TR.info(methodName," Update Status of installation")
-        data = "350_AWS_STACKNAME="+self.stackName+",Status="+status
+        data = "301_AWS_STACKNAME="+self.stackName+",Status="+status
         updateStatus = "curl -X POST https://un6laaf4v0.execute-api.us-west-2.amazonaws.com/testtracker --data "+data
         try:
             call(updateStatus, shell=True)
@@ -994,8 +985,6 @@ class CPDInstall(object):
         self.updateTemplateFile(installConfigFile,'${sshKey}',self.readFileContent("/root/.ssh/id_rsa.pub"))
         self.updateTemplateFile(installConfigFile,'${clustername}',self.ClusterName)
         self.updateTemplateFile(installConfigFile, '${FIPS}',self.EnableFips)
-        self.updateTemplateFile(installConfigFile, '${PrivateCluster}',self.PrivateCluster)
-        self.updateTemplateFile(installConfigFile, '${cluster-cidr}',self.ClusterNetworkCIDR)
         self.updateTemplateFile(installConfigFile, '${machine-cidr}', self.VPCCIDR)
         self.updateTemplateFile(autoScalerFile, '${az1}', self.zones[0])
         self.updateTemplateFile(healthcheckFile, '${az1}', self.zones[0])
@@ -1015,9 +1004,9 @@ class CPDInstall(object):
             self.updateTemplateFile(healthcheckFile, '${az3}', self.zones[2])
         
         TR.info(methodName,"Download Openshift Container Platform")
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/openshift-install", destPath="/ibm/openshift-install")
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/oc", destPath="/usr/bin/oc")
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/kubectl", destPath="/usr/bin/kubectl")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/openshift-install", destPath="/ibm/openshift-install")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/oc", destPath="/usr/bin/oc")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/kubectl", destPath="/usr/bin/kubectl")
         os.chmod("/usr/bin/oc", stat.S_IEXEC)
         os.chmod("/usr/bin/kubectl", stat.S_IEXEC)	
         TR.info(methodName,"Initiating installation of Openshift Container Platform")
@@ -1100,44 +1089,11 @@ class CPDInstall(object):
         create_registry = "oc create -f "+registry_mc
         create_crio_mc  = "oc create -f "+crio_mc
 
-        """
-        Addd logic to create openshift httpdpasswd and use it instead of default kubeadmin credentials
-        """
-
-        TR.info(methodName,"Creating htpasswd for openshift")
-        htpasswd_cmd = "htpasswd -c -B -b /tmp/.htpasswd admin "+self.password
-        htpass_secret_cmd = "oc create secret generic htpass-secret --from-file=htpasswd=/tmp/.htpasswd -n openshift-config"
-        create_OAuth_cmd = "oc apply -f /ibm/installDir/auth-htpasswd.yaml"
-        create_oc_policy_cmd = "oc adm policy add-cluster-role-to-user cluster-admin admin"
-        TR.info(methodName,"Creating htpasswd for openshift with command")
-        try:
-            htpasswd_retcode = check_output(['bash','-c', htpasswd_cmd]) 
-
-            TR.info(methodName,"Creating OC secret generic with  command %s"%htpass_secret_cmd)
-            secret_retcode = check_output(['bash','-c', htpass_secret_cmd])
-            TR.info(methodName,"Creating OAuth with  command %s"%create_OAuth_cmd)
-            oauth_retcode = check_output(['bash','-c', create_OAuth_cmd]) 
-            TR.info(methodName,"Creating OC Adm policy add cluster role to user with  command %s"%create_oc_policy_cmd)
-            oc_policy_retcode = check_output(['bash','-c', create_oc_policy_cmd])  
-
-        except CalledProcessError as e:
-            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-
-        TR.info(methodName,"Created htpasswd returned %s"%(htpasswd_retcode))
-        TR.info(methodName,"Created OC secret  with command %s returned %s"%(htpass_secret_cmd,secret_retcode))
-        TR.info(methodName,"Created OAuth with command %s returned %s"%(create_OAuth_cmd,oauth_retcode))
-        TR.info(methodName,"Created Cluster role to user with command %s returned %s"%(create_oc_policy_cmd,oc_policy_retcode))    
-
-        TR.info(methodName,"Created htpasswd for openshift")
-
-
-        TR.info(methodName,"Creating registry mc with command %s"%create_registry)
-
         TR.info(methodName,"Creating registry mc with command %s"%create_registry)
         try:
             reg_retcode = check_output(['bash','-c', create_registry]) 
-
             TR.info(methodName,"Creating crio mc with command %s"%create_crio_mc)
+            
             crio_retcode = check_output(['bash','-c', create_crio_mc]) 
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
@@ -1299,6 +1255,7 @@ class CPDInstall(object):
                 self.installOSWML = Utilities.toBoolean(self.OpenScale)
                 self.installCDE = Utilities.toBoolean(self.CDE)
                 self.installSpark= Utilities.toBoolean(self.Spark)
+                #self.EnableFips = Utilities.toBoolean(self.EnableFips)
 
                 if(self.installOSWML):
                     self.installWML=True
@@ -1307,7 +1264,6 @@ class CPDInstall(object):
                 storagestart = Utilities.currentTimeMillis()
                 if(self.StorageType=='OCS'):
                     self.configureOCS(icpdInstallLogFile)
-
                 elif(self.StorageType=='Portworx'):
                     TR.info(methodName,"PortworxSpec %s" %self.PortworxSpec)
                     spec = self.PortworxSpec.split('/',1)
@@ -1318,7 +1274,6 @@ class CPDInstall(object):
                     TR.info(methodName,"s3 cp cmd %s"%s3_cp_cmd)
                     call(s3_cp_cmd, shell=True,stdout=icpdInstallLogFile)
                     self.configurePx(icpdInstallLogFile)
-
                 elif(self.StorageType=='EFS'):
                     self.EFSDNSName = environ.get('EFSDNSName')
                     self.EFSID = environ.get('EFSID')   
@@ -1329,6 +1284,7 @@ class CPDInstall(object):
 
                 self.installCPD(icpdInstallLogFile)
                 self.validateInstall(icpdInstallLogFile)
+                self.manageUser(icpdInstallLogFile)
                 self.updateSecret(icpdInstallLogFile)
                 self.exportResults(self.stackName+"-OpenshiftURL", "https://"+self.openshiftURL, icpdInstallLogFile)
                 self.exportResults(self.stackName+"-CPDURL", "https://"+self.cpdURL, icpdInstallLogFile)
@@ -1357,13 +1313,13 @@ class CPDInstall(object):
             status = 'SUCCESS'
             TR.info(methodName,"SUCCESS END CPD Install AWS ICPD Quickstart.  Elapsed time (hh:mm:ss): %d:%02d:%02d" % (eth,etm,ets))
             # TODO update this later
-            # self.updateStatus(status)
+            self.updateStatus(status)
         else:
             success = 'false'
             status = 'FAILURE: Check logs in S3 log bucket or on the Boot node EC2 instance in /ibm/logs/icpd_install.log and /ibm/logs/post_install.log'
             TR.info(methodName,"FAILED END CPD Install AWS ICPD Quickstart.  Elapsed time (hh:mm:ss): %d:%02d:%02d" % (eth,etm,ets))
             # # TODO update this later
-           # self.updateStatus(status)
+            self.updateStatus(status)
            
         #endIf 
         try:

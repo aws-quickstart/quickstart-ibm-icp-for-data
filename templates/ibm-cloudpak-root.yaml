@@ -19,7 +19,6 @@ Metadata:
           - PublicSubnet2CIDR
           - PublicSubnet3CIDR
           - BootNodeAccessCIDR
-          - ClusterNetworkCIDR
       - Label:
           default: DNS configuration
         Parameters:
@@ -38,7 +37,6 @@ Metadata:
           - AdminPassword
           - ClusterName
           - EnableFips
-          - PrivateCluster
       - Label:
           default: Storage Configuration
         Parameters:   
@@ -97,8 +95,6 @@ Metadata:
         default: Quick Start S3 key prefix
       BootNodeAccessCIDR:
         default: Boot node external access CIDR
-      ClusterNetworkCIDR:
-        default: Cluster network CIDR
       VPCCIDR:
         default: VPC CIDR
       AdminPassword:
@@ -133,8 +129,6 @@ Metadata:
         default: Portworx spec file  
       EnableFips:
         default: Enable Fips
-      PrivateCluster:
-        default: Publish the user-facing endpoints of your cluster. 
       LicenseAgreement:
         default: License agreement
       WSL:
@@ -311,13 +305,6 @@ Parameters:
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
     Description: The CIDR IP range that is permitted to access boot node instance. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
     Type: String
-  ClusterNetworkCIDR:
-    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access Openshift Cluster Network. We recommend that you set this value to a trusted IP range. 
-    Type: String
-    Default: 10.128.0.0/14
-
   AdminPassword:
     Description: The password for the Cloud Pak for Data web client. The password must contain at least 8 characters, including letters (with a minimum of one capital letter), numbers, and symbols.
     Type: String
@@ -433,14 +420,6 @@ Parameters:
       - "True"
     Default: "False"
 
-  PrivateCluster:  
-    Description: To Deploy a Private cluster select Internal and External for Public cluster
-    Type: String
-    AllowedValues:
-      - "Internal"
-      - "External"
-    Default: "External"
-
   ICPDVersion:
     Description: The version of Cloud Pak for Data to be deployed. Currently only v3.0.1 is supported.
     Type: String
@@ -543,7 +522,6 @@ Resources:
           - !GetAtt 'VPCStack.Outputs.PublicSubnet3ID'
           - ""
         BootNodeAccessCIDR: !Ref 'BootNodeAccessCIDR'
-        ClusterNetworkCIDR: !Ref 'ClusterNetworkCIDR'
         QSS3BucketName: !Ref 'QSS3BucketName'
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
@@ -559,7 +537,6 @@ Resources:
         ClusterName: !Ref ClusterName
         StorageType: !Ref StorageType
         EnableFips: !Ref EnableFips
-        PrivateCluster: !Ref PrivateCluster
         PortworxSpec: !Ref PortworxSpec
         WKC: !Ref WKC
         WML: !Ref WML
@@ -585,4 +562,3 @@ Outputs:
   OpenshiftPassword:
     Description: OpenShift password secret.
     Value: !GetAtt 'CloudPakDataStack.Outputs.OpenshiftPassword'
-    
