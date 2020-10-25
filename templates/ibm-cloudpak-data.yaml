@@ -732,6 +732,7 @@ Resources:
                 AWS_REGION=${AWS::Region}
                 AWS_STACKID="${AWS::StackId}"
                 AWS_STACKNAME="${AWS::StackName}"
+         
             /root/.aws/config:
               content: !Sub |
                 [default]

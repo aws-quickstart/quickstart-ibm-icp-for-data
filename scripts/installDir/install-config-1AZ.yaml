@@ -46,3 +46,4 @@ pullSecret: '${pullSecret}'
 fips: ${FIPS}
 sshKey: |
   ${sshKey}
+  
