@@ -27,7 +27,6 @@ class CPDInstall(object):
     def __init__(self):
         """
         Constructor
-        
         NOTE: Some instance variable initialization happens in self._init() which is 
         invoked early in main() at some point after _getStackParameters().
         """
