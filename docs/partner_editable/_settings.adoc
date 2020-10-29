@@ -1,6 +1,6 @@
 // Do not change this first attribute. Do change the others.
 :quickstart-team-name: AWS Quick Start team
-:quickstart-project-name: quickstart-documentation-base
+:quickstart-project-name: quickstart-ibm-icp-for-data
 :partner-product-name: IBM Cloud Pak for Data
 // For the following attribute, if you have no short name, enter the same name as partner-product-name.
 :partner-product-short-name: Cloud Pak for Data

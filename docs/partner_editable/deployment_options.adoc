@@ -10,25 +10,25 @@ The Quick Start provides separate templates for these options. It also lets you 
 
 == Step 1. Sign up for a Red Hat subscription
 
-This Quick Start requires a Red Hat subscription. During the deployment of the Quick Start, provide your https://cloud.redhat.com/openshift/install/aws/installer-provisioned[OpenShift installer-provisioned infrastructure pull secret].
+This Quick Start requires a Red Hat subscription. During the deployment of the Quick Start, provide your https://cloud.redhat.com/openshift/install/aws/installer-provisioned[OpenShift installer-provisioned infrastructure pull secret^].
 
-If you don‚Äôt have a Red Hat account, you can register for one through the Red Hat website. (Registration may require a non-personal email address). To procure a 60-day evaluation license for OpenShift, follow the instructions at https://www.redhat.com/en/technologies/cloud-computing/openshift/try-it[Evaluate Red Hat OpenShift Container Platform].
+If you don‚Äôt have a Red Hat account, you can register for one through the Red Hat website. (Registration may require a non-personal email address). To procure a 60-day evaluation license for OpenShift, follow the instructions at https://www.redhat.com/en/technologies/cloud-computing/openshift/try-it[Evaluate Red Hat OpenShift Container Platform^].
 
-The https://cloud.redhat.com/openshift/install/aws/installer-provisioned[OpenShift pull secret] should be uploaded to an S3 bucket. The Quick Start pulls this secret file from the specified S3 bucket location to provision the cluster.
+The https://cloud.redhat.com/openshift/install/aws/installer-provisioned[OpenShift pull secret^] should be uploaded to an S3 bucket. The Quick Start pulls this secret file from the specified S3 bucket location to provision the cluster.
 
 [[step-2.-cloud-pak-for-data-subscription]]
-== Step 2. Cloud Pak for Data subscription
+== Step 2. {partner-product-short-name} subscription
 
-When you deploy the Quick Start, you can enable the production instance by entering the API key, which comes as part of the Cloud Pak for Data entitlement. If you don't have a paid entitlement, you can create a https://www.ibm.com/account/reg/us-en/signup?formid=urx-42212[60-day trial subscription key].
+When you deploy the Quick Start, you can enable the production instance by entering the API key, which comes as part of the {partner-product-short-name} entitlement. If you don't have a paid entitlement, you can create a https://www.ibm.com/account/reg/us-en/signup?formid=urx-42212[60-day trial subscription key^].
 
-*Note:* After 60 days, please contact https://www.ibm.com/account/reg/us-en/signup?formid=MAIL-cloud[IBM Cloud Pak for Data sales].
+*Note:* After 60 days, please contact https://www.ibm.com/account/reg/us-en/signup?formid=MAIL-cloud[IBM Cloud Pak for Data sales^].
 
 [[step-3.-storage-subscription]]
 == Step 3. Storage subscription
 
 You can choose one of three container-storage options for this Quick Start.
 
-* https://portworx.com/products/features/[Portworx]: When you choose Portworx as the persistent storage layer, you must specify your install spec from your https://central.portworx.com/specGen/list[Portworx account]. You can generate new spec using the https://central.portworx.com/specGen/wizard[spec generator]. Choose the edition you want, and then enter the values for the following fields.
+* https://portworx.com/products/features/[Portworx]: When you choose Portworx as the persistent storage layer, you must specify your install spec from your https://central.portworx.com/specGen/list[Portworx account]. You can generate new spec using the https://central.portworx.com/specGen/wizard[spec generator^]. Choose the edition you want, and then enter the values for the following fields.
 
 * Basic details:
 ** Kubernetes version: 1.16.2
@@ -52,5 +52,5 @@ Accept the Portworx license agreement terms and save the spec with a name. On th
 Upload this file to the S3 bucket, and share the value as input for the Portworx spec parameter.
 ____________________________________________________________________________________________________________________________________________________________
 
-* https://www.openshift.com/products/container-storage/[OCS]: The Red Hat OCS license is linked as a separate entitlement to your Red Hat subscription. If you do not have a separate subscription for OCS, a 60-day trial version is installed.
-* https://aws.amazon.com/efs/[Amazon EFS]: An EFS instance is provisioned in your account and Region when you choose this option.
+* https://www.openshift.com/products/container-storage/[OCS^]: The Red Hat OCS license is linked as a separate entitlement to your Red Hat subscription. If you do not have a separate subscription for OCS, a 60-day trial version is installed.
+* https://aws.amazon.com/efs/[Amazon EFS^]: An EFS instance is provisioned in your account and Region when you choose this option.

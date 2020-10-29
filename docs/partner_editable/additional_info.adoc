@@ -2,9 +2,9 @@
 //Should any sections not be applicable, remove them
 
 == Test the deployment
-When the AWS CloudFormation template successfully created the stack, all server nodes ran with the software installed in your AWS account. In the following steps, connect to Cloud Pak for Data web client to verify the deployment, and then use the web client to explore Cloud Pak for Data features.
+When the AWS CloudFormation template successfully created the stack, all server nodes ran with the software installed in your AWS account. In the following steps, connect to {partner-product-short-name} web client to verify the deployment, and then use the web client to explore {partner-product-short-name} features.
 
-1.  To access the Cloud Pak for Data web client, go to the *ICPDWebClientURL* output of the root stack. For a list of supported browsers, see 
+1.  To access the {partner-product-short-name} web client, go to the *ICPDWebClientURL* output of the root stack. For a list of supported browsers, see
 https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_current/cpd/plan/rhos-reqs.html#rhos-reqs__web[Supported web browsers].
 
 :xrefstyle: short
@@ -13,23 +13,23 @@ https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_current/cpd/p
 [link=images/image7.png]
 image::../images/image7.png[image,width=100%,height=100%]
 
-1.  A new tab opens in your browser. If you configured the hostname resolution for the cluster DNS name in the URL, you will see either the Cloud Pak for Data web client login page or a warning from your browser that the HTTPS connection is unsafe. By default, the public key infrastructure (PKI) certificate that is created for the Cloud Pak for Data cluster is self-signed, leading to the unsafe connection warning from your browser.
-2.  Log in to the Cloud Pak for Data web client by using the default administrator and the password you supplied when creating the stack.
+1.  A new tab opens in your browser. If you configured the hostname resolution for the cluster DNS name in the URL, you will see either the {partner-product-short-name} web client login page or a warning from your browser that the HTTPS connection is unsafe. By default, the public key infrastructure (PKI) certificate that is created for the {partner-product-short-name} cluster is self-signed, leading to the unsafe connection warning from your browser.
+2.  Log in to the {partner-product-short-name} web client by using the default administrator and the password you supplied when creating the stack.
 3.  Once you log in, the welcome page is displayed.
 
 :xrefstyle: short
 [#cpdwelcomepage]
-.Welcome page for Cloud Pak for Data web client
+.Welcome page for {partner-product-short-name} web client
 [link=images/image8.png]
 image::../images/image8.png[image,width=100%,height=100%]
 
-For resources on platform features and capabilities, see the https://docs-icpdata.mybluemix.net/home[Cloud Pak for Data product hub]. To understand its capabilities, see the https://docs-icpdata.mybluemix.net/resources[video tutorials].
+For resources on platform features and capabilities, see the https://docs-icpdata.mybluemix.net/home[{partner-product-short-name} product hub^]. To understand its capabilities, see the https://docs-icpdata.mybluemix.net/resources[video tutorials^].
 
 == Post deployment steps
 // If Post-deployment steps are required, add them here. If not, remove the heading
 
 Manage your cluster using the OpenShift Console
-To access the Cloud Pak for Data web client, go to the *OpenShiftUI* output of the root stack.
+To access the {partner-product-short-name} web client, go to the *OpenShiftUI* output of the root stack.
 
 The default OpenShift administrator name is *kubeadmin.* The password can be obtained from the OpenShiftSecret resource.
 
@@ -145,13 +145,13 @@ image::../images/image17.png[image,width=567,height=182]
 
 The cluster auto scaler can overrule scaling activity to maintain the required threshold.
 
-Cloud Pak for Data services
+{partner-product-short-name} services
 
-For more information about available services for Cloud Pak for Data, see https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_current/cpd/svc/services.html[IBM services in the catalog].
+For more information about available services for {partner-product-short-name}, see https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_current/cpd/svc/services.html[IBM services in the catalog^].
 
 :xrefstyle: short
 [#serviceCatalog]
-.Services catalog page in Cloud Pak for Data
+.Services catalog page in {partner-product-short-name}
 [link=images/image18.png]
 image::../images/image18.png[image,width=592,height=284]
 
@@ -193,7 +193,7 @@ $ ./cpd-linux adm -r ./repo.yaml -a <Service Name> -n <Project Name> --apply
 
 $ ./cpd-linux -c <Storage Class> -r ./repo.yaml -a lite -n <Project Name> --transfer-image-to $(oc get route -n openshift-image-registry | tail -1| awk '\{print $2}')/<Project Name> --target-registry-username $(oc whoami | sed 's/://g') --target-registry-password $( oc serviceaccounts get-token cpdtoken) --cluster-pull-prefix image-registry.openshift-image-registry.svc:5000/<Project Name> -o override.yaml --insecure-skip-tls-verify
 
-For information about other available services, see the https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_current/cpd/svc/services.html[Cloud Pak for Data Service Catalog].
+For information about other available services, see the https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_current/cpd/svc/services.html[{partner-product-short-name} Service Catalog^].
 
 
 
@@ -211,7 +211,7 @@ _Add any security-related information._
 //Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
 
 = Limitations
-* For the list of supported versions, see the Cloud Pak for Data version (ICPDVersion) parameter.
+* For the list of supported versions, see the {partner-product-short-name} version (ICPDVersion) parameter.
 * The only browsers supported are Google Chrome (version 60 or higher) and Mozilla Firefox (version 54 or higher).
-* Deploying a Cloud Pak for Data cluster with dedicated infrastructure nodes is not currently supported.
-* Review the https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_current/cpd/overview/known-issues.html[known issues and limitations] for Cloud Pak for Data.
+* Deploying a {partner-product-short-name} cluster with dedicated infrastructure nodes is not currently supported.
+* Review the https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_current/cpd/overview/known-issues.html[known issues and limitations^] for {partner-product-short-name}.
