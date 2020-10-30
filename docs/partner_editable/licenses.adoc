@@ -1,14 +1,6 @@
 // Include details about the license and how they can sign up. If no license is required, clarify that. 
 
-== Cost and licenses
+You can get started with a 60-day trial or use your existing {partner-product-short-name} entitlement. Additional costs depend on the storage type for your platform. You can choose among three storage classes: Amazon EFS, Portworx, or OCS. EFS costs are charged automatically to your AWS account. You have an option to use a Portworx trial version or an evaluation version of OCS. Visit https://portworx.com/products/features/[Portworx^] or https://www.openshift.com/products/container-storage/contact[OCS^] for licensed versions.
 
-You are responsible for the cost of the AWS services used while running this Quick Start reference deployment. There is no additional cost for using the Quick Start. The Quick Start deploys the Cloud Pak for Data environment by using an AWS CloudFormation template, which you can use to build a new VPC for your AWS cluster.
-
-The AWS CloudFormation template for this Quick Start includes configuration parameters that you can customize. Some of these settings, such as instance type, affect the cost of deployment. For cost estimates, see the pricing pages for each AWS service you use. Prices are subject to change.
-
-*Tip:* After you deploy the Quick Start, we recommend that you enable the https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html[AWS Cost and Usage Report] to track costs associated with the Quick Start. This report delivers billing metrics to an Amazon Simple Storage Service (Amazon S3) bucket in your account. It provides cost estimates based on usage throughout each month, and finalizes the data at the end of the month. For more information about the report, see the https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html[AWS documentation].
-
-You can get started with a 60-day trial or use your existing Cloud Pak for Data entitlement. Additional costs depend on the storage type for your platform. You can choose among three storage classes: Amazon EFS, Portworx, or OCS. EFS costs are charged automatically to your AWS account. You have an option to use a Portworx trial version or an evaluation version of OCS. Visit https://portworx.com/products/features/[Portworx] or https://www.openshift.com/products/container-storage/contact[OCS] for licensed versions.
-
-For Cloud Pak for Data pricing information, or to use your existing entitlements, contact your IBM sales representative at +1 (877) 426-3774. For more information about licensing terms, see the https://ibm.biz/BdqSw4[IBM License Agreement].
+For {partner-product-short-name} pricing information, or to use your existing entitlements, contact your IBM sales representative at +1 (877) 426-3774. For more information about licensing terms, see the https://ibm.biz/BdqSw4[IBM License Agreement^].
 
