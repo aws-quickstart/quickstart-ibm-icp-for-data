@@ -36,7 +36,7 @@ For more information, see https://docs.aws.amazon.com/AWSCloudFormation/latest/U
 * https://aws.amazon.com/documentation/vpc/[Amazon VPC^]
 * https://aws.amazon.com/documentation/cloudformation/[AWS CloudFormation^]
 
-*IBM Cloud Pak for Data documentation*
+*{partner-product-name} documentation*
 
 * https://www.ibm.com/support/knowledgecenter/en/SSQNUZ[IBM Knowledge Center^]
 * https://www.ibm.com/support/producthub/icpdata/resources[Product Hub^]
@@ -63,7 +63,7 @@ link:#scale-up-your-cluster-by-adding-compute-nodes[Scaling Nodes]
 |February 2020 |Updated license terms; added information about service options; updated license-activation information a|
 link:#cost-and-licenses[Cost and licenses]; link:#step-5.-launch-the-quick-start[Step 3];
 
-link:#cloud-pak-for-data-services[Cloud Pak for Data services]; link:#limitations[Activating your IBM Cloud Pak for Data license]
+link:#cloud-pak-for-data-services[{partner-product-name} services]; link:#limitations[Activating your {partner-product-name} license]
 
 |December 2019 a|
 Red Hat OpenShift support documentation
@@ -76,14 +76,14 @@ Added information about add-on options
 
 Version updates
 
-Added information about scaling up your cluster, and activating your IBM Cloud Pak for Data license
+Added information about scaling up your cluster, and activating your {partner-product-name} license
 
  a|
-link:#deployment-steps[Cloud Pak for Data add-on options] (removed in Dec. 2019)
+link:#deployment-steps[{partner-product-name} add-on options] (removed in Dec. 2019)
 
 link:#option-1-parameters-for-deploying-cloud-pak-for-data-into-a-new-vpc[Parameters for deploying Cloud; Pak for Data into a new VPC]
 
-link:#scale-up-your-cluster-by-adding-compute-nodes[Scaling up your cluster by adding compute nodes]; link:#limitations[Activating your IBM Cloud Pak for Data license]
+link:#scale-up-your-cluster-by-adding-compute-nodes[Scaling up your cluster by adding compute nodes]; link:#limitations[Activating your {partner-product-name} license]
 
 |March 2019 |Initial publication |
 |======================================================================================================================================================================

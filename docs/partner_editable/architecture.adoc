@@ -22,7 +22,7 @@ As shown in <<architecture1>>, the Quick Start sets up the following:
 * A Master Load Balancer, which spans the private subnets, for accessing the OCP compute nodes. This provides web-browser access to {partner-product-short-name}.
 * An Application Load Balancer, which spans the private subnets, for accessing the OCP compute nodes.
 * https://docs.openshift.com/container-platform/4.3/machine_management/applying-autoscaling.html[OpenShift auto scaling^] for the OCP compute nodes.
-* Amazon Route 53, as your public Domain Name System (DNS), for resolving domain names for the IBM Cloud Pak for Data management console.
+* Amazon Route 53, as your public Domain Name System (DNS), for resolving domain names for the {partner-product-name} management console.
 * Amazon S3 for storing the pull secret and deployment logs.
 
 *The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.

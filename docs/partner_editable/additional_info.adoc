@@ -56,7 +56,7 @@ After deployment, you only have access to the boot node. Provide the workstation
 
 This section describes the steps to modify the BootNodeSecurityGroup inbound rules.
 
-*Note:* These steps assume access to the AWS CloudFormation console for the IBM Cloud Pak for Data deployment.
+*Note:* These steps assume access to the AWS CloudFormation console for the {partner-product-name} deployment.
 
 *  In the list of stacks created viewing the nested stacks, choose the *CloudPakDataStack* stack.
 
