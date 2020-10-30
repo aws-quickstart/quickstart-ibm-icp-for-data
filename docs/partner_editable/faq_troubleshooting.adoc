@@ -4,7 +4,7 @@
 
 *Q.* I encountered a *CREATE_FAILED* error when I launched the Quick Start.
 
-*A.* If AWS CloudFormation fails to create the stack, we recommend that you relaunch the template with *Rollback on failure* set to *Disabled*. (This setting is under *Advanced* in the AWS CloudFormation console, *Options* page.) With this setting, the stack‚Äôs state is retained and the instance remains running, so you can troubleshoot the issue. (Look at the log files in %ProgramFiles%\Amazon\EC2ConfigService and C:\cfn\log.)
+*A.* If AWS CloudFormation fails to create the stack, we recommend that you relaunch the template with *Rollback on failure* set to *Disabled*. (This setting is under *Advanced* in the AWS CloudFormation console, *Options* page.) With this setting, the stack's state is retained and the instance remains running, so you can troubleshoot the issue. (Look at the log files in %ProgramFiles%\Amazon\EC2ConfigService and C:\cfn\log.)
 
 *Important:* When you set *Rollback on failure* to *Disabled*, you continue to incur AWS charges for this stack. Ensure to delete the stack when you finish troubleshooting.
 
@@ -42,49 +42,4 @@ For more information, see https://docs.aws.amazon.com/AWSCloudFormation/latest/U
 * https://www.ibm.com/support/producthub/icpdata/resources[Product Hub^]
 
 * https://docs.openshift.com/container-platform/3.11/architecture/index.html[Red Hat OpenShift Container Platform^]
-
-*Other Quick Start reference deployments*
-
-* https://aws.amazon.com/quickstart/[AWS Quick Start home page^]
-
-== Document revisions
-[cols=",,",options="header",]
-|======================================================================================================================================================================
-|Date |Change |In sections
-|June 2020 |OpenShift 4.3 support; updated license terms; storage support a|
-link:#cost-and-licenses[Cost and licenses]
-
-link:#architecture[Architecture]
-
-link:#deployment-steps[Steps For Deployment]
-
-link:#scale-up-your-cluster-by-adding-compute-nodes[Scaling Nodes]
-
-|February 2020 |Updated license terms; added information about service options; updated license-activation information a|
-link:#cost-and-licenses[Cost and licenses]; link:#step-5.-launch-the-quick-start[Step 3];
-
-link:#cloud-pak-for-data-services[{partner-product-name} services]; link:#limitations[Activating your {partner-product-name} license]
-
-|December 2019 a|
-Red Hat OpenShift support documentation
-
-Version updates
-
- |link:#architecture[Architecture]; link:#cost-and-licenses[Cost and licenses]; link:#deployment-steps[Deployment steps]
-|July 2019 a|
-Added information about add-on options
-
-Version updates
-
-Added information about scaling up your cluster, and activating your {partner-product-name} license
-
- a|
-link:#deployment-steps[{partner-product-name} add-on options] (removed in Dec. 2019)
-
-link:#option-1-parameters-for-deploying-cloud-pak-for-data-into-a-new-vpc[Parameters for deploying Cloud; Pak for Data into a new VPC]
-
-link:#scale-up-your-cluster-by-adding-compute-nodes[Scaling up your cluster by adding compute nodes]; link:#limitations[Activating your {partner-product-name} license]
-
-|March 2019 |Initial publication |
-|======================================================================================================================================================================
 

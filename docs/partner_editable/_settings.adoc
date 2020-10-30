@@ -21,6 +21,7 @@
 // for example, 1.25 hours, 2 hours, 2.5 hours.
 :deployment_time: 3 hours
 :default_deployment_region: us-east-2
+:template_ec2: true
 :parameters_as_appendix:
 // Uncomment the following two attributes if you are using an AWS Marketplace listing.
 // Additional content will be generated automatically based on these attributes.
