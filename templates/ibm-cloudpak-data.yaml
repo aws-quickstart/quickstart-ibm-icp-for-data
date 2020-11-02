@@ -732,7 +732,7 @@ Resources:
                 AWS_REGION=${AWS::Region}
                 AWS_STACKID="${AWS::StackId}"
                 AWS_STACKNAME="${AWS::StackName}"
-
+         
             /root/.aws/config:
               content: !Sub |
                 [default]
@@ -906,5 +906,4 @@ Outputs:
   
   OpenshiftPassword:
     Description: OpenShift password secret.
-    Value: !Ref OpenshiftSecret  
-  
+    Value: !Ref OpenshiftSecret 

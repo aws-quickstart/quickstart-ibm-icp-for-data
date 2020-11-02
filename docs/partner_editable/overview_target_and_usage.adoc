@@ -2,6 +2,6 @@
 // Identify your target audience and explain how/why they would use this Quick Start.
 //Avoid borrowing text from third-party websites (copying text from AWS service documentation is fine). Also, avoid marketing-speak, focusing instead on the technical aspect.
 
-This guide provides instructions for deploying the {partner-product-short-name} Quick Start reference architecture on the AWS Cloud.
+This Quick Start deployment guide provides step-by-step instructions for deploying the {partner-product-short-name} on a Red Hat OpenShift Container Platform 4.3 cluster on the AWS Cloud. With this Quick Start, you can automatically deploy a multimaster, production instance of {partner-product-short-name}.
 
-This Quick Start is for users who <target audience and usage scenario>
+This Quick Start is for enterprise users to connect, catalog, govern, transform, and analyze data, regardless of location. {partner-product-short-name} includes an enterprise data catalog that helps to create a cohesive information architecture.

@@ -27,7 +27,6 @@ class CPDInstall(object):
     def __init__(self):
         """
         Constructor
-
         NOTE: Some instance variable initialization happens in self._init() which is 
         invoked early in main() at some point after _getStackParameters().
         """
@@ -40,16 +39,12 @@ class CPDInstall(object):
         """
         Return the value from the args dictionary that may be specified with any of the
         argument names in the list of synonyms.
-
         The synonyms argument may be a Jython list of strings or it may be a string representation
         of a list of names with a comma or space separating each name.
-
         The args is a dictionary with the keyword value pairs that are the arguments
         that may have one of the names in the synonyms list.
-
         If the args dictionary does not include the option that may be named by any
         of the given synonyms then the given default value is returned.
-
         NOTE: This method has to be careful to make explicit checks for value being None
         rather than something that is just logically false.  If value gets assigned 0 from
         the get on the args (command line args) dictionary, that appears as false in a
@@ -79,11 +74,9 @@ class CPDInstall(object):
     def _configureTraceAndLogging(self,traceArgs):
         """
         Return a tuple with the trace spec and logFile if trace is set based on given traceArgs.
-
         traceArgs is a dictionary with the trace configuration specified.
             loglevel|trace <tracespec>
             logfile|logFile <pathname>
-
         If trace is specified in the trace arguments then set up the trace.
         If a log file is specified, then set up the log file as well.
         If trace is specified and no log file is specified, then the log file is
@@ -159,7 +152,6 @@ class CPDInstall(object):
         creates a OC project with user defined name
         Downloads binary file from S3 and extracts it to /ibm folder
         installs user selected services using transfer method
-
         """
 
         methodName = "installCPD"

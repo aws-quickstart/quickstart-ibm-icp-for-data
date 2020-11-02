@@ -1,13 +1,41 @@
-// If no preperation is required, remove all content from here
+==== Sign up for a Red Hat subscription
 
-==== Prepare your AWS account
+This Quick Start requires a Red Hat subscription. During the deployment of the Quick Start, provide your https://cloud.redhat.com/openshift/install/aws/installer-provisioned[OpenShift installer-provisioned infrastructure pull secret^].
 
-_Describe any setup required in the AWS account prior to template launch_
+If you don't have a Red Hat account, you can register for one through the Red Hat website. (Registration may require a non-personal email address). To procure a 60-day evaluation license for OpenShift, follow the instructions at https://www.redhat.com/en/technologies/cloud-computing/openshift/try-it[Evaluate Red Hat OpenShift Container Platform^].
 
-==== Prepare your {partner-company-name} account
+The https://cloud.redhat.com/openshift/install/aws/installer-provisioned[OpenShift pull secret^] should be uploaded to an S3 bucket. The Quick Start pulls this secret file from the specified S3 bucket location to provision the cluster.
 
-_Describe any setup required in the partner portal/account prior to template launch_
+==== {partner-product-short-name} subscription
 
-==== Prepare for the deployment
+When you deploy the Quick Start, you can enable the production instance by entering the API key, which comes as part of the {partner-product-short-name} entitlement. If you don't have a paid entitlement, you can create a https://www.ibm.com/account/reg/us-en/signup?formid=urx-42212[60-day trial subscription key^].
 
-_Describe any preparation required to complete the product build, such as obtaining licenses or placing files in S3_
+*Note:* After 60 days, please contact https://www.ibm.com/account/reg/us-en/signup?formid=MAIL-cloud[IBM Cloud Pak for Data sales^].
+
+==== Storage subscription
+
+You can choose one of three container-storage options for this Quick Start.
+
+* https://portworx.com/products/features/[Portworx^]: When you choose Portworx as the persistent storage layer, you must specify your install spec from your https://central.portworx.com/specGen/list[Portworx account^]. You can generate new spec using the https://central.portworx.com/specGen/wizard[spec generator^]. Choose the edition you want, and then enter the values for the following fields.
+** Basic details:
+*** Kubernetes version: 1.16.2
+*** Portworx version: 2.5
+*** ETCD: BuiltIn
+** Storage details:
+*** Environment: Cloud/AWS
+*** Choose type of disk: ‚ÄúCreate using a spec‚Äù
+*** Leave the disk type and size as defaults
+*** Add additional disk for storage (500 GB recommended per node)
+** Network details:
+*** Data network interface: auto
+*** Management network interface: auto
+** Customize details:
+*** OpenShift version: 4.x
+*** Enable CSI in *Advanced Settings*.
++
+Accept the Portworx license agreement terms and save the spec with a name. On the *Spec list* page, choose the spec you created, and then choose *Download*.
++
+Upload this file to the S3 bucket, and share the value as input for the Portworx spec parameter.
++
+* https://www.openshift.com/products/container-storage/[OCS^]: The Red Hat OCS license is linked as a separate entitlement to your Red Hat subscription. If you do not have a separate subscription for OCS, a 60-day trial version is installed.
+* https://aws.amazon.com/efs/[Amazon EFS^]: An EFS instance is provisioned in your account and Region when you choose this option.
