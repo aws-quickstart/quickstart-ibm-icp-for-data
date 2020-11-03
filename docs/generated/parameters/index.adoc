@@ -1,1 +1,6 @@
-// placeholder
+
+=== Parameters for deploying into a new VPC
+include::ibm-cloudpak-root.template.adoc[]
+
+=== Parameters for deploying into an existing VPC
+include::ibm-cloudpak-data.template.adoc[]

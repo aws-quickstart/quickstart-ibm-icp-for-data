@@ -1,0 +1,81 @@
+
+.VPC network configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Number of Availability Zones
+(`NumberOfAZs`)|`3`|The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to 2 Availability Zones.  For a single ICPD cluster to be highly available, 3 Availability Zones are needed to avoid a single point of failure when using 3, 5 or 7 master nodes.  With less than 3 Availability Zones, one of the AZs will have more master nodes.|Availability Zones
+(`AvailabilityZones`)|`**__Requires input__**`|The list of Availability Zones to use for the subnets in the VPC. The Quick Start uses one or three Availability Zones and preserves the logical order you specify.|VPC CIDR
+(`VPCCIDR`)|`10.0.0.0/16`|CIDR block for the VPC|Private subnet 1 CIDR
+(`PrivateSubnet1CIDR`)|`10.0.0.0/19`|The CIDR block for the private subnet located in Availability Zone 1.|Private subnet 2 CIDR
+(`PrivateSubnet2CIDR`)|`10.0.32.0/19`|The CIDR block for the private subnet located in Availability Zone 2.|Private subnet 3 CIDR
+(`PrivateSubnet3CIDR`)|`10.0.64.0/19`|The CIDR block for the private subnet located in Availability Zone 3.|Public subnet 1 CIDR
+(`PublicSubnet1CIDR`)|`10.0.128.0/20`|The CIDR block for the public subnet located in Availability Zone 1.|Public subnet 2 CIDR
+(`PublicSubnet2CIDR`)|`10.0.144.0/20`|The CIDR block for the public subnet located in Availability Zone 2.|Public subnet 3 CIDR
+(`PublicSubnet3CIDR`)|`10.0.160.0/20`|The CIDR block for the public subnet located in Availability Zone 3.|Boot node external access CIDR
+(`BootNodeAccessCIDR`)|`**__Requires input__**`|The CIDR IP range that is permitted to access boot node instance. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
+|===
+.DNS configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Domain name
+(`DomainName`)|`**__Requires input__**`|Amazon Route 53 base domain configured for your OpenShift Container Platform cluster. Name must consist of lower case alphanumeric characters and must start and end with an alphanumeric character.
+|===
+.Amazon EC2 configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Key pair name
+(`KeyPairName`)|`**__Requires input__**`|The name of an existing public/private key pair, which allows you to securely connect to your instance after it launches.
+|===
+.OpenShift hosts configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Number of master nodes
+(`NumberOfMaster`)|`3`|The desired capacity for the OpenShift master instances. Must be an odd number. For a development deployment, 1 is sufficient; for production deployments, a minimum of 3 is required.|Number of compute nodes
+(`NumberOfCompute`)|`3`|The desired capacity for the OpenShift compute instances. Minimum of 3 nodes required. If the number of compute instances exceeds your Red Hat entitlement limits or AWS instance limits, the stack will fail. Choose a number that is within your limits.|Master instance type
+(`MasterInstanceType`)|`m5.xlarge`|The EC2 instance type for the OpenShift master instances.|Compute instance type
+(`ComputeInstanceType`)|`m5.4xlarge`|The EC2 instance type for the OpenShift compute instances.|Cloud Pak for Data UI password
+(`AdminPassword`)|`**__Requires input__**`|The password for the Cloud Pak for Data web client. The password must contain at least 8 characters, including letters (with a minimum of one capital letter), numbers, and symbols.|Cluster name
+(`ClusterName`)|`**__Requires input__**`|Custom cluster name for kubernetes.io/cluster/tags.|Enable Fips
+(`EnableFips`)|`False`|Enable Fips for Openshift
+|===
+.Storage Configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Cluster storage type
+(`StorageType`)|`OCS`|Select either EFS, Portworx or Openshift Container Storage as default Storage class.|Portworx spec file
+(`PortworxSpec`)|`**__Blank string__**`|Update this value if Storage type selected is Portworx. S3 path of Portworx Spec (e.g., s3://my-bucket/path/to/portworxspec.yaml).|Number of OCS nodes
+(`NumberOfOCS`)|`3`|Update this value if Storage type selected is OCS. The desired capacity for the OpenShift container storage instances.  Minimum of 3 is required.|OCS instance type
+(`OCSInstanceType`)|`m4.4xlarge`|Update this value if Storage type selected is OCS. The EC2 instance type for the OpenShift Container Storage instances.
+|===
+.Red Hat subscription information
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Red Hat pull secret
+(`RedhatPullSecret`)|`**__Requires input__**`|S3 path of OpenShift Installer Provisioned Infrastructure pull secret(e.g., s3://my-bucket/path/to/pull-secret).
+|===
+.IBM Cloud Pak for Data configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|License agreement
+(`LicenseAgreement`)|`-`|I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/BdqyB2).|IBM Cloud Pak for Data version
+(`ICPDVersion`)|`3.0.1`|The version of Cloud Pak for Data to be deployed. Currently only v3.0.1 is supported.|IBM Cloud Pak for Data API user name
+(`APIUsername`)|`cp`|The IBM Cloud Pak for Data user name to access IBM Container Registry.|IBM Cloud Pak for Data API key
+(`APIKey`)|`**__Requires input__**`|The IBM Cloud Pak for Data API key to access IBM Container Registry.|OpenShift project
+(`Namespace`)|`zen`|The OpenShift project that will be created for deploying Cloud Pak for Data. It can be any lowercase string.|Output S3 bucket name
+(`ICPDDeploymentLogsBucketName`)|`**__Requires input__**`|The name of the S3 bucket where IBM Cloud Pak for Data deployment logs are to be exported. The deployment logs provide a record of the boot strap scripting actions and are useful for problem determination if the deployment fails in some way.|Watson Knowledge Catalog service
+(`WKC`)|`False`|Choose True to install the Watson Knowledge Catalog service.|Watson Machine Learning service
+(`WML`)|`False`|Choose True to install the Watson Machine Learning service.|Data Virtualization service
+(`DV`)|`False`|Choose True to install the Data Virtualization service.|Watson Studio service
+(`WSL`)|`False`|Choose True to install the Watson Studio service.|Watson OpenScale and Watson Machine Learning services
+(`OpenScale`)|`False`|Choose True to install the Watson OpenScale and Watson Machine Learning services.|Analytics Engine powered by Apache Spark service
+(`Spark`)|`False`|Choose True to install the Analytics Engine powered by Apache Spark service.|Cognos Dashboard service
+(`CDE`)|`False`|Choose True to install the Cognos Dashboard Engine service.
+|===
+.AWS Quick Start configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Quick Start S3 bucket name
+(`QSS3BucketName`)|`aws-quickstart`|S3 bucket name for the Quick Start assets. This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|Quick Start S3 bucket region
+(`QSS3BucketRegion`)|`us-east-1`|The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.|Quick Start S3 key prefix
+(`QSS3KeyPrefix`)|`quickstart-ibm-icp-for-data/`|S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
+|===

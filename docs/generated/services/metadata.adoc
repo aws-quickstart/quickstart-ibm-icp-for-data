@@ -1,1 +1,21 @@
-// placeholder
+
+:template_aws_cloudformation_stack:
+:template_aws_cloudformation_waitcondition:
+:template_aws_cloudformation_waitconditionhandle:
+:template_aws_ec2_instance:
+:template_aws_ec2_securitygroup:
+:template_aws_iam_accesskey:
+:template_aws_iam_instanceprofile:
+:template_aws_iam_role:
+:template_aws_iam_user:
+:template_aws_lambda_function:
+:template_aws_secretsmanager_secret:
+:template_aws_ssm_parameter:
+:template_cleanup:
+:template_cloudformation:
+:template_custom_cleanup:
+:template_ec2:
+:template_iam:
+:template_lambda:
+:template_secretsmanager:
+:template_ssm:
