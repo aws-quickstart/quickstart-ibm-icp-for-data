@@ -50,34 +50,34 @@ tests:
     regions:  
     - ca-central-1
     s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml
+    template: templates/ibm-cloudpak-root.template.yaml
 
-  1AZ-wml-px:
-    parameters:
-      WML: 'True'
-      NumberOfAZs: '1'
-      AvailabilityZones: $[taskcat_genaz_1]
-      VPCCIDR: 10.0.0.0/16
-      ComputeInstanceType: r5.4xlarge
-      LicenseAgreement: I agree
-      ClusterName: $[taskcat_random-string]
-      StorageType: Portworx
-      Namespace: zenpx
-      ICPDDeploymentLogsBucketName: override
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
-      DomainName: override
-      AdminPassword: override
-      APIKey: override
-      APIUsername: override
-      KeyPairName: override
-      BootNodeAccessCIDR: override
-      RedhatPullSecret: override
-      PortworxSpec: override
-    regions:  
-    - ap-south-1
-    s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml
+#  1AZ-wml-px:
+#    parameters:
+#      WML: 'True'
+#      NumberOfAZs: '1'
+#      AvailabilityZones: $[taskcat_genaz_1]
+#      VPCCIDR: 10.0.0.0/16
+#      ComputeInstanceType: r5.4xlarge
+#      LicenseAgreement: I agree
+#      ClusterName: $[taskcat_random-string]
+#      StorageType: Portworx
+#      Namespace: zenpx
+#      ICPDDeploymentLogsBucketName: override
+#      QSS3BucketName: $[taskcat_autobucket]
+#      QSS3BucketRegion: $[taskcat_current_region]
+#      DomainName: override
+#      AdminPassword: override
+#      APIKey: override
+#      APIUsername: override
+#      KeyPairName: override
+#      BootNodeAccessCIDR: override
+#      RedhatPullSecret: override
+#      PortworxSpec: override
+#    regions:  
+#    - ap-south-1
+#    s3_bucket: ''
+#    template: templates/ibm-cloudpak-root.template.yaml
 
 #  3AZ-os-ocs:
 #    parameters:
@@ -101,7 +101,7 @@ tests:
 #    regions:
 #    - ap-southeast-1
 #    s3_bucket: ''
-#    template: templates/ibm-cloudpak-root.yaml
+#    template: templates/ibm-cloudpak-root.template.yaml
 
   3AZ-wml-dv-px:
     parameters:
@@ -130,7 +130,7 @@ tests:
     regions:  
     - ap-northeast-2
     s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml   
+    template: templates/ibm-cloudpak-root.template.yaml
 
   3AZ-wkc-px:
     parameters:
@@ -157,7 +157,7 @@ tests:
     regions:  
     - eu-west-3
     s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml 
+    template: templates/ibm-cloudpak-root.template.yaml
 
   3AZ-dv-cde-spark-efs:
     parameters:
@@ -186,7 +186,7 @@ tests:
     regions:  
     - eu-west-2
     s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml 
+    template: templates/ibm-cloudpak-root.template.yaml
 
 #  3AZ-wkc-wsl-efs:
 #    parameters:
@@ -211,7 +211,7 @@ tests:
 #    regions:
 #    - eu-west-1
 #    s3_bucket: ''
-#    template: templates/ibm-cloudpak-root.yaml
+#    template: templates/ibm-cloudpak-root.template.yaml
 
 #  1AZ-wsl-os-ocs:
 #    parameters:
@@ -239,7 +239,7 @@ tests:
 #    regions:
 #    - us-west-1
 #    s3_bucket: ''
-#    template: templates/ibm-cloudpak-root.yaml
+#    template: templates/ibm-cloudpak-root.template.yaml
 
   3AZ-wkc-spark-efs:
     parameters:
@@ -266,7 +266,7 @@ tests:
     regions:  
     - us-west-2
     s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml
+    template: templates/ibm-cloudpak-root.template.yaml
 
   3AZ-wkc-dv-px:
     parameters:
@@ -293,7 +293,7 @@ tests:
     regions:  
     - us-east-2
     s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml
+    template: templates/ibm-cloudpak-root.template.yaml
 
   3AZ-wkc-cde-ocs:
     parameters:
@@ -320,7 +320,7 @@ tests:
     regions:  
     - us-east-1
     s3_bucket: ''
-    template: templates/ibm-cloudpak-root.yaml
+    template: templates/ibm-cloudpak-root.template.yaml
 
 
               
