@@ -12,7 +12,7 @@ Get a quick, interactive tutorial on {partner-product-short-name} by test-drivin
 
 This reference deployment provides AWS CloudFormation templates to deploy {partner-product-short-name} on a new OpenShift cluster. This cluster includes:
 
-* A Red Hat OpenShift Container Platform cluster created in a new or existing VPC on Red Hat CoreOS (RHCOS) instances, using the https://docs.openshift.com/container-platform/4.3/installing/installing_aws/installing-aws-customizations.html[Red Hat OpenShift installer provisioned infrastructure^]. See the https://docs.openshift.com/container-platform/4.3/architecture/architecture-installation.html[OpenShift Container Platform installation overview^] for details about the underlying OpenShift deployment architecture.
+* A Red Hat OpenShift Container Platform cluster created in a new or existing VPC on Red Hat CoreOS (RHCOS) instances, using the https://docs.openshift.com/container-platform/4.5/installing/installing_aws/installing-aws-customizations.html[Red Hat OpenShift installer provisioned infrastructure^]. See the https://docs.openshift.com/container-platform/4.5/architecture/architecture-installation.html[OpenShift Container Platform installation overview^] for details about the underlying OpenShift deployment architecture.
 * A highly available storage infrastructure with Portworx, Amazon EFS, or Red Hat OpenShift Container Storage (OCS).
 * Scalable OpenShift compute nodes running {partner-product-short-name} services.
 
