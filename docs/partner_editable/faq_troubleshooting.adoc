@@ -4,18 +4,42 @@
 
 *Q.* I encountered a *CREATE_FAILED* error when I launched the Quick Start.
 
-*A.* If AWS CloudFormation fails to create the stack, we recommend that you relaunch the template with *Rollback on failure* set to *Disabled*. (This setting is under *Advanced* in the AWS CloudFormation console, *Options* page.) With this setting, the stack’s state is retained and the instance is left running, so you can troubleshoot the issue. (For Windows, look at the log files in %ProgramFiles%\Amazon\EC2ConfigService and C:\cfn\log.)
-// If you’re deploying on Linux instances, provide the location for log files on Linux, or omit this sentence.
+*A.* If AWS CloudFormation fails to create the stack, we recommend that you relaunch the template with *Rollback on failure* set to *Disabled*. (This setting is under *Advanced* in the AWS CloudFormation console, *Options* page.) With this setting, the stack's state is retained and the instance remains running, so you can troubleshoot the issue. (Look at the log files in %ProgramFiles%\Amazon\EC2ConfigService and C:\cfn\log.)
 
-WARNING: When you set *Rollback on failure* to *Disabled*, you continue to incur AWS charges for this stack. Delete the stack when you finish troubleshooting.
+*Important:* When you set *Rollback on failure* to *Disabled*, you continue to incur AWS charges for this stack. Ensure to delete the stack when you finish troubleshooting.
 
-For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html[Troubleshooting AWS CloudFormation^] on the AWS website.
+For more information, see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html[Troubleshooting AWS CloudFormation^].
 
 *Q.* I encountered a size limitation error when I deployed the AWS CloudFormation templates.
 
-*A.* We recommend that you launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template size limitations. For more information, see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html[AWS CloudFormation quotas] on the AWS website.
+*A.* We recommend that you launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a non-S3 location, you might encounter template size limitations when you create the stack. For more information about AWS CloudFormation limits, see the http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html[AWS documentation^].
 
+*Q.* I am not able to delete the stack that I created from the Quick Start.
 
-== Troubleshooting
+*A.* We recommend that you clean up the registry bucket in your S3 account and retry deleting the stack.
 
-<Steps for troubleshooting the deployment go here.>
+== Additional resources
+
+*AWS resources*
+
+* https://aws.amazon.com/getting-started/[Getting Started Resource Center^]
+* https://docs.aws.amazon.com/general/latest/gr/[AWS General Reference^]
+* https://docs.aws.amazon.com/general/latest/gr/glos-chap.html[AWS Glossary^]
+
+*AWS services*
+
+* https://aws.amazon.com/documentation/ec2/[Amazon EC2^]
+* https://docs.aws.amazon.com/efs/[Amazon EFS^]
+* https://docs.aws.amazon.com/efs/latest/ug/efs-backup-solutions.html[AWS Backup^]
+* https://docs.aws.amazon.com/route53/[Amazon Route 53^]
+* https://docs.aws.amazon.com/s3/[Amazon S3^]
+* https://aws.amazon.com/documentation/vpc/[Amazon VPC^]
+* https://aws.amazon.com/documentation/cloudformation/[AWS CloudFormation^]
+
+*{partner-product-name} documentation*
+
+* https://www.ibm.com/support/knowledgecenter/en/SSQNUZ[IBM Knowledge Center^]
+* https://www.ibm.com/support/producthub/icpdata/resources[Product Hub^]
+
+* https://docs.openshift.com/container-platform/3.11/architecture/index.html[Red Hat OpenShift Container Platform^]
+

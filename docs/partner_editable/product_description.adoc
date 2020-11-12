@@ -2,4 +2,19 @@
 // Briefly describe the software. Use consistent and clear branding. 
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
 
-<Describe how the software works on AWS.>
+{partner-product-short-name} is an analytics platform that helps prepare data for artificial intelligence (AI). It enables data engineers, data stewards, data scientists, and business analysts to collaborate using an integrated multicloud platform.
+
+{partner-product-short-name} uses IBM's deep analytics portfolio to help organizations meet data and analytics challenges. The required building blocks (collect, organize, analyze, infuse) for information architecture are available using {partner-product-short-name} on AWS.
+
+Get a quick, interactive tutorial on {partner-product-short-name} by test-driving key features within https://www.ibm.com/account/reg/us-en/signup?formid=urx-34120[Cloud Pak Experiences^], which requires no installation or deployment to get started. To get the most out of your experience, spend a few minutes exploring the use case outlined in Experiences. By building foundational knowledge of the product, you can accelerate customizations before setting up your instance of {partner-product-short-name}.
+
+{partner-product-short-name} can use AWS services and features, including virtual private clouds (VPCs), Availability Zones, security groups, Amazon Elastic Block Store (Amazon EBS), Amazon Elastic File System (Amazon EFS), and Elastic Load Balancing to build a reliable and scalable cloud platform.
+
+This reference deployment provides AWS CloudFormation templates to deploy {partner-product-short-name} on a new OpenShift cluster. This cluster includes:
+
+* A Red Hat OpenShift Container Platform cluster created in a new or existing VPC on Red Hat CoreOS (RHCOS) instances, using the https://docs.openshift.com/container-platform/4.3/installing/installing_aws/installing-aws-customizations.html[Red Hat OpenShift installer provisioned infrastructure^]. See the https://docs.openshift.com/container-platform/4.3/architecture/architecture-installation.html[OpenShift Container Platform installation overview^] for details about the underlying OpenShift deployment architecture.
+* A highly available storage infrastructure with Portworx, Amazon EFS, or Red Hat OpenShift Container Storage (OCS).
+* Scalable OpenShift compute nodes running {partner-product-short-name} services.
+
+For more information about {partner-product-short-name}, see https://www.ibm.com/support/knowledgecenter/en/SSQNUZ/[IBM Cloud Pak for Data^].
+

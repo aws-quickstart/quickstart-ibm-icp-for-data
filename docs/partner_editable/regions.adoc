@@ -1,6 +1,3 @@
-This Quick Start supports the following Regions:
-
-* us-east-1, US East (N. Virginia) (EXAMPLE)
-* us-east-2, US East (Ohio) (EXAMPLE)
+This deployment includes 3 Availability Zones, which isn’t currently supported in all AWS Regions. For a current list of supported Regions, see https://aws.amazon.com/about-aws/global-infrastructure/regions_az/[Regions and Availability Zones^] in the AWS documentation.
 
 //Full list: https://docs.aws.amazon.com/general/latest/gr/rande.html

@@ -6,22 +6,30 @@ AWS Cloud.
 :xrefstyle: short
 [#architecture1]
 .Quick Start architecture for {partner-product-short-name} on AWS
-image::../images/architecture_diagram.png[Architecture,width=100%,height=100%]
+image::../images/image1.png[Architecture,width=100%,height=100%]
 
 As shown in <<architecture1>>, the Quick Start sets up the following:
 
-* A highly available architecture that spans two Availability Zones.*
-* A VPC configured with public and private subnets, according to AWS
-best practices, to provide you with your own virtual network on AWS.*
+* A highly available architecture that spans one or three Availability Zones.*
+* A VPC configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.*
 * In the public subnets:
-** Managed network address translation (NAT) gateways to allow outbound
-internet access for resources in the private subnets.*
-** A Linux bastion host in an Auto Scaling group to allow inbound Secure
-Shell (SSH) access to EC2 instances in public and private subnets.*
+** A boot node Amazon Elastic Compute Cloud (Amazon EC2) instance that also serves as a bastion host to allow inbound Secure Shell (SSH) access to EC2 instances in the private subnets.
+** Managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.*
 * In the private subnets:
-** <item>.
-** <item>.
-// Add bullet points for any additional components that are included in the deployment. Make sure that the additional components are also represented in the architecture diagram. End each bullet with a period.
-* <describe any additional components>.
+** OpenShift Container Platform (OCP) master nodes in up to three Availability Zones.
+** OCP compute nodes that combine services by {partner-product-short-name} (Collect, Organize, and Analyze).
+** For container-persistent data, Elastic Block Store disks that are mounted on the compute nodes.
+* A Master Load Balancer, which spans the private subnets, for accessing the OCP compute nodes. This provides web-browser access to {partner-product-short-name}.
+* An Application Load Balancer, which spans the private subnets, for accessing the OCP compute nodes.
+* https://docs.openshift.com/container-platform/4.3/machine_management/applying-autoscaling.html[OpenShift auto scaling^] for the OCP compute nodes.
+* Amazon Route 53, as your public Domain Name System (DNS), for resolving domain names for the {partner-product-name} management console.
+* Amazon S3 for storing the pull secret and deployment logs.
 
-[.small]#*The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#
+*The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.
+
+{partner-product-short-name} microservices are preconfigured on compute nodes. The following diagram shows the platform architecture.
+
+:xrefstyle: short
+[#cpdservices]
+.{partner-product-short-name} services
+image::../images/image2.png[Architecture,width=100%,height=100%]

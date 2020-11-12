@@ -103,7 +103,6 @@ tests:
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.template.yaml
 
-
   3AZ-cde-private-efs:
     parameters:
       CDE: 'True'

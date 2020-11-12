@@ -8,7 +8,6 @@ echo $SCRIPT
 source ${P}
 qs_enable_epel &> /var/log/userdata.qs_enable_epel.log
 yum -y install jq
-yum install -y httpd-tools
 qs_retry_command 10 pip install boto3 &> /var/log/userdata.boto3_install.log
 
 

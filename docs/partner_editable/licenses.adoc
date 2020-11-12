@@ -1,13 +1,6 @@
 // Include details about the license and how they can sign up. If no license is required, clarify that. 
 
-These two paragraphs provide an example of the details you can provide. Provide links as appropriate.
+You can get started with a 60-day trial or use your existing {partner-product-short-name} entitlement. Additional costs depend on the storage type for your platform. You can choose among three storage classes: Amazon EFS, Portworx, or OCS. EFS costs are charged automatically to your AWS account. You have an option to use a Portworx trial version or an evaluation version of OCS. Visit https://portworx.com/products/features/[Portworx^] or https://www.openshift.com/products/container-storage/contact[OCS^] for licensed versions.
 
+For {partner-product-short-name} pricing information, or to use your existing entitlements, contact your IBM sales representative at +1 (877) 426-3774. For more information about licensing terms, see the https://ibm.biz/BdqSw4[IBM License Agreement^].
 
-Example content below:
-
-_<license information>This Quick Start requires a license for {partner-product-short-name}. To use the Quick Start in your production environment, sign up for a license at <link>. When you launch the Quick Start, place the license key in an S3 bucket and specify its location._
-
-_If you don’t have a license, the Quick Start deploys with a trial license. The trial license gives you <n> days of free usage in a non-production environment. After this time, you can upgrade to a production license by following the instructions at <link>._
-
-// Or, if the deployment uses an AMI, update this paragraph. If it doesn’t, remove the paragraph.
-_<AMI information>The Quick Start requires a subscription to the Amazon Machine Image (AMI) for {partner-product-short-name}, which is available from https://aws.amazon.com/marketplace/[AWS Marketplace^]. Additional pricing, terms, and conditions may apply. For instructions, see link:#step-2.-subscribe-to-the-software-ami[step 2] in the deployment section._
