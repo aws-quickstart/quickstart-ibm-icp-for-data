@@ -388,9 +388,9 @@ Parameters:
     Type: String
   NumberOfMaster:
     Default: '3'
-    Description: The desired capacity for the OpenShift master instances. Must be an odd number. For a development deployment, 1 is sufficient; for production deployments, a minimum of 3 is required.
+    Description: The desired capacity for the OpenShift master instances. Must be an odd number. A minimum of 3 is required.
     Type: String
-    AllowedPattern: '^[13579]$|(^[1-9]+[13579]$)'
+    AllowedPattern: '^[3579]$|(^[3-9]+[3579]$)'
   NumberOfOCS:
     Default: '3'
     Description: Update this value if Storage type selected is OCS. The desired capacity for the OpenShift container storage instances.  Minimum of 3 is required.
@@ -483,11 +483,11 @@ Resources:
       TemplateURL: !If
           - 3AZCondition
           - !Sub
-            - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template
+            - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template.yaml
             - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
           - !Sub
-            - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/aws-vpc.yaml
+            - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/aws-vpc.template.yaml
             - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
               S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion] 
       Parameters:
@@ -511,7 +511,7 @@ Resources:
     Properties:
       TemplateURL: !Sub 
         - >- 
-          https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/ibm-cloudpak-data.yaml
+          https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/ibm-cloudpak-data.template.yaml
         - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
           S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
       Parameters:
