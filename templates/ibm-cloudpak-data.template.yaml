@@ -143,8 +143,7 @@ Metadata:
       EnableFips: 
         default: Enable Fips
       PrivateCluster:
-        default: Publish the user-facing endpoints of your cluster.    
-        default: Enable Fips  
+        default: Publish the user-facing endpoints of your cluster.
       LicenseAgreement:
         default: License agreement
       WSL:
@@ -380,9 +379,6 @@ Parameters:
     Description: The desired capacity for the OpenShift master instances. Must be an odd number.A minimum of 3 is required.
     Type: String
     AllowedPattern: '^[3579]$|(^[3-9]+[3579]$)'
-    Description: The desired capacity for the OpenShift master instances. Must be an odd number. For a development deployment, 1 is sufficient; for production deployments, a minimum of 3 is required.
-    Type: String
-    AllowedPattern: '^[13579]$|(^[1-9]+[13579]$)'
   NumberOfOCS:
     Default: '3'
     Description: TUpdate this value if Storage type selected is OCS. he desired capacity for the OpenShift container storage instances.  Minimum of 3 is required.
