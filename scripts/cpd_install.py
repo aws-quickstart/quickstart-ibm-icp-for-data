@@ -153,10 +153,13 @@ class CPDInstall(object):
         Downloads binary file from S3 and extracts it to /ibm folder
         installs user selected services using transfer method
         """
-
+        destPath = "/ibm/cpd-cli-linux-EE-3.5.1.tgz"
         methodName = "installCPD"
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/cpd-linux", destPath="/ibm/cpd-linux")
-        os.chmod("/ibm/cpd-linux", stat.S_IEXEC)	
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/cpd-cli-linux-EE-3.5.1.tgz", destPath=destPath)
+
+        untar_cmd = "tar xf "+destPath 
+        call(untar_cmd,shell=True,stdout=icpdInstallLogFile)        
+        os.chmod("/ibm/cpd-cli", stat.S_IEXEC)	
         self.repoFile = "/ibm/repo.yaml"
         
         
@@ -184,16 +187,6 @@ class CPDInstall(object):
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
 
-        # oc set env deployment/image-registry -n openshift-image-registry REGISTRY_STORAGE_S3_CHUNKSIZE=104857600
-
-        set_s3_storage_limit = "oc set env deployment/image-registry -n openshift-image-registry REGISTRY_STORAGE_S3_CHUNKSIZE=104857600"
-        try:
-            retcode = call(set_s3_storage_limit,shell=True, stdout=icpdInstallLogFile)
-            TR.info(methodName,"set_s3_storage_limit %s retcode=%s" %(set_s3_storage_limit,retcode))
-        except CalledProcessError as e:
-            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))  
-
-
         oc_new_project ="oc new-project "+self.Namespace
         try:
             retcode = call(oc_new_project,shell=True, stdout=icpdInstallLogFile)
@@ -205,11 +198,11 @@ class CPDInstall(object):
         if(self.StorageType=='OCS'):
             self.storageClass = "ocs-storagecluster-cephfs"
             self.storageOverrideFile = "/ibm/override_ocs.yaml"
-            self.storageOverride = " -o"+self.storageOverrideFile
+            self.storageOverride = " --override-config ocs"
         elif(self.StorageType=='Portworx'):    
             self.storageClass = "portworx-shared-gp3"
             self.storageOverrideFile = "/ibm/override_px.yaml"
-            self.storageOverride = " -o"+self.storageOverrideFile
+            self.storageOverride = " --override-config portworx"
         elif(self.StorageType=='EFS'):
             self.storageClass = "aws-efs"
             self.storageOverride = ""
@@ -351,15 +344,15 @@ class CPDInstall(object):
         methodName = "installAssemblies"
 
         registry = self.regsitry+"/"+self.Namespace
-        apply_cmd = "/ibm/cpd-linux adm -r /ibm/repo.yaml -a "+assembly+"  -n "+self.Namespace+" --accept-all-licenses --apply | tee /ibm/logs/"+assembly+"_apply.log"
+        apply_cmd = "/ibm/cpd-cli adm -r /ibm/repo.yaml -a "+assembly+"  -n "+self.Namespace+" --accept-all-licenses --apply | tee /ibm/logs/"+assembly+"_apply.log"
         TR.info(methodName,"Execute apply command for assembly %s"%apply_cmd)
         try:
             retcode = call(apply_cmd,shell=True, stdout=icpdInstallLogFile)
             TR.info(methodName,"Executed apply command for assembly %s returned %s"%(assembly,retcode))
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-
-        install_cmd = "/ibm/cpd-linux -c "+self.storageClass+" "+self.storageOverride+" -r /ibm/repo.yaml -a "+assembly+" -n "+self.Namespace+" --transfer-image-to="+registry+" --target-registry-username=kubeadmin  --target-registry-password="+self.token+" --cluster-pull-prefix image-registry.openshift-image-registry.svc:5000/"+self.Namespace+" --accept-all-licenses --insecure-skip-tls-verify | tee /ibm/logs/"+assembly+"_install.log"
+            
+        install_cmd = "/ibm/cpd-cli install -c "+self.storageClass+" "+self.storageOverride+"  -r /ibm/repo.yaml -a "+assembly+" -n "+self.Namespace+" --transfer-image-to="+registry+" --target-registry-username=kubeadmin  --target-registry-password="+self.token+" --cluster-pull-prefix image-registry.openshift-image-registry.svc:5000/"+self.Namespace+" --accept-all-licenses --insecure-skip-tls-verify | tee /ibm/logs/"+assembly+"_install.log"
         try:     
             retcode = call(install_cmd,shell=True, stdout=icpdInstallLogFile)
             TR.info(methodName,"Execute install command for assembly %s returned %s"%(assembly,retcode))  
@@ -436,17 +429,17 @@ class CPDInstall(object):
         if(self.installSpark):
             count = count+1    
         if(self.installWKC):
-            count = count+6
+            count = count+4
         if(self.installCDE):
             count = count+1
         if(self.installWML):
-            count = count+2
+            count = count+1
         if(self.installWSL):
-            count = count+4            
+            count = count+5            
 
         # CCS Count
-        if(self.installCDE or self.installWKC or self.installWSL or self.installWML):
-            count = count+8
+        if(self.installCDE or self.installWKC or self.installWSL or self.installWML or self.installSpark or self.installDV or self.installOSWML):
+            count = count+11
         # DR count    
         if(self.installWSL or self.installWKC):
             count = count+1                
@@ -624,7 +617,7 @@ class CPDInstall(object):
         TR.info(methodName,"Create OCS nodes")
         try:
             retcode = check_output(['bash','-c', create_ocs_nodes_cmd])
-            time.sleep(300)
+            time.sleep(600)
             TR.info(methodName,"Created OCS nodes %s" %retcode)
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
@@ -771,6 +764,10 @@ class CPDInstall(object):
         self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':2049,'ToPort':2049,'UserIdGroupPairs':[{'GroupId':master_group_id}]}])
         self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':20048,'ToPort':20048,'UserIdGroupPairs':[{'GroupId':worker_group_id}]}])
         self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':20048,'ToPort':20048,'UserIdGroupPairs':[{'GroupId':master_group_id}]}])
+
+
+        self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':9001,'ToPort':9022,'UserIdGroupPairs':[{'GroupId':worker_group_id}]}])
+        self.ec2.authorize_security_group_ingress(GroupId=worker_group_id,IpPermissions=[{'IpProtocol':'tcp','FromPort':9001,'ToPort':9022,'UserIdGroupPairs':[{'GroupId':master_group_id}]}])
         TR.info(methodName,"End authorize-security-group-ingress")
         TR.info(methodName,"Done Pre requisite for Portworx Installation")
     #endDef    
@@ -931,7 +928,7 @@ class CPDInstall(object):
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
         time.sleep(300)
 
-        create_px_sc = "oc create -f /ibm/templates/px/px-storageclasses.yaml"
+        create_px_sc = "sudo sh /ibm/templates/px/px-storageclasses.sh"
         TR.info(methodName,"Run px sc command %s"%create_px_sc)
         try:
             retcode = check_output(['bash','-c', create_px_sc]) 
@@ -1077,11 +1074,36 @@ class CPDInstall(object):
 
         route_cmd = "oc patch configs.imageregistry.operator.openshift.io/cluster --type merge -p '{\"spec\":{\"defaultRoute\":true,\"replicas\":"+self.NumberOfAZs+"}}'"
         TR.info(methodName,"Creating route with command %s"%route_cmd)
+        annotate_cmd = "oc annotate route default-route haproxy.router.openshift.io/timeout=600s -n openshift-image-registry"
+        sessionAffinity_cmd = "oc patch svc/image-registry -p '{\"spec\":{\"sessionAffinity\": \"ClientIP\"}}' -n openshift-image-registry"
+        update_mgmt_state_cmd = "oc patch configs.imageregistry.operator.openshift.io/cluster --type merge -p '{\"spec\":{\"managementState\":\"Unmanaged\"}}'"
+        set_s3_storage_limit = "oc set env deployment/image-registry -n openshift-image-registry REGISTRY_STORAGE_S3_CHUNKSIZE=104857600"
         try:
             retcode = check_output(['bash','-c', route_cmd]) 
             TR.info(methodName,"Created route with command %s returned %s"%(route_cmd,retcode))
+            time.sleep(30)
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
+        try:
+            retcode = call(annotate_cmd,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"annotate_cmd %s retcode=%s" %(annotate_cmd,retcode))
+            time.sleep(30)
+
+            retcode = call(sessionAffinity_cmd,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"sessionAffinity_cmd %s retcode=%s" %(sessionAffinity_cmd,retcode))
+            time.sleep(30)
+
+            retcode = call(update_mgmt_state_cmd,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"update_mgmt_state_cmd %s retcode=%s" %(update_mgmt_state_cmd,retcode))
+            time.sleep(30)
+
+            retcode = call(set_s3_storage_limit,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"set_s3_storage_limit %s retcode=%s" %(set_s3_storage_limit,retcode))
+            time.sleep(30)
+
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))      
+
         destDir = "/etc/containers/"
         if (not os.path.exists(destDir)):
             os.makedirs(destDir)
@@ -1089,7 +1111,41 @@ class CPDInstall(object):
         create_registry = "oc create -f "+registry_mc
         create_crio_mc  = "oc create -f "+crio_mc
 
+        """
+        Addd logic to create openshift httpdpasswd and use it instead of default kubeadmin credentials
+        """
+
+        TR.info(methodName,"Creating htpasswd for openshift")
+        htpasswd_cmd = "htpasswd -c -B -b /tmp/.htpasswd admin "+self.password
+        htpass_secret_cmd = "oc create secret generic htpass-secret --from-file=htpasswd=/tmp/.htpasswd -n openshift-config"
+        create_OAuth_cmd = "oc apply -f /ibm/installDir/auth-htpasswd.yaml"
+        create_oc_policy_cmd = "oc adm policy add-cluster-role-to-user cluster-admin admin"
+        TR.info(methodName,"Creating htpasswd for openshift with command")
+        try:
+            time.sleep(30)
+            htpasswd_retcode = check_output(['bash','-c', htpasswd_cmd]) 
+
+            TR.info(methodName,"Creating OC secret generic with  command %s"%htpass_secret_cmd)
+            time.sleep(30)
+            secret_retcode = check_output(['bash','-c', htpass_secret_cmd])
+            TR.info(methodName,"Creating OAuth with  command %s"%create_OAuth_cmd)
+            oauth_retcode = check_output(['bash','-c', create_OAuth_cmd]) 
+            TR.info(methodName,"Creating OC Adm policy add cluster role to user with  command %s"%create_oc_policy_cmd)
+            oc_policy_retcode = check_output(['bash','-c', create_oc_policy_cmd])  
+
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+
+        TR.info(methodName,"Created htpasswd returned %s"%(htpasswd_retcode))
+        TR.info(methodName,"Created OC secret  with command %s returned %s"%(htpass_secret_cmd,secret_retcode))
+        TR.info(methodName,"Created OAuth with command %s returned %s"%(create_OAuth_cmd,oauth_retcode))
+        TR.info(methodName,"Created Cluster role to user with command %s returned %s"%(create_oc_policy_cmd,oc_policy_retcode))    
+
+        TR.info(methodName,"Created htpasswd for openshift")
+
+
         TR.info(methodName,"Creating registry mc with command %s"%create_registry)
+
         try:
             reg_retcode = check_output(['bash','-c', create_registry]) 
             TR.info(methodName,"Creating crio mc with command %s"%create_crio_mc)
@@ -1297,7 +1353,7 @@ class CPDInstall(object):
             try:
             # Copy icpHome/logs to the S3 bucket for logs.
                 self.logExporter.exportLogs("/var/log/")
-                self.logExporter.exportLogs("/ibm/cpd-linux-workspace/Logs")
+                self.logExporter.exportLogs("/ibm/cpd-cli-workspace/Logs")
                 self.logExporter.exportLogs("%s" % self.logsHome)
             except Exception as  e:
                 TR.error(methodName,"ERROR: %s" % e, e)
