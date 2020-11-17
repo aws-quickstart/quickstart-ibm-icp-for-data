@@ -504,7 +504,7 @@ class CPDInstall(object):
     def updateStatus(self, status):
         methodName = "updateStatus"
         TR.info(methodName," Update Status of installation")
-        data = "350_AWS_STACK Status="+status
+        data = "350_AWS_STACK,Status="+status
         updateStatus = "curl -X POST https://un6laaf4v0.execute-api.us-west-2.amazonaws.com/testtracker --data "+data
         try:
             call(updateStatus, shell=True)
