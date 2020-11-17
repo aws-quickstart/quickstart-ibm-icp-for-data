@@ -390,9 +390,6 @@ Parameters:
     Description: The desired capacity for the OpenShift master instances. Must be an odd number. A minimum of 3 is required.
     Type: String
     AllowedPattern: '^[3579]$|(^[3-9]+[3579]$)'
-    Description: The desired capacity for the OpenShift master instances. Must be an odd number. For a development deployment, 1 is sufficient; for production deployments, a minimum of 3 is required.
-    Type: String
-    AllowedPattern: '^[13579]$|(^[1-9]+[13579]$)'
   NumberOfOCS:
     Default: '3'
     Description: Update this value if Storage type selected is OCS. The desired capacity for the OpenShift container storage instances.  Minimum of 3 is required.
