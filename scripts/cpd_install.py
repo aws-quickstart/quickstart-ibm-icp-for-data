@@ -1314,7 +1314,6 @@ class CPDInstall(object):
                 self.installOSWML = Utilities.toBoolean(self.OpenScale)
                 self.installCDE = Utilities.toBoolean(self.CDE)
                 self.installSpark= Utilities.toBoolean(self.Spark)
-                #self.EnableFips = Utilities.toBoolean(self.EnableFips)
 
                 if(self.installOSWML):
                     self.installWML=True
