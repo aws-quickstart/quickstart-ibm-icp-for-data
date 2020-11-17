@@ -1,7 +1,7 @@
 # quickstart-ibm-icp-for-data
 ## IBM Cloud Pak for Data on AWS
 
-This Quick Start automatically deploys a multi-master, production instance of IBM Cloud Pak for Data on a Red Hat OpenShift Container Platform 4.3.x cluster on the Amazon Web Services (AWS) Cloud. The cluster is created in a new or existing virtual private cloud (VPC) on Red Hat CoreOS instances. using the A standard deployment takes about 3 hours, and a high availability (HA) deployment takes about 4 hours. 
+This Quick Start automatically deploys a multi-master, production instance of IBM Cloud Pak for Data on a Red Hat OpenShift Container Platform 4.5.x cluster on the Amazon Web Services (AWS) Cloud. The cluster is created in a new or existing virtual private cloud (VPC) on Red Hat CoreOS instances. using the A standard deployment takes about 3 hours, and a high availability (HA) deployment takes about 4 hours. 
 
 IBM Cloud Pak for Data is an analytics platform that helps you prepare your data for artificial intelligence (AI). 
 

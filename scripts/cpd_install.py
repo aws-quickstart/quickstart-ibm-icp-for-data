@@ -163,7 +163,7 @@ class CPDInstall(object):
         self.repoFile = "/ibm/repo.yaml"
         
         
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/repo.yaml", destPath=self.repoFile)
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/repo.yaml", destPath=self.repoFile)
         TR.info(methodName, "updating repo.yaml with apikey value provided")
         
         #TODO change this later
@@ -219,7 +219,8 @@ class CPDInstall(object):
             TR.info(methodName, "CPD URL retrieved %s"%self.cpdURL)
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
-
+        self.manageUser(icpdInstallLogFile)
+        
         if(self.installSpark):
             TR.info(methodName,"Start installing Spark AE package")
             sparkstart = Utilities.currentTimeMillis()
@@ -503,7 +504,7 @@ class CPDInstall(object):
     def updateStatus(self, status):
         methodName = "updateStatus"
         TR.info(methodName," Update Status of installation")
-        data = "301_AWS_STACKNAME="+self.stackName+",Status="+status
+        data = "350_AWS_STACKNAME="+self.stackName+",Status="+status
         updateStatus = "curl -X POST https://un6laaf4v0.execute-api.us-west-2.amazonaws.com/testtracker --data "+data
         try:
             call(updateStatus, shell=True)
@@ -982,6 +983,8 @@ class CPDInstall(object):
         self.updateTemplateFile(installConfigFile,'${sshKey}',self.readFileContent("/root/.ssh/id_rsa.pub"))
         self.updateTemplateFile(installConfigFile,'${clustername}',self.ClusterName)
         self.updateTemplateFile(installConfigFile, '${FIPS}',self.EnableFips)
+        self.updateTemplateFile(installConfigFile, '${PrivateCluster}',self.PrivateCluster)
+        self.updateTemplateFile(installConfigFile, '${cluster-cidr}',self.ClusterNetworkCIDR)
         self.updateTemplateFile(installConfigFile, '${machine-cidr}', self.VPCCIDR)
         self.updateTemplateFile(autoScalerFile, '${az1}', self.zones[0])
         self.updateTemplateFile(healthcheckFile, '${az1}', self.zones[0])
@@ -1001,9 +1004,9 @@ class CPDInstall(object):
             self.updateTemplateFile(healthcheckFile, '${az3}', self.zones[2])
         
         TR.info(methodName,"Download Openshift Container Platform")
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/openshift-install", destPath="/ibm/openshift-install")
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/oc", destPath="/usr/bin/oc")
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.0/kubectl", destPath="/usr/bin/kubectl")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/openshift-install", destPath="/ibm/openshift-install")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/oc", destPath="/usr/bin/oc")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/kubectl", destPath="/usr/bin/kubectl")
         os.chmod("/usr/bin/oc", stat.S_IEXEC)
         os.chmod("/usr/bin/kubectl", stat.S_IEXEC)	
         TR.info(methodName,"Initiating installation of Openshift Container Platform")
@@ -1340,7 +1343,6 @@ class CPDInstall(object):
 
                 self.installCPD(icpdInstallLogFile)
                 self.validateInstall(icpdInstallLogFile)
-                self.manageUser(icpdInstallLogFile)
                 self.updateSecret(icpdInstallLogFile)
                 self.exportResults(self.stackName+"-OpenshiftURL", "https://"+self.openshiftURL, icpdInstallLogFile)
                 self.exportResults(self.stackName+"-CPDURL", "https://"+self.cpdURL, icpdInstallLogFile)
