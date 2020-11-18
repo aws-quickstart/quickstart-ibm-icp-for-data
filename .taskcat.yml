@@ -33,7 +33,7 @@ tests:
       AvailabilityZones: $[taskcat_genaz_1]
       VPCCIDR: 10.0.0.0/16
       ComputeInstanceType: m5a.4xlarge
-      NumberOfMaster: '1'
+      NumberOfMaster: '3'
       LicenseAgreement: I agree
       ClusterName: $[taskcat_random-string]
       Namespace: zen
@@ -48,73 +48,19 @@ tests:
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
     regions:  
-    - ca-central-1
+    - us-west-2
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.template.yaml
 
-#  1AZ-wml-px:
-#    parameters:
-#      WML: 'True'
-#      NumberOfAZs: '1'
-#      AvailabilityZones: $[taskcat_genaz_1]
-#      VPCCIDR: 10.0.0.0/16
-#      ComputeInstanceType: r5.4xlarge
-#      LicenseAgreement: I agree
-#      ClusterName: $[taskcat_random-string]
-#      StorageType: Portworx
-#      Namespace: zenpx
-#      ICPDDeploymentLogsBucketName: override
-#      QSS3BucketName: $[taskcat_autobucket]
-#      QSS3BucketRegion: $[taskcat_current_region]
-#      DomainName: override
-#      AdminPassword: override
-#      APIKey: override
-#      APIUsername: override
-#      KeyPairName: override
-#      BootNodeAccessCIDR: override
-#      RedhatPullSecret: override
-#      PortworxSpec: override
-#    regions:  
-#    - ap-south-1
-#    s3_bucket: ''
-#    template: templates/ibm-cloudpak-root.template.yaml
-
-#  3AZ-os-ocs:
-#    parameters:
-#      OpenScale: 'True'
-#      NumberOfAZs: '3'
-#      AvailabilityZones: $[taskcat_genaz_3]
-#      VPCCIDR: 10.0.0.0/16
-#      LicenseAgreement: I agree
-#      ClusterName: $[taskcat_random-string]
-#      Namespace: zen
-#      ICPDDeploymentLogsBucketName: override
-#      QSS3BucketName: $[taskcat_autobucket]
-#      QSS3BucketRegion: $[taskcat_current_region]
-#      DomainName: override
-#      AdminPassword: override
-#      APIKey: override
-#      APIUsername: override
-#      KeyPairName: override
-#      BootNodeAccessCIDR: override
-#      RedhatPullSecret: override
-#    regions:
-#    - ap-southeast-1
-#    s3_bucket: ''
-#    template: templates/ibm-cloudpak-root.template.yaml
-
-  3AZ-wml-dv-px:
+  1AZ-dv-private-ocs:
     parameters:
-      WML: 'True'
       DV: 'True'
-      EnableFips: 'True'
-      NumberOfAZs: '3'
-      AvailabilityZones: $[taskcat_genaz_3]
+      NumberOfAZs: '1'
+      NumberOfMaster: '3'
+      AvailabilityZones: $[taskcat_genaz_1]
       VPCCIDR: 10.0.0.0/16
-      ComputeInstanceType: r5.4xlarge
       LicenseAgreement: I agree
       ClusterName: $[taskcat_random-string]
-      StorageType: Portworx
       Namespace: zen
       ICPDDeploymentLogsBucketName: override
       QSS3BucketName: $[taskcat_autobucket]
@@ -126,44 +72,40 @@ tests:
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
-      PortworxSpec: override
+      PrivateCluster: "Internal"
     regions:  
-    - ap-northeast-2
+    - ap-northeast-1
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.template.yaml
 
-  3AZ-wkc-px:
+  3AZ-spark-ocs:
     parameters:
-      WKC: 'True'
-      EnableFips: 'True'
-      AvailabilityZones: $[taskcat_genaz_3]
-      VPCCIDR: 10.0.0.0/16
-      ComputeInstanceType: r5.4xlarge
-      LicenseAgreement: I agree
-      ClusterName: $[taskcat_random-string]
-      StorageType: Portworx
-      Namespace: pxzen
-      ICPDDeploymentLogsBucketName: override
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
-      DomainName: override
-      AdminPassword: override
-      APIKey: override
-      APIUsername: override
-      KeyPairName: override
-      BootNodeAccessCIDR: override
-      RedhatPullSecret: override
-      PortworxSpec: override
-    regions:  
-    - eu-west-3
-    s3_bucket: ''
-    template: templates/ibm-cloudpak-root.template.yaml
-
-  3AZ-dv-cde-spark-efs:
-    parameters:
-      DV: 'True'
-      CDE: 'True'
       Spark: 'True'
+      EnableFips: 'True'
+      AvailabilityZones: $[taskcat_genaz_3]
+      VPCCIDR: 10.0.0.0/16
+      LicenseAgreement: I agree
+      ClusterName: $[taskcat_random-string]
+      Namespace: zen
+      ICPDDeploymentLogsBucketName: override
+      QSS3BucketName: $[taskcat_autobucket]
+      QSS3BucketRegion: $[taskcat_current_region]
+      DomainName: override
+      AdminPassword: override
+      APIKey: override
+      APIUsername: override
+      KeyPairName: override
+      BootNodeAccessCIDR: override
+      RedhatPullSecret: override
+      PortworxSpec: override
+    regions:  
+    - eu-central-1
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.template.yaml
+
+  3AZ-cde-private-efs:
+    parameters:
+      CDE: 'True'
       EnableFips: 'True'
       AvailabilityZones: $[taskcat_genaz_3]
       VPCCIDR: 10.0.0.0/16
@@ -183,70 +125,17 @@ tests:
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
       PortworxSpec: override
+      PrivateCluster: "Internal"
     regions:  
     - eu-west-2
     s3_bucket: ''
-    template: templates/ibm-cloudpak-root.template.yaml
+    template: templates/ibm-cloudpak-root.template.yaml 
 
-#  3AZ-wkc-wsl-efs:
-#    parameters:
-#      WKC: 'True'
-#      WSL: 'True'
-#      AvailabilityZones: $[taskcat_genaz_3]
-#      VPCCIDR: 10.0.0.0/16
-#      LicenseAgreement: I agree
-#      ClusterName: $[taskcat_random-string]
-#      StorageType: EFS
-#      Namespace: zen
-#      ICPDDeploymentLogsBucketName: override
-#      QSS3BucketName: $[taskcat_autobucket]
-#      QSS3BucketRegion: $[taskcat_current_region]
-#      DomainName: override
-#      AdminPassword: override
-#      APIKey: override
-#      APIUsername: override
-#      KeyPairName: override
-#      BootNodeAccessCIDR: override
-#      RedhatPullSecret: override
-#    regions:
-#    - eu-west-1
-#    s3_bucket: ''
-#    template: templates/ibm-cloudpak-root.template.yaml
-
-#  1AZ-wsl-os-ocs:
-#    parameters:
-#      WSL: 'True'
-#      OpenScale: 'True'
-#      OCSInstanceType: r5.4xlarge
-#      NumberOfAZs: '1'
-#      AvailabilityZones: $[taskcat_genaz_1]
-#      VPCCIDR: 10.0.0.0/16
-#      ComputeInstanceType: r5.4xlarge
-#      NumberOfMaster: '1'
-#      LicenseAgreement: I agree
-#      ClusterName: $[taskcat_random-string]
-#      Namespace: zen
-#      ICPDDeploymentLogsBucketName: override
-#      QSS3BucketName: $[taskcat_autobucket]
-#      QSS3BucketRegion: $[taskcat_current_region]
-#      DomainName: override
-#      AdminPassword: override
-#      APIKey: override
-#      APIUsername: override
-#      KeyPairName: override
-#      BootNodeAccessCIDR: override
-#      RedhatPullSecret: override
-#    regions:
-#    - us-west-1
-#    s3_bucket: ''
-#    template: templates/ibm-cloudpak-root.template.yaml
-
-  3AZ-wkc-spark-efs:
+  1AZ-OS-efs:
     parameters:
-      WKC: 'True'
-      Spark: 'True'
-      EnableFips: 'True'
-      AvailabilityZones: $[taskcat_genaz_3]
+      OpenScale: 'True'
+      NumberOfAZs: '1'
+      AvailabilityZones: $[taskcat_genaz_1]
       VPCCIDR: 10.0.0.0/16
       LicenseAgreement: I agree
       ClusterName: $[taskcat_random-string]
@@ -262,18 +151,70 @@ tests:
       KeyPairName: override
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
-      PortworxSpec: override
     regions:  
-    - us-west-2
+    - us-west-1
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.template.yaml
 
-  3AZ-wkc-dv-px:
+  1AZ-WML-c4-px:
     parameters:
-      DV: 'True'
-      WKC: 'True'
+      WML: 'True'
+      EnableFips: 'True'
+      StorageType: 'Portworx'
+      NumberOfAZs: '1'
+      AvailabilityZones: $[taskcat_genaz_1]
+      VPCCIDR: 10.0.0.0/16
+      ComputeInstanceType: c5.4xlarge
+      NumberOfMaster: '3'
+      LicenseAgreement: I agree
+      ClusterName: $[taskcat_random-string]
+      Namespace: cpdtest
+      ICPDDeploymentLogsBucketName: override
+      QSS3BucketName: $[taskcat_autobucket]
+      QSS3BucketRegion: $[taskcat_current_region]
+      DomainName: override
+      AdminPassword: override
+      APIKey: override
+      APIUsername: override
+      KeyPairName: override
+      BootNodeAccessCIDR: override
+      RedhatPullSecret: override
+    regions:  
+    - us-east-2
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.template.yaml
+
+  3AZ-wsl-px:
+    parameters:
+      WSL: 'True'
       AvailabilityZones: $[taskcat_genaz_3]
       VPCCIDR: 10.0.0.0/16
+      ComputeInstanceType: r5.4xlarge
+      LicenseAgreement: I agree
+      ClusterName: $[taskcat_random-string]
+      StorageType: Portworx
+      Namespace: zenpx
+      ICPDDeploymentLogsBucketName: override
+      QSS3BucketName: $[taskcat_autobucket]
+      QSS3BucketRegion: $[taskcat_current_region]
+      DomainName: override
+      AdminPassword: override
+      APIKey: override
+      APIUsername: override
+      KeyPairName: override
+      BootNodeAccessCIDR: override
+      RedhatPullSecret: override
+      PortworxSpec: override
+    regions:  
+    - eu-west-1
+    s3_bucket: ''
+    template: templates/ibm-cloudpak-root.template.yaml
+
+  1AZ-lite-private-px:
+    parameters:
+      AvailabilityZones: $[taskcat_genaz_1]
+      VPCCIDR: 10.0.0.0/16
+      NumberOfAZs: 1
       ComputeInstanceType: r5.4xlarge
       LicenseAgreement: I agree
       ClusterName: $[taskcat_random-string]
@@ -291,34 +232,7 @@ tests:
       RedhatPullSecret: override
       PortworxSpec: override
     regions:  
-    - us-east-2
-    s3_bucket: ''
-    template: templates/ibm-cloudpak-root.template.yaml
-
-  3AZ-wkc-cde-ocs:
-    parameters:
-      WKC: 'True'
-      CDE: 'True'
-      NumberOfAZs: '3'
-      NumberOfMaster: '3'
-      OCSInstanceType: r5.4xlarge
-      AvailabilityZones: $[taskcat_genaz_3]
-      VPCCIDR: 10.0.0.0/16
-      LicenseAgreement: I agree
-      ClusterName: $[taskcat_random-string]
-      Namespace: zen
-      ICPDDeploymentLogsBucketName: override
-      QSS3BucketName: $[taskcat_autobucket]
-      QSS3BucketRegion: $[taskcat_current_region]
-      DomainName: override
-      AdminPassword: override
-      APIKey: override
-      APIUsername: override
-      KeyPairName: override
-      BootNodeAccessCIDR: override
-      RedhatPullSecret: override
-    regions:  
-    - us-east-1
+    - ap-south-1
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.template.yaml
 
