@@ -13,7 +13,8 @@
 (`PublicSubnet1ID`)|`**__Requires input__**`|The ID of the public subnet in Availability Zone 1 for the ELB load balancer (e.g., subnet-9bc642ac).|Public subnet 2 ID
 (`PublicSubnet2ID`)|`**__Requires input__**`|The ID of the public subnet in Availability Zone 2 for the ELB load balancer (e.g., subnet-e3246d8e).|Public subnet 3 ID
 (`PublicSubnet3ID`)|`**__Requires input__**`|The ID of the public subnet in Availability Zone 3 for the ELB load balancer (e.g., subnet-e324ad8e).|Boot node external access CIDR
-(`BootNodeAccessCIDR`)|`**__Requires input__**`|The CIDR IP range that is permitted to access boot node instance. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
+(`BootNodeAccessCIDR`)|`**__Requires input__**`|The CIDR IP range that is permitted to access boot node instance. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.|Cluster network CIDR
+(`ClusterNetworkCIDR`)|`10.128.0.0/14`|The CIDR IP range that is permitted to access Openshift Cluster Network. We recommend that you set this value to a trusted IP range.
 |===
 .DNS configuration
 [width="100%",cols="16%,11%,73%",options="header",]
@@ -31,13 +32,14 @@
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|Number of master nodes
-(`NumberOfMaster`)|`3`|The desired capacity for the OpenShift master instances. Must be an odd number. For a development deployment, 1 is sufficient; for production deployments, a minimum of 3 is required.|Number of compute nodes
+(`NumberOfMaster`)|`3`|The desired capacity for the OpenShift master instances. Must be an odd number.A minimum of 3 is required.|Number of compute nodes
 (`NumberOfCompute`)|`3`|The desired capacity for the OpenShift compute instances. Minimum of 3 nodes required. If the number of compute instances exceeds your Red Hat entitlement limits or AWS instance limits, the stack will fail. Choose a number that is within your limits.|Master instance type
 (`MasterInstanceType`)|`m5.xlarge`|The EC2 instance type for the OpenShift master instances.|Compute instance type
 (`ComputeInstanceType`)|`m5.4xlarge`|The EC2 instance type for the OpenShift compute instances.|Cloud Pak for Data UI password
 (`AdminPassword`)|`**__Requires input__**`|The password for the Cloud Pak for Data web client. The password must contain at least 8 characters, including letters (with a minimum of one capital letter), numbers, and symbols.|Cluster name
 (`ClusterName`)|`**__Blank string__**`|Custom cluster name for kubernetes.io/cluster/tags.|Enable Fips
-(`EnableFips`)|`False`|Enable Fips for Openshift
+(`EnableFips`)|`False`|Enable Fips for Openshift|Publish the user-facing endpoints of your cluster.
+(`PrivateCluster`)|`External`|To Deploy a Private cluster select Internal and External for Public cluster
 |===
 .Storage Configuration
 [width="100%",cols="16%,11%,73%",options="header",]

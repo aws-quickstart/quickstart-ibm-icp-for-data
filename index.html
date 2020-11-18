@@ -1978,6 +1978,12 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The CIDR IP range that is permitted to access boot node instance. We recommend that you set this value to a trusted IP range. The value <code>0.0.0.0/0</code> permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cluster network CIDR
+(<code>ClusterNetworkCIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.128.0.0/14</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The CIDR IP range that is permitted to access Openshift Cluster Network. We recommend that you set this value to a trusted IP range.</p></td>
+</tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
@@ -2045,7 +2051,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of master nodes
 (<code>NumberOfMaster</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>3</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The desired capacity for the OpenShift master instances. Must be an odd number. For a development deployment, 1 is sufficient; for production deployments, a minimum of 3 is required.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The desired capacity for the OpenShift master instances. Must be an odd number. A minimum of 3 is required.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of compute nodes
@@ -2082,6 +2088,12 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 (<code>EnableFips</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>False</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Enable Fips for Openshift</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Publish the user-facing endpoints of your cluster.
+(<code>PrivateCluster</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>External</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">To Deploy a Private cluster select Internal and External for Public cluster</p></td>
 </tr>
 </tbody>
 </table>
@@ -2363,6 +2375,12 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The CIDR IP range that is permitted to access boot node instance. We recommend that you set this value to a trusted IP range. The value <code>0.0.0.0/0</code> permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Cluster network CIDR
+(<code>ClusterNetworkCIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.128.0.0/14</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The CIDR IP range that is permitted to access Openshift Cluster Network. We recommend that you set this value to a trusted IP range.</p></td>
+</tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
@@ -2430,7 +2448,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of master nodes
 (<code>NumberOfMaster</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>3</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The desired capacity for the OpenShift master instances. Must be an odd number. For a development deployment, 1 is sufficient; for production deployments, a minimum of 3 is required.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The desired capacity for the OpenShift master instances. Must be an odd number.A minimum of 3 is required.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Number of compute nodes
@@ -2467,6 +2485,12 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 (<code>EnableFips</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>False</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Enable Fips for Openshift</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Publish the user-facing endpoints of your cluster.
+(<code>PrivateCluster</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>External</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">To Deploy a Private cluster select Internal and External for Public cluster</p></td>
 </tr>
 </tbody>
 </table>
