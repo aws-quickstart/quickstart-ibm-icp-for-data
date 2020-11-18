@@ -180,7 +180,7 @@ As part of the Quick Start installation, the control plane is installed by defau
 
 ==== Install a service
 
-. Log in to your boot-node server as mentioned in link:#accessing-the-control-plane-through-the-boot-node[access section].
+. Log in to your boot-node server as mentioned in link:#_accessing_the_control_plane_through_the_boot_node[access section].
 .  Change to the install directory.
 .  Run `$ cd /ibm`.
 .  Run the following commands.
