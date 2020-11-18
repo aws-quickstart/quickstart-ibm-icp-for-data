@@ -48,7 +48,7 @@ tests:
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
     regions:  
-    - us-east-1
+    - us-west-2
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.template.yaml
 
@@ -180,7 +180,7 @@ tests:
       BootNodeAccessCIDR: override
       RedhatPullSecret: override
     regions:  
-    - us-west-2
+    - us-east-2
     s3_bucket: ''
     template: templates/ibm-cloudpak-root.template.yaml
 
