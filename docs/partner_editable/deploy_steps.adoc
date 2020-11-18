@@ -28,10 +28,10 @@ NOTE: You are responsible for the cost of the AWS services used while running th
 [cols=2*]
 |===
 ^|https://fwd.aws/r9QRP[Deploy {partner-product-short-name} into a new VPC on AWS^]
-^|https://aws-quickstart.s3.amazonaws.com/quickstart-ibm-icp-for-data/templates/ibm-cloudpak-root.yaml[View template^]
+^|https://aws-quickstart.s3.amazonaws.com/quickstart-ibm-icp-for-data/templates/ibm-cloudpak-root.template.yaml[View template^]
 
 ^|https://fwd.aws/6zgYY[Deploy {partner-product-short-name} into an existing VPC on AWS^]
-^|https://aws-quickstart.s3.amazonaws.com/quickstart-ibm-icp-for-data/templates/ibm-cloudpak-data.yaml[View template^]
+^|https://aws-quickstart.s3.amazonaws.com/quickstart-ibm-icp-for-data/templates/ibm-cloudpak-data.template.yaml[View template^]
 |===
 
 // Adapt the following warning to your Quick Start.

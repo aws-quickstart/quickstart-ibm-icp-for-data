@@ -6,7 +6,7 @@ AWS Cloud.
 :xrefstyle: short
 [#architecture1]
 .Quick Start architecture for {partner-product-short-name} on AWS
-image::../images/image1.png[Architecture,width=100%,height=100%]
+image::../images/architecture.png[Architecture,width=100%,height=100%]
 
 As shown in <<architecture1>>, the Quick Start sets up the following:
 
@@ -21,7 +21,7 @@ As shown in <<architecture1>>, the Quick Start sets up the following:
 ** For container-persistent data, Elastic Block Store disks that are mounted on the compute nodes.
 * A Master Load Balancer, which spans the private subnets, for accessing the OCP compute nodes. This provides web-browser access to {partner-product-short-name}.
 * An Application Load Balancer, which spans the private subnets, for accessing the OCP compute nodes.
-* https://docs.openshift.com/container-platform/4.3/machine_management/applying-autoscaling.html[OpenShift auto scaling^] for the OCP compute nodes.
+* https://docs.openshift.com/container-platform/4.5/machine_management/applying-autoscaling.html[OpenShift auto scaling^] for the OCP compute nodes.
 * Amazon Route 53, as your public Domain Name System (DNS), for resolving domain names for the {partner-product-name} management console.
 * Amazon S3 for storing the pull secret and deployment logs.
 
@@ -32,4 +32,4 @@ As shown in <<architecture1>>, the Quick Start sets up the following:
 :xrefstyle: short
 [#cpdservices]
 .{partner-product-short-name} services
-image::../images/image2.png[Architecture,width=100%,height=100%]
+image::../images/cpd.png[Architecture,width=100%,height=100%]
