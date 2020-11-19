@@ -14,7 +14,7 @@
 (`PublicSubnet2ID`)|`**__Requires input__**`|The ID of the public subnet in Availability Zone 2 for the ELB load balancer (e.g., subnet-e3246d8e).|Public subnet 3 ID
 (`PublicSubnet3ID`)|`**__Requires input__**`|The ID of the public subnet in Availability Zone 3 for the ELB load balancer (e.g., subnet-e324ad8e).|Boot node external access CIDR
 (`BootNodeAccessCIDR`)|`**__Requires input__**`|The CIDR IP range that is permitted to access boot node instance. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.|Cluster network CIDR
-(`ClusterNetworkCIDR`)|`10.128.0.0/14`|The CIDR IP range that is permitted to access Openshift Cluster Network. We recommend that you set this value to a trusted IP range.
+(`ClusterNetworkCIDR`)|`10.128.0.0/14`|The Cluster Network CIDR IP range that is used as IP address pools for pods.
 |===
 .DNS configuration
 [width="100%",cols="16%,11%,73%",options="header",]

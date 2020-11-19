@@ -13,7 +13,7 @@
 (`PublicSubnet2CIDR`)|`10.0.144.0/20`|The CIDR block for the public subnet located in Availability Zone 2.|Public subnet 3 CIDR
 (`PublicSubnet3CIDR`)|`10.0.160.0/20`|The CIDR block for the public subnet located in Availability Zone 3.|Boot node external access CIDR
 (`BootNodeAccessCIDR`)|`**__Requires input__**`|The CIDR IP range that is permitted to access boot node instance. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.|Cluster network CIDR
-(`ClusterNetworkCIDR`)|`10.128.0.0/14`|The CIDR IP range that is permitted to access Openshift Cluster Network. We recommend that you set this value to a trusted IP range.
+(`ClusterNetworkCIDR`)|`10.128.0.0/14`|The Cluster Network CIDR IP range that is used as IP address pools for pods.
 |===
 .DNS configuration
 [width="100%",cols="16%,11%,73%",options="header",]
@@ -38,7 +38,7 @@
 (`AdminPassword`)|`**__Requires input__**`|The password for the Cloud Pak for Data web client. The password must contain at least 8 characters, including letters (with a minimum of one capital letter), numbers, and symbols.|Cluster name
 (`ClusterName`)|`**__Requires input__**`|Custom cluster name for kubernetes.io/cluster/tags.|Enable Fips
 (`EnableFips`)|`False`|Enable Fips for Openshift|Publish the user-facing endpoints of your cluster.
-(`PrivateCluster`)|`External`|To Deploy a Private cluster select Internal and External for Public cluster
+(`PrivateCluster`)|`External`|Choose Internal to deploy a private cluster. For details visit OpenShift documentation (https://docs.openshift.com/container-platform/4.5/installing/installing_aws/installing-aws-private.html)
 |===
 .Storage Configuration
 [width="100%",cols="16%,11%,73%",options="header",]

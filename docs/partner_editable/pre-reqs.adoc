@@ -18,12 +18,12 @@ You can choose one of three container-storage options for this Quick Start.
 
 * https://portworx.com/products/features/[Portworx^]: When you choose Portworx as the persistent storage layer, you must specify your install spec from your https://central.portworx.com/specGen/list[Portworx account^]. You can generate new spec using the https://central.portworx.com/specGen/wizard[spec generator^]. Choose the edition you want, and then enter the values for the following fields.
 ** Basic details:
-*** Kubernetes version: 1.16.2
+*** Check Use the Portworx Operator
 *** Portworx version: 2.5
 *** ETCD: BuiltIn
 ** Storage details:
 *** Environment: Cloud/AWS
-*** Choose type of disk: ‚ÄúCreate using a spec‚Äù
+*** Choose type of disk: ‚Create using a spec‚
 *** Leave the disk type and size as defaults
 *** Add additional disk for storage (500 GB recommended per node)
 ** Network details:

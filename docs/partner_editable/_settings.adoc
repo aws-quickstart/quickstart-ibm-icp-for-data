@@ -6,7 +6,7 @@
 :partner-product-short-name: Cloud Pak for Data
 // If there's no partner, comment partner-company-name and partner-contributors.
 :partner-company-name: IBM
-:doc-month: June
+:doc-month: November
 :doc-year: 2020
 // For the following two "contributor" attributes, if the partner agrees to include names in the byline, 
 // enter names for both partner-contributors and quickstart-contributors. 

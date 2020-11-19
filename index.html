@@ -851,7 +851,7 @@ p.footer-text a{color:#d7d8d8}
 </div>
 </div>
 <div class="paragraph text-center">
-<p><strong>June 2020</strong><br>
+<p><strong>November 2020</strong><br>
 <em>Clarinda Mascarenhas, Sharath Aithal, Partha Komperla, and Sumit Kumar, IBM</em><br>
 <em>Vinod Shukla and Jim McConnell, AWS Quick Start team</em></p>
 </div>
@@ -877,7 +877,7 @@ report bugs, or submit feature ideas for this Quick Start.
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This Quick Start deployment guide provides step-by-step instructions for deploying the Cloud Pak for Data on a Red Hat OpenShift Container Platform 4.3 cluster on the AWS Cloud. With this Quick Start, you can automatically deploy a multimaster, production instance of Cloud Pak for Data.</p>
+<p>This Quick Start deployment guide provides step-by-step instructions for deploying the Cloud Pak for Data on a Red Hat OpenShift Container Platform cluster on the AWS Cloud. With this Quick Start, you can automatically deploy a multimaster, production instance of Cloud Pak for Data.</p>
 </div>
 <div class="paragraph">
 <p>This Quick Start is for enterprise users to connect, catalog, govern, transform, and analyze data, regardless of location. Cloud Pak for Data includes an enterprise data catalog that helps to create a cohesive information architecture.</p>
@@ -917,7 +917,7 @@ Amazon may share user-deployment information with the AWS Partner that collabora
 <div class="ulist">
 <ul>
 <li>
-<p>A Red Hat OpenShift Container Platform cluster created in a new or existing VPC on Red Hat CoreOS (RHCOS) instances, using the <a href="https://docs.openshift.com/container-platform/4.3/installing/installing_aws/installing-aws-customizations.html" target="_blank" rel="noopener">Red Hat OpenShift installer provisioned infrastructure</a>. See the <a href="https://docs.openshift.com/container-platform/4.3/architecture/architecture-installation.html" target="_blank" rel="noopener">OpenShift Container Platform installation overview</a> for details about the underlying OpenShift deployment architecture.</p>
+<p>A Red Hat OpenShift Container Platform cluster created in a new or existing VPC on Red Hat CoreOS (RHCOS) instances, using the <a href="https://docs.openshift.com/container-platform/4.5/installing/installing_aws/installing-aws-customizations.html" target="_blank" rel="noopener">Red Hat OpenShift installer provisioned infrastructure</a>. See the <a href="https://docs.openshift.com/container-platform/4.5/architecture/architecture-installation.html" target="_blank" rel="noopener">OpenShift Container Platform installation overview</a> for details about the underlying OpenShift deployment architecture.</p>
 </li>
 <li>
 <p>A highly available storage infrastructure with Portworx, Amazon EFS, or Red Hat OpenShift Container Storage (OCS).</p>
@@ -967,7 +967,7 @@ After you deploy the Quick Start, <a href="https://docs.aws.amazon.com/awsaccoun
 <p>You can get started with a 60-day trial or use your existing Cloud Pak for Data entitlement. Additional costs depend on the storage type for your platform. You can choose among three storage classes: Amazon EFS, Portworx, or OCS. EFS costs are charged automatically to your AWS account. You have an option to use a Portworx trial version or an evaluation version of OCS. Visit <a href="https://portworx.com/products/features/" target="_blank" rel="noopener">Portworx</a> or <a href="https://www.openshift.com/products/container-storage/contact" target="_blank" rel="noopener">OCS</a> for licensed versions.</p>
 </div>
 <div class="paragraph">
-<p>For Cloud Pak for Data pricing information, or to use your existing entitlements, contact your IBM sales representative at +1 (877) 426-3774. For more information about licensing terms, see the <a href="https://ibm.biz/BdqSw4" target="_blank" rel="noopener">IBM License Agreement</a>.</p>
+<p>For Cloud Pak for Data pricing information, or to use your existing entitlements, contact your IBM sales representative at +1 (877) 426-3774. For more information about licensing terms, see the <a href="https://ibm.biz/Bdq6KP" target="_blank" rel="noopener">IBM License Agreement</a>.</p>
 </div>
 </div>
 </div>
@@ -981,7 +981,7 @@ AWS Cloud.</p>
 </div>
 <div id="architecture1" class="imageblock">
 <div class="content">
-<img src="images/image1.png" alt="Architecture" width="100%" height="100%">
+<img src="images/architecture.png" alt="Architecture" width="100%" height="100%">
 </div>
 <div class="title">Figure 1. Quick Start architecture for Cloud Pak for Data on AWS</div>
 </div>
@@ -1032,7 +1032,7 @@ AWS Cloud.</p>
 <p>An Application Load Balancer, which spans the private subnets, for accessing the OCP compute nodes.</p>
 </li>
 <li>
-<p><a href="https://docs.openshift.com/container-platform/4.3/machine_management/applying-autoscaling.html" target="_blank" rel="noopener">OpenShift auto scaling</a> for the OCP compute nodes.</p>
+<p><a href="https://docs.openshift.com/container-platform/4.5/machine_management/applying-autoscaling.html" target="_blank" rel="noopener">OpenShift auto scaling</a> for the OCP compute nodes.</p>
 </li>
 <li>
 <p>Amazon Route 53, as your public Domain Name System (DNS), for resolving domain names for the IBM Cloud Pak for Data management console.</p>
@@ -1050,7 +1050,7 @@ AWS Cloud.</p>
 </div>
 <div id="cpdservices" class="imageblock">
 <div class="content">
-<img src="images/image2.png" alt="Architecture" width="100%" height="100%">
+<img src="images/cpd.png" alt="Architecture" width="100%" height="100%">
 </div>
 <div class="title">Figure 2. Cloud Pak for Data services</div>
 </div>
@@ -1062,13 +1062,7 @@ AWS Cloud.</p>
 <div class="sect2">
 <h3 id="_specialized_knowledge">Specialized knowledge</h3>
 <div class="paragraph">
-<p>This deployment guide requires a moderate level of familiarity with
-AWS services. If you’re new to AWS, visit the
-<a href="https://aws.amazon.com/getting-started/" target="_blank" rel="noopener">Getting Started Resource Center</a>
-and the <a href="https://aws.amazon.com/training/">AWS Training and Certification
-website</a>. These sites provide materials for learning how to design,
-deploy, and operate your infrastructure and applications on the AWS
-Cloud.</p>
+<p>This deployment requires a moderate level of familiarity with AWS services. If you’re new to AWS, visit <a href="https://aws.amazon.com/getting-started/" target="_blank" rel="noopener">Getting Started with AWS</a> and <a href="https://aws.amazon.com/training/" target="_blank" rel="noopener">Training and Certification</a>. These sites provide materials for learning how to design, deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 </div>
 <div class="paragraph">
 <p>This Quick Start assumes basic familiarity with Cloud Pak for Data components and services. If you‚are new to Cloud Pak for Data and Red Hat OpenShift, see <a href="#_additional_resources">Additional resources</a>.</p>
@@ -1213,7 +1207,7 @@ Certain Regions are available on an opt-in basis. See <a href="https://docs.aws.
 <div class="ulist">
 <ul>
 <li>
-<p>Kubernetes version: 1.16.2</p>
+<p>Check Use the Portworx Operator</p>
 </li>
 <li>
 <p>Portworx version: 2.5</p>
@@ -1232,7 +1226,7 @@ Certain Regions are available on an opt-in basis. See <a href="https://docs.aws.
 <p>Environment: Cloud/AWS</p>
 </li>
 <li>
-<p>Choose type of disk: ‚ÄúCreate using a spec‚Äù</p>
+<p>Choose type of disk: ‚Create using a spec‚</p>
 </li>
 <li>
 <p>Leave the disk type and size as defaults</p>
@@ -1354,11 +1348,11 @@ You are responsible for the cost of the AWS services used while running this Qui
 <tbody>
 <tr>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://fwd.aws/r9QRP" target="_blank" rel="noopener">Deploy Cloud Pak for Data into a new VPC on AWS</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://aws-quickstart.s3.amazonaws.com/quickstart-ibm-icp-for-data/templates/ibm-cloudpak-root.yaml" target="_blank" rel="noopener">View template</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://aws-quickstart.s3.amazonaws.com/quickstart-ibm-icp-for-data/templates/ibm-cloudpak-root.template.yaml" target="_blank" rel="noopener">View template</a></p></td>
 </tr>
 <tr>
 <td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://fwd.aws/6zgYY" target="_blank" rel="noopener">Deploy Cloud Pak for Data into an existing VPC on AWS</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://aws-quickstart.s3.amazonaws.com/quickstart-ibm-icp-for-data/templates/ibm-cloudpak-data.yaml" target="_blank" rel="noopener">View template</a></p></td>
+<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="https://aws-quickstart.s3.amazonaws.com/quickstart-ibm-icp-for-data/templates/ibm-cloudpak-data.template.yaml" target="_blank" rel="noopener">View template</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -1415,7 +1409,7 @@ If you’re deploying Cloud Pak for Data into an existing VPC, make sure that yo
 </div>
 <div id="cfn_outputs" class="imageblock">
 <div class="content">
-<a class="image" href="images/cfn_outputs.png"><img src="images/cfn_outputs.png" alt="cfn_outputs" width="648" height="439"></a>
+<a class="image" href="images/cfn_outputs.png"><img src="images/cfn_outputs.png" alt="cfn_outputs" width="100%" height="100%"></a>
 </div>
 <div class="title">Figure 3. Cloud Pak for Data outputs after successful deployment</div>
 </div>
@@ -1438,7 +1432,7 @@ If you’re deploying Cloud Pak for Data into an existing VPC, make sure that yo
 <p>A new tab opens in your browser. If you configured the hostname resolution for the cluster DNS name in the URL, you will see either the Cloud Pak for Data web client login page or a warning from your browser that the HTTPS connection is unsafe. By default, the public key infrastructure (PKI) certificate that is created for the Cloud Pak for Data cluster is self-signed, leading to the unsafe connection warning from your browser.</p>
 </li>
 <li>
-<p>Log in to the Cloud Pak for Data web client by using the default administrator and the password you supplied when creating the stack.</p>
+<p>Log in to the Cloud Pak for Data web client by using the default administrator username <strong>admin</strong> and password you supplied while creating the stack.</p>
 </li>
 <li>
 <p>Once you log in, the welcome page is displayed as shown in <a href="#cpdwelcomepage">Figure 4</a>.</p>
@@ -1447,7 +1441,7 @@ If you’re deploying Cloud Pak for Data into an existing VPC, make sure that yo
 </div>
 <div id="cpdwelcomepage" class="imageblock">
 <div class="content">
-<a class="image" href="images/image8.png"><img src="images/image8.png" alt="image" width="100%" height="100%"></a>
+<a class="image" href="images/cpdwelcomepage.png"><img src="images/cpdwelcomepage.png" alt="image" width="100%" height="100%"></a>
 </div>
 <div class="title">Figure 4. Welcome page for Cloud Pak for Data web client</div>
 </div>
@@ -1462,14 +1456,21 @@ If you’re deploying Cloud Pak for Data into an existing VPC, make sure that yo
 <div class="sect2">
 <h3 id="_manage_your_cluster_using_the_openshift_console">Manage your cluster using the OpenShift Console</h3>
 <div class="paragraph">
-<p>To access the Cloud Pak for Data web client, go to the <strong>OpenShiftUI</strong> output of the root stack.</p>
+<p>To access the Openshift web console, go to the <strong>OpenShiftUI</strong> output of the root stack.</p>
 </div>
-<div class="paragraph">
-<p>The default OpenShift administrator name is <strong>kubeadmin.</strong> The password can be obtained from the OpenShiftSecret resource.</p>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Log in to the Openshift web console by using the default administrator username <strong>admin</strong> and password you supplied while creating the stack.</p>
+</li>
+<li>
+<p>Alternatively, use the default OpenShift administrator  <strong>kubeadmin.</strong> The password can be obtained from the OpenShiftSecret resource.</p>
+</li>
+</ol>
 </div>
 <div id="ocpsecret" class="imageblock">
 <div class="content">
-<a class="image" href="images/image9.png"><img src="images/image9.png" alt="image" width="100%" height="100%"></a>
+<a class="image" href="images/ocpsecret.png"><img src="images/ocpsecret.png" alt="image" width="100%" height="100%"></a>
 </div>
 <div class="title">Figure 5. OpenShift secret resource</div>
 </div>
@@ -1478,7 +1479,7 @@ If you’re deploying Cloud Pak for Data into an existing VPC, make sure that yo
 </div>
 <div id="ocppassword" class="imageblock">
 <div class="content">
-<a class="image" href="images/image10.png"><img src="images/image10.png" alt="image" width="100%" height="100%"></a>
+<a class="image" href="images/ocppassword.png"><img src="images/ocppassword.png" alt="image" width="100%" height="100%"></a>
 </div>
 <div class="title">Figure 6. Retrieve secret value for console password</div>
 </div>
@@ -1502,7 +1503,7 @@ If you’re deploying Cloud Pak for Data into an existing VPC, make sure that yo
 <p>In the list of stacks created viewing the nested stacks, choose the <strong>CloudPakDataStack</strong> stack.</p>
 <div id="ocpstack" class="imageblock">
 <div class="content">
-<a class="image" href="images/image11.png"><img src="images/image11.png" alt="image" width="100%" height="100%"></a>
+<a class="image" href="images/ocpstack.png"><img src="images/ocpstack.png" alt="image" width="100%" height="100%"></a>
 </div>
 <div class="title">Figure 7. OpenShift stack</div>
 </div>
@@ -1511,7 +1512,7 @@ If you’re deploying Cloud Pak for Data into an existing VPC, make sure that yo
 <p>In the stack window, choose the <strong>Resources</strong> tab, and choose <strong>BootnodeSecurityGroup</strong>.</p>
 <div id="bootnodeSG" class="imageblock">
 <div class="content">
-<a class="image" href="images/image12.png"><img src="images/image12.png" alt="image" width="100%" height="100%"></a>
+<a class="image" href="images/bootnodeSG.png"><img src="images/bootnodeSG.png" alt="image" width="100%" height="100%"></a>
 </div>
 <div class="title">Figure 8. Boot node security group</div>
 </div>
@@ -1520,7 +1521,7 @@ If you’re deploying Cloud Pak for Data into an existing VPC, make sure that yo
 <p>The security group window displays the ingress rules. On the <strong>Inbound</strong> tab, choose <strong>Edit</strong> to bring up the rule editor.</p>
 <div id="inboundrules" class="imageblock">
 <div class="content">
-<a class="image" href="images/image13.png"><img src="images/image13.png" alt="image" width="100%" height="100%"></a>
+<a class="image" href="images/inboundrules.png"><img src="images/inboundrules.png" alt="image" width="100%" height="100%"></a>
 </div>
 <div class="title">Figure 9. Editing inbound rules</div>
 </div>
@@ -1529,7 +1530,7 @@ If you’re deploying Cloud Pak for Data into an existing VPC, make sure that yo
 <p>Choose <strong>Add rule</strong>, and fill in the rule details. Add the network CIDR for the group of IP addresses that you want to permit SSH access to the boot nodes. To allow any IP address, use 0.0.0.0/0.</p>
 <div id="inboundruledetails" class="imageblock">
 <div class="content">
-<a class="image" href="images/image14.png"><img src="images/image14.png" alt="image" width="100%" height="100%"></a>
+<a class="image" href="images/inboundruledetails.png"><img src="images/inboundruledetails.png" alt="image" width="100%" height="100%"></a>
 </div>
 <div class="title">Figure 10. Supplying rule details</div>
 </div>
@@ -1546,19 +1547,19 @@ If you’re deploying Cloud Pak for Data into an existing VPC, make sure that yo
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Run the command ssh-add -K &lt;your-key.pem&gt; to store the key in your keychain. On Linux, you must omit the -K flag.</p>
+<p>Run the command <code>ssh-add -K &lt;your-key.pem&gt;</code> to store the key in your keychain. On Linux, you must omit the <code>-K</code> flag.</p>
 </li>
 <li>
 <p>Retrieve the hostname of the boot node from the Amazon EC2 console.</p>
 <div id="bootnodename" class="imageblock">
 <div class="content">
-<a class="image" href="images/image15.png"><img src="images/image15.png" alt="image" width="100%" height="100%"></a>
+<a class="image" href="images/bootnodename.png"><img src="images/bootnodename.png" alt="image" width="100%" height="100%"></a>
 </div>
 <div class="title">Figure 11. Hostname of the boot node</div>
 </div>
 </li>
 <li>
-<p>To log in to the bastion host, run ssh -A ec2-user@&lt;bootnode-host-name&gt;.</p>
+<p>To log in to the bastion host, run <code>ssh -A ec2-user@&lt;bootnode-host-name&gt;</code>.</p>
 </li>
 <li>
 <p>Run sudo to become root:</p>
@@ -1596,7 +1597,7 @@ $ oc get pods</code></pre>
 <p>Run <code>oc get machineset -n openshift-machine-api</code> to get the machine sets for each Availability Zone.</p>
 <div id="machinesets" class="imageblock">
 <div class="content">
-<a class="image" href="images/image16.png"><img src="images/image16.png" alt="image" width="566" height="84"></a>
+<a class="image" href="images/machinesets.png"><img src="images/machinesets.png" alt="image" width="566" height="84"></a>
 </div>
 <div class="title">Figure 12. Machinesets output</div>
 </div>
@@ -1613,7 +1614,7 @@ $ oc get pods</code></pre>
 </div>
 <div id="editmachineset" class="imageblock">
 <div class="content">
-<a class="image" href="images/image17.png"><img src="images/image17.png" alt="image" width="567" height="182"></a>
+<a class="image" href="images/editmachineset.png"><img src="images/editmachineset.png" alt="image" width="567" height="182"></a>
 </div>
 <div class="title">Figure 13. Edit Machineset</div>
 </div>
@@ -1649,7 +1650,7 @@ If you choose to scale down your cluster or reduce the number of compute nodes, 
 </div>
 <div id="serviceCatalog" class="imageblock">
 <div class="content">
-<a class="image" href="images/image18.png"><img src="images/image18.png" alt="image" width="592" height="284"></a>
+<a class="image" href="images/serviceCatalog.png"><img src="images/serviceCatalog.png" alt="image" width="592" height="284"></a>
 </div>
 <div class="title">Figure 14. Services catalog page in Cloud Pak for Data</div>
 </div>
@@ -1740,7 +1741,7 @@ If you choose to scale down your cluster or reduce the number of compute nodes, 
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Log in to your boot-node server as mentioned in <a href="#accessing-the-control-plane-through-the-boot-node">access section</a>.</p>
+<p>Log in to your boot-node server as mentioned in <a href="#_accessing_the_control_plane_through_the_boot_node">access section</a>.</p>
 </li>
 <li>
 <p>Change to the install directory.</p>
@@ -1752,9 +1753,9 @@ If you choose to scale down your cluster or reduce the number of compute nodes, 
 <p>Run the following commands.</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>$ ./cpd-linux adm -r ./repo.yaml -a &lt;Service Name&gt; -n &lt;Project Name&gt; --apply
+<pre class="highlight"><code>$ ./cpd-cli adm -r ./repo.yaml -a &lt;Service Name&gt; -n &lt;Project Name&gt; --apply
 
-$ ./cpd-linux -c &lt;Storage Class&gt; -r ./repo.yaml -a lite -n &lt;Project Name&gt; --transfer-image-to $(oc get route -n openshift-image-registry | tail -1| awk '\{print $2}')/&lt;Project Name&gt; --target-registry-username $(oc whoami | sed 's/://g') --target-registry-password $( oc serviceaccounts get-token cpdtoken) --cluster-pull-prefix image-registry.openshift-image-registry.svc:5000/&lt;Project Name&gt; -o override.yaml --insecure-skip-tls-verify</code></pre>
+$ ./cpd-cli install -c &lt;Storage Class&gt; --override-config &lt;Storage Type(ocs/portworx)&gt; -r ./repo.yaml -a &lt;Service Name&gt; -n &lt;Project Name&gt; --transfer-image-to $(oc get route -n openshift-image-registry | tail -1| awk '\{print $2}')/&lt;Project Name&gt; --target-registry-username $(oc whoami | sed 's/://g') --target-registry-password $( oc serviceaccounts get-token cpdtoken) --cluster-pull-prefix image-registry.openshift-image-registry.svc:5000/&lt;Project Name&gt; --insecure-skip-tls-verify</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1868,18 +1869,14 @@ $ ./cpd-linux -c &lt;Storage Class&gt; -r ./repo.yaml -a lite -n &lt;Project Nam
 </ul>
 </div>
 <div class="paragraph">
-<p><strong>IBM Cloud Pak for Data documentation</strong></p>
+<p><strong>IBM Cloud Pak for Data documentation</strong>
+* <a href="https://www.ibm.com/support/knowledgecenter/SSQNUZ_current" target="_blank" rel="noopener">IBM Knowledge Center</a>
+* <a href="https://www.ibm.com/support/producthub/icpdata/resources" target="_blank" rel="noopener">Product Hub</a></p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://www.ibm.com/support/knowledgecenter/en/SSQNUZ" target="_blank" rel="noopener">IBM Knowledge Center</a></p>
-</li>
-<li>
-<p><a href="https://www.ibm.com/support/producthub/icpdata/resources" target="_blank" rel="noopener">Product Hub</a></p>
-</li>
-<li>
-<p><a href="https://docs.openshift.com/container-platform/3.11/architecture/index.html" target="_blank" rel="noopener">Red Hat OpenShift Container Platform</a></p>
+<p><a href="https://docs.openshift.com/container-platform/4.5/architecture/architecture.html" target="_blank" rel="noopener">Red Hat OpenShift Container Platform</a></p>
 </li>
 </ul>
 </div>
@@ -1982,7 +1979,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock">Cluster network CIDR
 (<code>ClusterNetworkCIDR</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.128.0.0/14</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The CIDR IP range that is permitted to access Openshift Cluster Network. We recommend that you set this value to a trusted IP range.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Cluster Network CIDR IP range that is used as IP address pools for pods.</p></td>
 </tr>
 </tbody>
 </table>
@@ -2093,7 +2090,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock">Publish the user-facing endpoints of your cluster.
 (<code>PrivateCluster</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>External</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">To Deploy a Private cluster select Internal and External for Public cluster</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose Internal to deploy a private cluster. For details visit OpenShift documentation (<a href="https://docs.openshift.com/container-platform/4.5/installing/installing_aws/installing-aws-private.html" class="bare">https://docs.openshift.com/container-platform/4.5/installing/installing_aws/installing-aws-private.html</a>)</p></td>
 </tr>
 </tbody>
 </table>
@@ -2379,7 +2376,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock">Cluster network CIDR
 (<code>ClusterNetworkCIDR</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.128.0.0/14</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The CIDR IP range that is permitted to access Openshift Cluster Network. We recommend that you set this value to a trusted IP range.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Cluster Network CIDR IP range that is used as IP address pools for pods.</p></td>
 </tr>
 </tbody>
 </table>
