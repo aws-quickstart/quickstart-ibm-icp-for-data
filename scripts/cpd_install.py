@@ -473,12 +473,14 @@ class CPDInstall(object):
         method to update the default password of admin user of CPD with user defined password 
         Note: CPD password will be same as Openshift Cluster password
         """
-        methodName = "manageUser"  
-        manageUser = "sudo python /ibm/manage_admin_user.py "+self.Namespace+" admin "+self.password
+        methodName = "manageUser"      
+        bash_cmd = 'printf \"'+self.password+'\n" | /usr/src/server-src/scripts/manage-user.sh --enable-user admin'
+        manageUser="oc -n "+self.Namespace+" exec -it  $(oc get pod  -n "+self.Namespace+" -l component=usermgmt | tail -1 | cut -f1 -d\ ) -- bash -c '"+bash_cmd+"'"
+
         TR.info(methodName,"Start manageUser")    
         try:
-            call(manageUser, shell=True, stdout=icpdInstallLogFile)
-            TR.info(methodName,"End manageUser")    
+            retcode = check_output(['bash','-c', manageUser])
+            TR.info(methodName,"End manageUser returned %s"%(retcode))    
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
                 
