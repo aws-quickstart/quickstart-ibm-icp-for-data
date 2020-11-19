@@ -3,3 +3,6 @@ ci/taskcat-dev*
 .DS_Store
 venv/
 .idea/
+index.html
+docs/index.html
+docs/generated/*
