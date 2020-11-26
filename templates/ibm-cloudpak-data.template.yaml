@@ -432,8 +432,8 @@ Parameters:
       The version of IBM Cloud Pak for Data to be deployed.  The full version must be provided, e.g., 3.0.1.
     Type: String
     AllowedValues:
-      - 3.0.1
-    Default: 3.0.1
+      - 3.5
+    Default: 3.5
   LicenseAgreement:
     Description: >-
       I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/BdqyB2).
