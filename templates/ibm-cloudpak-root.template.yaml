@@ -441,7 +441,7 @@ Parameters:
     Default: "External"
 
   ICPDVersion:
-    Description: The version of Cloud Pak for Data to be deployed. Currently only v3.0.1 is supported.
+    Description: The version of Cloud Pak for Data to be deployed. Currently only v3.5 is supported.
     Type: String
     AllowedValues:
       - 3.5
