@@ -147,7 +147,7 @@ The cluster auto scaler can overrule scaling activity to maintain the required t
 
 === {partner-product-short-name} services
 
-For more information about available services for {partner-product-short-name}, see https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_current/cpd/svc/services.html[IBM services in the catalog^].
+For more information about available services for {partner-product-short-name}, see https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/svc-nav/head/services.html[IBM services in the catalog^].
 
 :xrefstyle: short
 [#serviceCatalog]
