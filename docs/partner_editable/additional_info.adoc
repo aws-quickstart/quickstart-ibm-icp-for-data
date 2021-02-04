@@ -88,7 +88,7 @@ image::../images/inboundruledetails.png[image,width=100%,height=100%]
 
 To use SSH access on the OpenShift cluster instances via the bastion host, use SSH agent forwarding, as in the following bash instructions.
 
-.  Run the command ssh-add -K <your-key.pem> to store the key in your keychain. On Linux, you must omit the -K flag.
+.  Run the command `ssh-add -K <your-key.pem>` to store the key in your keychain. On Linux, you must omit the `-K` flag.
 .  Retrieve the hostname of the boot node from the Amazon EC2 console.
 +
 :xrefstyle: short
@@ -97,7 +97,7 @@ To use SSH access on the OpenShift cluster instances via the bastion host, use S
 [link=images/bootnodename.png]
 image::../images/bootnodename.png[image,width=100%,height=100%]
 +
-.  To log in to the bastion host, run ssh -A ec2-user@<bootnode-host-name>.
+.  To log in to the bastion host, run `ssh -A ec2-user@<bootnode-host-name>`.
 .  Run sudo to become root:
 +
 ```
@@ -181,7 +181,7 @@ As part of the Quick Start installation, the control plane is installed by defau
 
 ==== Install a service
 
-. Log in to your boot-node server as mentioned in link:#accessing-the-control-plane-through-the-boot-node[access section].
+. Log in to your boot-node server as mentioned in link:#_accessing_the_control_plane_through_the_boot_node[access section].
 .  Change to the install directory.
 .  Run `$ cd /ibm`.
 .  Run the following commands.
