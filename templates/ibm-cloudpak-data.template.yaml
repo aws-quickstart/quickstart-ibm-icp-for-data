@@ -432,11 +432,11 @@ Parameters:
       The version of Cloud Pak for Data to be deployed. Currently only v3.5 is supported.
     Type: String
     AllowedValues:
-      - 3.5
-    Default: 3.5
+      - 3.5.2
+    Default: 3.5.2
   LicenseAgreement:
     Description: >-
-      I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/BdqyB2).
+      I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/BdfEkc).
     Type: String
     Default: '-'
     AllowedValues:
@@ -457,52 +457,52 @@ Mappings:
   AWSAMIRegionMap:
     eu-central-1:
       RHEL76HVM: ami-062dacb006c5860f9
-      COREOS: ami-0ceea534b63224411
+      COREOS: ami-0bd7175ff5b1aef0c
     ap-southeast-2:
       RHEL76HVM: ami-0f1ef883e90ca71c0
-      COREOS: ami-08929f33bfab49b83
+      COREOS: ami-069450613262ba03c
     eu-west-1:
       RHEL76HVM: ami-0a0d2dc2f521ddce6
-      COREOS: ami-0e95125b57fa63b0d
+      COREOS: ami-01b89df58b5d4d5fa
     us-east-1:
       RHEL76HVM: ami-0916c408cb02e310b
-      COREOS: ami-06f85a7940faa3217
+      COREOS: ami-04a16d506e5b0e246
     us-east-2:
       RHEL76HVM: ami-03cfe750d5ea278f5
-      COREOS: ami-04a79d8d7cfa540cc
+      COREOS: ami-0a1f868ad58ea59a7
     us-west-2:
       RHEL76HVM: ami-04b7963c90686dd4c
-      COREOS: ami-0d231993dddc5cd2e
+      COREOS: ami-0dd9008abadc519f1
     ap-northeast-1:
       RHEL76HVM: ami-0dc41c7805e171046
-      COREOS: ami-023d0452866845125
+      COREOS: ami-04e5b5722a55846ea
     eu-west-2:
       RHEL76HVM: ami-096fbd31de0375d2a
-      COREOS: ami-0eef98c447b85ffcd
+      COREOS: ami-06f6e31ddd554f89d
     eu-west-3:
       RHEL76HVM: ami-025fb013ee01513b5
-      COREOS: ami-0049e16104f360df6
+      COREOS: ami-0dc82e2517ded15a1
     ap-southeast-1:
       RHEL76HVM: ami-07cafca3788493264
-      COREOS:  ami-086b93722336bd1d9
+      COREOS:  ami-0630e03f75e02eec4
     eu-north-1:
       RHEL76HVM: ami-75941f0b
-      COREOS: ami-06b7087b2768f644a
+      COREOS: ami-06c9ec42d0a839ad2
     ap-south-1:
       RHEL76HVM: ami-021912f2c8d2c70c9
-      COREOS: ami-0bf62e963a473068e
+      COREOS: ami-09e3deb397cc526a8
     ap-northeast-2:
       RHEL76HVM: ami-0b5425629eb18a008
-      COREOS: ami-0ba4f9a0358bcb44a
+      COREOS: ami-0fdc25c8a0273a742
     sa-east-1:
       RHEL76HVM: ami-048b2348ac2ccfc53
-      COREOS: ami-0c80d785b30eef121
+      COREOS: ami-0cd44e6dd20e6c7fa
     ca-central-1:
       RHEL76HVM: ami-05816666b3178f208
-      COREOS: ami-0f6d943a1fa9172fd
+      COREOS: ami-012518cdbd3057dfd
     us-west-1:
       RHEL76HVM: ami-0388d197bb42be9be
-      COREOS: ami-0633b392e8eff25e7
+      COREOS: ami-0a65d76e3a6f6622f
 
 
 
@@ -796,10 +796,11 @@ Resources:
             yum install -y git
             yum install -y wget
             yum install -y unzip
-            
+            yum install -y python3
             git clone https://github.com/aws-quickstart/quickstart-linux-utilities.git
             export P=/quickstart-linux-utilities/quickstart-cfn-tools.source
             source $P
+            
             qs_bootstrap_pip || qs_err " pip bootstrap failed "
             qs_aws-cfn-bootstrap || qs_err "cfn bootstrap failed"
             pip install awscli  &> /var/log/userdata.awscli_install.log || qs_err " awscli install failed "
@@ -850,7 +851,7 @@ Resources:
                     instanceID = os.environ['BootNode']
                     storage = os.environ['Storage']
                     stackname = os.environ['StackName']
-                    print instanceID
+                    print(instanceID)
                     response = ssm.send_command(Targets=[{"Key":"instanceids","Values":[instanceID]}],
                             DocumentName="AWS-RunShellScript",
                             Parameters={"commands":["/ibm/destroy.sh %s %s" %(storage,stackname)],
@@ -887,7 +888,7 @@ Resources:
           StackName: !Ref AWS::StackName
       Handler: index.handler
       Role: !GetAtt 'LambdaExecutionRole.Arn'
-      Runtime: python2.7
+      Runtime: python3.8
       Timeout: 600
              
   Cleanup :

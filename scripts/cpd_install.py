@@ -153,23 +153,22 @@ class CPDInstall(object):
         Downloads binary file from S3 and extracts it to /ibm folder
         installs user selected services using transfer method
         """
-        destPath = "/ibm/cpd-cli-linux-EE-3.5.1.tgz"
+        cloudctl_destPath = "/ibm/cloudctl-linux-amd64.tar.gz"
+        cloudctl_sig_destPath = "/ibm/cloudctl-linux-amd64.tar.gz.sig"
+        cp_datacore_destPath = "/ibm/ibm-cp-datacore.tgz"
         methodName = "installCPD"
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/cpd-cli-linux-EE-3.5.1.tgz", destPath=destPath)
 
-        untar_cmd = "tar xf "+destPath 
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5.2/cloudctl-linux-amd64.tar.gz", destPath=cloudctl_destPath)
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5.2/cloudctl-linux-amd64.tar.gz.sig", destPath=cloudctl_sig_destPath)
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5.2/ibm-cp-datacore-1.3.3.tgz", destPath=cp_datacore_destPath)
+
+        untar_cmd = "sudo tar -xvf "+cloudctl_destPath+" -C /usr/bin"
+        TR.info(methodName,"untarcmd =%s"%untar_cmd)
         call(untar_cmd,shell=True,stdout=icpdInstallLogFile)        
-        os.chmod("/ibm/cpd-cli", stat.S_IEXEC)	
-        self.repoFile = "/ibm/repo.yaml"
-        
-        
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/repo.yaml", destPath=self.repoFile)
-        TR.info(methodName, "updating repo.yaml with apikey value provided")
-        
-        #TODO change this later
-        self.updateTemplateFile(self.repoFile, '${apikeyusername}',self.APIUsername)
-        self.updateTemplateFile(self.repoFile ,'${apikey}',self.apiKey)
-      
+        untar_datacore_cmd = "tar -xf "+cp_datacore_destPath
+        TR.info(methodName,"untar_datacore_cmd =%s"%untar_datacore_cmd)
+        call(untar_datacore_cmd,shell=True,stdout=icpdInstallLogFile)
+
         default_route = "oc get route default-route -n openshift-image-registry --template='{{ .spec.host }}'"
         TR.info(methodName,"Get default route  %s"%default_route)
         try:
@@ -186,7 +185,14 @@ class CPDInstall(object):
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
+        oc_new_project ="oc new-project cpd-meta-ops"
+        try:
+            retcode = call(oc_new_project,shell=True, stdout=icpdInstallLogFile)
+            TR.info(methodName,"Create meta ops project cpd-meta-ops,retcode=%s" %(retcode))
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
 
+        self.installOperator(icpdInstallLogFile)
         oc_new_project ="oc new-project "+self.Namespace
         try:
             retcode = call(oc_new_project,shell=True, stdout=icpdInstallLogFile)
@@ -194,15 +200,15 @@ class CPDInstall(object):
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
 
-        self.token = self.getToken(icpdInstallLogFile)
+        #self.token = self.getToken(icpdInstallLogFile)
         if(self.StorageType=='OCS'):
             self.storageClass = "ocs-storagecluster-cephfs"
             self.storageOverrideFile = "/ibm/override_ocs.yaml"
-            self.storageOverride = " --override-config ocs"
+            self.storageOverride = "ocs"
         elif(self.StorageType=='Portworx'):    
             self.storageClass = "portworx-shared-gp3"
             self.storageOverrideFile = "/ibm/override_px.yaml"
-            self.storageOverride = " --override-config portworx"
+            self.storageOverride = "portworx"
         elif(self.StorageType=='EFS'):
             self.storageClass = "aws-efs"
             self.storageOverride = ""
@@ -221,13 +227,9 @@ class CPDInstall(object):
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
         self.manageUser(icpdInstallLogFile)
         
-        if(self.installSpark):
-            TR.info(methodName,"Start installing Spark AE package")
-            sparkstart = Utilities.currentTimeMillis()
-            self.installAssemblies("spark",icpdInstallLogFile)
-            sparkend = Utilities.currentTimeMillis()
-            TR.info(methodName,"Spark AE  package installation completed")
-            self.printTime(sparkstart, sparkend, "Installing Spark AE")   
+
+        
+        
 
         if(self.installDV):
             TR.info(methodName,"Start installing DV package")
@@ -253,7 +255,14 @@ class CPDInstall(object):
             wmlend = Utilities.currentTimeMillis()
             TR.info(methodName,"WML package installation completed")
             self.printTime(wmlstart, wmlend, "Installing WML")
-        
+
+        if(self.installSpark):
+            TR.info(methodName,"Start installing Spark AE package")
+            sparkstart = Utilities.currentTimeMillis()
+            self.installAssemblies("spark",icpdInstallLogFile)
+            sparkend = Utilities.currentTimeMillis()
+            TR.info(methodName,"Spark AE  package installation completed")
+            self.printTime(sparkstart, sparkend, "Installing Spark AE")   
         if(self.installWKC):
             TR.info(methodName,"Start installing WKC package")
             wkcstart = Utilities.currentTimeMillis()
@@ -277,12 +286,31 @@ class CPDInstall(object):
             cdeend = Utilities.currentTimeMillis()
             TR.info(methodName,"Cognos Dashboard package installation completed")
             self.printTime(cdestart, cdeend, "Installing Cognos Dashboard")  
-
-               
-
-
         TR.info(methodName,"Installed all packages.")
     #endDef    
+
+    def installOperator(self,icpdInstallLogFile):
+        """
+        method to install cpd operator
+        """
+        methodName = "installOperator"
+        cloudctl_cmd = 'cloudctl-linux-amd64 case launch --case ibm-cp-datacore --namespace cpd-meta-ops --inventory cpdMetaOperatorSetup         --action install-operator --tolerance=1 --args "--entitledRegistry cp.icr.io/cp/cpd --entitledUser cp --entitledPass '+self.apiKey+'"'
+        try:
+            TR.info(methodName,"Execute install operator  %s"%cloudctl_cmd)
+            retcode = check_output(['bash','-c',cloudctl_cmd])
+            TR.info(methodName,"Install operator returned %s"%retcode)
+            time.sleep(300)
+            cloudctl_status_cmd = "oc get pods -n cpd-meta-ops -l name=ibm-cp-data-operator --no-headers | awk '{print $3}'"
+            retcode = check_output(['bash','-c',cloudctl_status_cmd])
+            TR.info(methodName,"Execute install operator returned %s"%(retcode))   
+            if("Running" not in retcode):
+                TR.error(methodName,"Installation of operator Failed %s"%retcode) 
+                raise Exception("Installation of operator Failed: %s" % retcode)
+        except CalledProcessError as e:
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+        
+    #endDef
+         
     def printTime(self, beginTime, endTime, text):
         """
         method to capture time elapsed for each event during installation
@@ -294,31 +322,7 @@ class CPDInstall(object):
         TR.info(methodName,"Elapsed time (hh:mm:ss): %d:%02d:%02d for %s" % (eth,etm,ets,text))
     #endDef
 
-    def getToken(self,icpdInstallLogFile):
-        """
-        method to get sa token to be used to push and pull from local docker registry
-        """
-        methodName = "getToken"
-        create_sa_cmd = "oc create serviceaccount cpdtoken"
-        TR.info(methodName,"Create service account cpdtoken %s"%create_sa_cmd)
-        try:
-            retcode = call(create_sa_cmd,shell=True, stdout=icpdInstallLogFile)
-            TR.info(methodName,"Created service account cpdtoken %s"%retcode)
-        except CalledProcessError as e:
-            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
-
-        addrole_cmd = "oc policy add-role-to-user admin system:serviceaccount:"+self.Namespace+":cpdtoken"
-        TR.info(methodName," Add role to service account %s"%addrole_cmd)
-        try:
-            retcode = call(addrole_cmd,shell=True, stdout=icpdInstallLogFile)
-            TR.info(methodName,"Role added to service account %s"%retcode)
-        except CalledProcessError as e:
-            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))    
-
-        get_token_cmd = "oc serviceaccounts get-token cpdtoken"
-        TR.info(methodName,"Retrieve token from service account %s"%get_token_cmd)
-        return check_output(['bash','-c', get_token_cmd])
-    #endDef    
+   
     def updateTemplateFile(self, source, placeHolder, value):
         """
         method to update placeholder values in templates
@@ -343,23 +347,32 @@ class CPDInstall(object):
         Installation will be done for the assembly using local registry
         """
         methodName = "installAssemblies"
-
-        registry = self.regsitry+"/"+self.Namespace
-        apply_cmd = "/ibm/cpd-cli adm -r /ibm/repo.yaml -a "+assembly+"  -n "+self.Namespace+" --accept-all-licenses --apply | tee /ibm/logs/"+assembly+"_apply.log"
-        TR.info(methodName,"Execute apply command for assembly %s"%apply_cmd)
+        service_tmpl = "/ibm/installDir/cpd-service.tpl.yaml"
+        service_cr = "/ibm/installDir/cpd-"+assembly+".yaml"
+        shutil.copyfile(service_tmpl,service_cr)
+        self.updateTemplateFile(service_cr,'${SERVICE}',assembly)
+        self.updateTemplateFile(service_cr,'${STORAGECLASS}',self.storageClass)
+        self.updateTemplateFile(service_cr,'${override-storage}', self.storageOverride)
+        install_cmd = "oc create -f "+service_cr
         try:
-            retcode = call(apply_cmd,shell=True, stdout=icpdInstallLogFile)
-            TR.info(methodName,"Executed apply command for assembly %s returned %s"%(assembly,retcode))
+            TR.info(methodName,"Execute install command for assembly %s"%assembly)
+            retcode = call(install_cmd,shell=True, stdout=icpdInstallLogFile)
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-            
-        install_cmd = "/ibm/cpd-cli install -c "+self.storageClass+" "+self.storageOverride+"  -r /ibm/repo.yaml -a "+assembly+" -n "+self.Namespace+" --transfer-image-to="+registry+" --target-registry-username=kubeadmin  --target-registry-password="+self.token+" --cluster-pull-prefix image-registry.openshift-image-registry.svc:5000/"+self.Namespace+" --accept-all-licenses --insecure-skip-tls-verify | tee /ibm/logs/"+assembly+"_install.log"
-        try:     
-            retcode = call(install_cmd,shell=True, stdout=icpdInstallLogFile)
-            TR.info(methodName,"Execute install command for assembly %s returned %s"%(assembly,retcode))  
+        TR.info(methodName,"Execute install command for assembly %s returned %s"%(assembly,retcode))    
+        cr_status_cmd = "oc get cpdservice "+assembly+"-cpdservice  --output='jsonpath={.status.status}' | xargs"
+        try:
+            retcode = "Installing"
+            while(retcode.rstrip()!="Ready"):
+                time.sleep(60)
+                retcode = check_output(['bash','-c',cr_status_cmd]) 
+                TR.info(methodName,"Get install status for assembly %s is %s"%(assembly,retcode))
+                if(retcode.rstrip() == "Failed"):
+                    TR.error(methodName,"Installation of assembly %s Failed"%assembly) 
+                    raise Exception("Installation of assembly %s Failed"%assembly)
+            TR.info(methodName,"Get install status for assembly %s is %s"%(assembly,retcode))        
         except CalledProcessError as e:
-            TR.error(methodName,"Exception while installing service %s with message %s" %(assembly,e))
-            self.rc = 1
+            TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))   
  
 
     def getS3Object(self, bucket=None, s3Path=None, destPath=None):
@@ -414,60 +427,6 @@ class CPDInstall(object):
         return destPath
     #endDef
     
-    def validateInstall(self, icpdInstallLogFile):
-        """
-            This method is used to validate the installation at the end. At times some services fails and it is not reported. 
-            We use this method to check if cpd operator is up and running. We will then get the helm list of deployed services and validate for each of the services selected by user. IF the count adds up to the defined count then installation is successful. Else  will be flagged it as failure back to cloud Formation.
-        """
-
-        methodName = "validateInstall"
-        count = 3
-        TR.info(methodName,"Validate Installation status")
-        if(self.installDV):
-            count = count+1
-        if(self.installOSWML):
-            count = count+1    
-        if(self.installSpark):
-            count = count+1    
-        if(self.installWKC):
-            count = count+4
-        if(self.installCDE):
-            count = count+1
-        if(self.installWML):
-            count = count+1
-        if(self.installWSL):
-            count = count+5            
-
-        # CCS Count
-        if(self.installCDE or self.installWKC or self.installWSL or self.installWML or self.installSpark or self.installDV or self.installOSWML):
-            count = count+11
-        # DR count    
-        if(self.installWSL or self.installWKC):
-            count = count+1                
-
-        operator_pod = "oc get pods | grep cpd-install-operator | awk '{print $1}'"
-        operator_status = "oc get pods | grep cpd-install-operator | awk '{print $3}'"
-        validate_cmd = "oc exec -it $(oc get pods | grep cpd-install-operator | awk '{print $1}') -- helm list --tls"
-        operator = check_output(['bash','-c',operator_pod])
-        TR.info(methodName,"Operator pod %s"%operator)
-        if(operator == ""):
-            self.rc = 1
-            return
-        op_status = check_output(['bash','-c',operator_status])
-        TR.info(methodName,"Operator pod status is %s"%op_status)
-        if(op_status.rstrip()!="Running"):
-            self.rc = 1
-            return   
-        install_status = check_output(['bash','-c',validate_cmd])
-        TR.info(methodName,"Installation status is %s"%install_status)
-        TR.info(methodName,"Actual Count is %s Deployed count is %s"%(count,install_status.count("DEPLOYED")))
-        if(install_status.count("DEPLOYED")< count):
-            self.rc = 1
-            TR.info(methodName,"Installation Deployed count  is %s"%install_status.count("DEPLOYED"))
-            return   
-
-    #endDef    
-
     def manageUser(self, icpdInstallLogFile):
         """
         method to update the default password of admin user of CPD with user defined password 
@@ -483,30 +442,11 @@ class CPDInstall(object):
             TR.info(methodName,"End manageUser returned %s"%(retcode))    
         except CalledProcessError as e:
             TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-                
-    # #endDef
-    # #     
-    # def activateLicense(self, icpdInstallLogFile):
-    #     """
-    #     method to activate trial license for cpd installation
-    #     """
-    #     methodName = "activateLicense"
-    #     self.updateTemplateFile('/ibm/activate-license.sh','<ELB_DNSNAME>',self.hostname)
-    #     TR.info(methodName,"Start Activate trial")
-    #     icpdUrl = "https://"+self.hostname
-    #     activatetrial = "sudo python /ibm/activate-trial.py "+icpdUrl+" admin "+self.password+" /ibm/trial.lic"
-    #     try:
-    #         call(activatetrial, shell=True, stdout=icpdInstallLogFile)
-    #     except CalledProcessError as e:
-    #         TR.error(methodName,"command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-    #     TR.info(methodName,"End Activate trial")
-    #     TR.info(methodName,"IBM Cloud Pak for Data installation completed.")
-    # #endDef    
 
     def updateStatus(self, status):
         methodName = "updateStatus"
         TR.info(methodName," Update Status of installation")
-        data = "350_AWS_STACK,Status="+status
+        data = "352_AWS_STACK,Status="+status
         updateStatus = "curl -X POST https://un6laaf4v0.execute-api.us-west-2.amazonaws.com/testtracker --data "+data
         try:
             call(updateStatus, shell=True)
@@ -1006,9 +946,9 @@ class CPDInstall(object):
             self.updateTemplateFile(healthcheckFile, '${az3}', self.zones[2])
         
         TR.info(methodName,"Download Openshift Container Platform")
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/openshift-install", destPath="/ibm/openshift-install")
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/oc", destPath="/usr/bin/oc")
-        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5/kubectl", destPath="/usr/bin/kubectl")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5.2/openshift-install", destPath="/ibm/openshift-install")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5.2/oc", destPath="/usr/bin/oc")
+        self.getS3Object(bucket=self.cpdbucketName, s3Path="3.5.2/kubectl", destPath="/usr/bin/kubectl")
         os.chmod("/usr/bin/oc", stat.S_IEXEC)
         os.chmod("/usr/bin/kubectl", stat.S_IEXEC)	
         TR.info(methodName,"Initiating installation of Openshift Container Platform")
@@ -1298,7 +1238,6 @@ class CPDInstall(object):
                 secret = self.RedhatPullSecret.split('/',1)
                 TR.info(methodName,"Pull secret  %s" %secret)  
                 self.pullSecret = "/ibm/pull-secret"
-                #self.getS3Object(bucket=secret[0], s3Path=secret[1], destPath=self.pullSecret)
                 s3_cp_cmd = "aws s3 cp "+self.RedhatPullSecret+" "+self.pullSecret
                 TR.info(methodName,"s3 cp cmd %s"%s3_cp_cmd)
                 call(s3_cp_cmd, shell=True,stdout=icpdInstallLogFile)
@@ -1329,7 +1268,6 @@ class CPDInstall(object):
                     spec = self.PortworxSpec.split('/',1)
                     TR.info(methodName,"spec  %s" %spec)
                     self.spec = "/ibm/templates/px/px-spec.yaml"
-                    #self.getS3Object(bucket=spec[0], s3Path=spec[1], destPath=self.spec)
                     s3_cp_cmd = "aws s3 cp "+self.PortworxSpec+" "+self.spec
                     TR.info(methodName,"s3 cp cmd %s"%s3_cp_cmd)
                     call(s3_cp_cmd, shell=True,stdout=icpdInstallLogFile)
@@ -1343,7 +1281,6 @@ class CPDInstall(object):
                 self.printTime(storagestart, storageend, "Installing storage")    
 
                 self.installCPD(icpdInstallLogFile)
-                self.validateInstall(icpdInstallLogFile)
                 self.updateSecret(icpdInstallLogFile)
                 self.exportResults(self.stackName+"-OpenshiftURL", "https://"+self.openshiftURL, icpdInstallLogFile)
                 self.exportResults(self.stackName+"-CPDURL", "https://"+self.cpdURL, icpdInstallLogFile)
@@ -1371,13 +1308,11 @@ class CPDInstall(object):
             success = 'true'
             status = 'SUCCESS'
             TR.info(methodName,"SUCCESS END CPD Install AWS ICPD Quickstart.  Elapsed time (hh:mm:ss): %d:%02d:%02d" % (eth,etm,ets))
-            # TODO update this later
             self.updateStatus(status)
         else:
             success = 'false'
             status = 'FAILURE: Check logs in S3 log bucket or on the Boot node EC2 instance in /ibm/logs/icpd_install.log and /ibm/logs/post_install.log'
             TR.info(methodName,"FAILED END CPD Install AWS ICPD Quickstart.  Elapsed time (hh:mm:ss): %d:%02d:%02d" % (eth,etm,ets))
-            # # TODO update this later
             self.updateStatus(status)
            
         #endIf 

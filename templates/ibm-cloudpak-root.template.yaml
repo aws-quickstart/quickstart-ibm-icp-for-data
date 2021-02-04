@@ -444,11 +444,11 @@ Parameters:
     Description: The version of Cloud Pak for Data to be deployed. Currently only v3.5 is supported.
     Type: String
     AllowedValues:
-      - 3.5
-    Default: 3.5
+      - 3.5.2
+    Default: 3.5.2
   LicenseAgreement:
     Description: >-
-      I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/BdqyB2).
+      I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/BdfEkc).
     Type: String
     Default: '-' 
     AllowedValues:
