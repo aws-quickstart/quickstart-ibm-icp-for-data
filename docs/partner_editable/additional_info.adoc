@@ -191,7 +191,7 @@ $ ./cpd-cli adm -r ./repo.yaml -a <Service Name> -n <Project Name> --apply
 
 $ ./cpd-cli install -c <Storage Class> --override-config <Storage Type(ocs/portworx)> -r ./repo.yaml -a <Service Name> -n <Project Name> --transfer-image-to $(oc get route -n openshift-image-registry | tail -1| awk '\{print $2}')/<Project Name> --target-registry-username $(oc whoami | sed 's/://g') --target-registry-password $( oc serviceaccounts get-token cpdtoken) --cluster-pull-prefix image-registry.openshift-image-registry.svc:5000/<Project Name> --insecure-skip-tls-verify
 ```
-For information about other available services, see the https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_current/cpd/svc/services.html[{partner-product-short-name} Service Catalog^].
+For information about other available services, see the https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/svc-nav/head/services.html[{partner-product-short-name} Service Catalog^].
 
 == Other useful information
 //Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
