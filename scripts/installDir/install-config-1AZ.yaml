@@ -32,7 +32,8 @@ networking:
   clusterNetwork:
   - cidr: ${cluster-cidr}
     hostPrefix: 23
-  machineCIDR: ${machine-cidr}
+  machineNetwork:
+  - cidr: ${machine-cidr}
   networkType: OpenShiftSDN
   serviceNetwork:
   - 172.30.0.0/16
