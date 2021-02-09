@@ -60,8 +60,8 @@
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|License agreement
-(`LicenseAgreement`)|`-`|I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/BdqyB2).|IBM Cloud Pak for Data version
-(`ICPDVersion`)|`3.5`|The version of Cloud Pak for Data to be deployed. Currently only v3.5 is supported.|IBM Cloud Pak for Data API user name
+(`LicenseAgreement`)|`-`|I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/BdfEkc).|IBM Cloud Pak for Data version
+(`ICPDVersion`)|`3.5.2`|The version of Cloud Pak for Data to be deployed. Currently only v3.5 is supported.|IBM Cloud Pak for Data API user name
 (`APIUsername`)|`cp`|The IBM Cloud Pak for Data user name to access IBM Container Registry.|IBM Cloud Pak for Data API key
 (`APIKey`)|`**__Requires input__**`|The IBM Cloud Pak for Data API key to access IBM Container Registry.|OpenShift project
 (`Namespace`)|`zen`|The OpenShift project that will be created for deploying Cloud Pak for Data. It can be any lowercase string.|Output S3 bucket name
