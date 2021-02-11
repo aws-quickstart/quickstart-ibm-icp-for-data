@@ -2,5 +2,5 @@
 
 You can get started with a 60-day trial or use your existing {partner-product-short-name} entitlement. Additional costs depend on the storage type for your platform. You can choose among three storage classes: Amazon EFS, Portworx, or OCS. EFS costs are charged automatically to your AWS account. You have an option to use a Portworx trial version or an evaluation version of OCS. Visit https://portworx.com/products/features/[Portworx^] or https://www.openshift.com/products/container-storage/contact[OCS^] for licensed versions.
 
-For {partner-product-short-name} pricing information, or to use your existing entitlements, contact your IBM sales representative at +1 (877) 426-3774. For more information about licensing terms, see the hhttps://ibm.biz/BdfEkc[IBM License Agreement^].
+For {partner-product-short-name} pricing information, or to use your existing entitlements, contact your IBM sales representative at +1 (877) 426-3774. For more information about licensing terms, see the https://ibm.biz/BdfEkc[IBM License Agreement^].
 
