@@ -183,13 +183,18 @@ As part of the Quick Start installation, the control plane is installed by defau
 
 . Log in to your boot-node server as mentioned in link:#_accessing_the_control_plane_through_the_boot_node[access section].
 .  Change to the install directory.
-.  Run `$ cd /ibm`.
+.  Run `$ cd /ibm/installDir`.
 .  Run the following commands.
 +
 ```
-$ ./cpd-cli adm -r ./repo.yaml -a <Service Name> -n <Project Name> --apply
+$ cp cpd-service.tpl.yaml cpd-service-<SERVICE_NAME>.yaml
 
-$ ./cpd-cli install -c <Storage Class> --override-config <Storage Type(ocs/portworx)> -r ./repo.yaml -a <Service Name> -n <Project Name> --transfer-image-to $(oc get route -n openshift-image-registry | tail -1| awk '\{print $2}')/<Project Name> --target-registry-username $(oc whoami | sed 's/://g') --target-registry-password $( oc serviceaccounts get-token cpdtoken) --cluster-pull-prefix image-registry.openshift-image-registry.svc:5000/<Project Name> --insecure-skip-tls-verify
+$ vi cpd-service-<SERVICE_NAME>.yaml
+$ replace ${SERVICE} with <SERVICE_NAME> 
+$ replace ${STORAGECLASS} with storageclass value
+$ replace ${override-storage} with `portworx` for Portworx storage, `ocs` for Openshift Container Storage and empty for EFS.
+$ oc project <PROJECT_NAME> (project name value set via cloudformation)
+$ oc create -f cpd-service-<SERVICE_NAME>.yaml
 ```
 For information about other available services, see the https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/svc-nav/head/services.html[{partner-product-short-name} Service Catalog^].
 

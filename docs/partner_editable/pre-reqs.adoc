@@ -19,7 +19,7 @@ You can choose one of three container-storage options for this Quick Start.
 * https://portworx.com/products/features/[Portworx^]: When you choose Portworx as the persistent storage layer, you must specify your install spec from your https://central.portworx.com/specGen/list[Portworx account^]. You can generate new spec using the https://central.portworx.com/specGen/wizard[spec generator^]. Choose the edition you want, and then enter the values for the following fields.
 ** Basic details:
 *** Check Use the Portworx Operator
-*** Portworx version: 2.5
+*** Portworx version: 2.6
 *** ETCD: BuiltIn
 ** Storage details:
 *** Environment: Cloud/AWS
