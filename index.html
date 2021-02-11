@@ -851,7 +851,7 @@ p.footer-text a{color:#d7d8d8}
 </div>
 </div>
 <div class="paragraph text-center">
-<p><strong>November 2020</strong><br>
+<p><strong>February 2021</strong><br>
 <em>Clarinda Mascarenhas, Sharath Aithal, Partha Komperla, and Sumit Kumar, IBM</em><br>
 <em>Vinod Shukla and Jim McConnell, AWS Quick Start team</em></p>
 </div>
@@ -967,7 +967,7 @@ After you deploy the Quick Start, <a href="https://docs.aws.amazon.com/awsaccoun
 <p>You can get started with a 60-day trial or use your existing Cloud Pak for Data entitlement. Additional costs depend on the storage type for your platform. You can choose among three storage classes: Amazon EFS, Portworx, or OCS. EFS costs are charged automatically to your AWS account. You have an option to use a Portworx trial version or an evaluation version of OCS. Visit <a href="https://portworx.com/products/features/" target="_blank" rel="noopener">Portworx</a> or <a href="https://www.openshift.com/products/container-storage/contact" target="_blank" rel="noopener">OCS</a> for licensed versions.</p>
 </div>
 <div class="paragraph">
-<p>For Cloud Pak for Data pricing information, or to use your existing entitlements, contact your IBM sales representative at +1 (877) 426-3774. For more information about licensing terms, see the <a href="https://ibm.biz/Bdq6KP" target="_blank" rel="noopener">IBM License Agreement</a>.</p>
+<p>For Cloud Pak for Data pricing information, or to use your existing entitlements, contact your IBM sales representative at +1 (877) 426-3774. For more information about licensing terms, see the <a href="https://ibm.biz/BdfEkc" target="_blank" rel="noopener">IBM License Agreement</a>.</p>
 </div>
 </div>
 </div>
@@ -1210,7 +1210,7 @@ Certain Regions are available on an opt-in basis. See <a href="https://docs.aws.
 <p>Check Use the Portworx Operator</p>
 </li>
 <li>
-<p>Portworx version: 2.5</p>
+<p>Portworx version: 2.6</p>
 </li>
 <li>
 <p>ETCD: BuiltIn</p>
@@ -1747,15 +1747,20 @@ If you choose to scale down your cluster or reduce the number of compute nodes, 
 <p>Change to the install directory.</p>
 </li>
 <li>
-<p>Run <code>$ cd /ibm</code>.</p>
+<p>Run <code>$ cd /ibm/installDir</code>.</p>
 </li>
 <li>
 <p>Run the following commands.</p>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>$ ./cpd-cli adm -r ./repo.yaml -a &lt;Service Name&gt; -n &lt;Project Name&gt; --apply
+<pre class="highlight"><code>$ cp cpd-service.tpl.yaml cpd-service-&lt;SERVICE_NAME&gt;.yaml
 
-$ ./cpd-cli install -c &lt;Storage Class&gt; --override-config &lt;Storage Type(ocs/portworx)&gt; -r ./repo.yaml -a &lt;Service Name&gt; -n &lt;Project Name&gt; --transfer-image-to $(oc get route -n openshift-image-registry | tail -1| awk '\{print $2}')/&lt;Project Name&gt; --target-registry-username $(oc whoami | sed 's/://g') --target-registry-password $( oc serviceaccounts get-token cpdtoken) --cluster-pull-prefix image-registry.openshift-image-registry.svc:5000/&lt;Project Name&gt; --insecure-skip-tls-verify</code></pre>
+$ vi cpd-service-&lt;SERVICE_NAME&gt;.yaml
+$ replace ${SERVICE} with &lt;SERVICE_NAME&gt;
+$ replace ${STORAGECLASS} with storageclass value
+$ replace ${override-storage} with `portworx` for Portworx storage, `ocs` for Openshift Container Storage and empty for EFS.
+$ oc project &lt;PROJECT_NAME&gt; (project name value set via cloudformation)
+$ oc create -f cpd-service-&lt;SERVICE_NAME&gt;.yaml</code></pre>
 </div>
 </div>
 <div class="paragraph">
