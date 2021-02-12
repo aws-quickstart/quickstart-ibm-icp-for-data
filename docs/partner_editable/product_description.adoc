@@ -6,7 +6,7 @@
 
 {partner-product-short-name} uses IBM's deep analytics portfolio to help organizations meet data and analytics challenges. The required building blocks (collect, organize, analyze, infuse) for information architecture are available using {partner-product-short-name} on AWS.
 
-Get a quick, interactive tutorial on {partner-product-short-name} by test-driving key features within https://www.ibm.com/account/reg/us-en/signup?formid=urx-34120[Cloud Pak Experiences^], which requires no installation or deployment to get started. To get the most out of your experience, spend a few minutes exploring the use case outlined in Experiences. By building foundational knowledge of the product, you can accelerate customizations before setting up your instance of {partner-product-short-name}.
+Get a quick, interactive tutorial with {partner-product-short-name} by test-driving key features with the https://dataplatform.cloud.ibm.com/registration/stepone?context=cpdaas&apps=all[no-cost trial^]. It requires no installation or deployment to get started, and lets you experience the benefits of integrated services available for your self-serve – spanning data science, DataOps, data management, ModelOps, automated AI and more.
 
 {partner-product-short-name} can use AWS services and features, including virtual private clouds (VPCs), Availability Zones, security groups, Amazon Elastic Block Store (Amazon EBS), Amazon Elastic File System (Amazon EFS), and Elastic Load Balancing to build a reliable and scalable cloud platform.
 
