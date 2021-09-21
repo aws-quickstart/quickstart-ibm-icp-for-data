@@ -38,4 +38,3 @@ Accept the Portworx license agreement terms and save the spec with a name. On th
 Upload this file to the S3 bucket, and share the value as input for the Portworx spec parameter.
 +
 * https://www.openshift.com/products/container-storage/[OCS^]: The Red Hat OCS license is linked as a separate entitlement to your Red Hat subscription. If you do not have a separate subscription for OCS, a 60-day trial version is installed.
-* https://aws.amazon.com/efs/[Amazon EFS^]: An EFS instance is provisioned in your account and Region when you choose this option.

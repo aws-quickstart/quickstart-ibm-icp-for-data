@@ -5,7 +5,7 @@ This Quick Start automatically deploys a multi-master, production instance of IB
 
 IBM Cloud Pak for Data is an analytics platform that helps you prepare your data for artificial intelligence (AI). 
 
-IBM Cloud Pak for Data can use AWS services and features, including VPCs, Availability Zones, security groups, Amazon Elastic File System (Amazon EFS) or Openshift Container Storage (OCS) or Portworx  as storage and Elastic Load Balancing to build a reliable and scalable cloud platform.
+IBM Cloud Pak for Data can use AWS services and features, including VPCs, Availability Zones, security groups, Openshift Container Storage (OCS) or Portworx  as storage and Elastic Load Balancing to build a reliable and scalable cloud platform.
 
 This Quick Start is for enterprise users who want to connect, catalog, govern, transform, and analyze data, regardless of where the data is.
 
