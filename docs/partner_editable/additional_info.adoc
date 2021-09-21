@@ -192,7 +192,7 @@ $ cp cpd-service.tpl.yaml cpd-service-<SERVICE_NAME>.yaml
 $ vi cpd-service-<SERVICE_NAME>.yaml
 $ replace ${SERVICE} with <SERVICE_NAME> 
 $ replace ${STORAGECLASS} with storageclass value
-$ replace ${override-storage} with `portworx` for Portworx storage, `ocs` for Openshift Container Storage and empty for EFS.
+$ replace ${override-storage} with `portworx` for Portworx storage and `ocs` for Openshift Container Storage.
 $ oc project <PROJECT_NAME> (project name value set via cloudformation)
 $ oc create -f cpd-service-<SERVICE_NAME>.yaml
 ```
