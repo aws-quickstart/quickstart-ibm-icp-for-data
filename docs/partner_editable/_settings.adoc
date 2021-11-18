@@ -25,5 +25,5 @@
 :parameters_as_appendix:
 // Uncomment the following two attributes if you are using an AWS Marketplace listing.
 // Additional content will be generated automatically based on these attributes.
-// :marketplace_subscription:
-// :marketplace_listing_url: https://example.com/
+:marketplace_subscription:
+:marketplace_listing_url: https://aws.amazon.com/marketplace/pp/prodview-xnyxvyyyjigue
