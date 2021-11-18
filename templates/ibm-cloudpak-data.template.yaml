@@ -1,86 +1,73 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Template for an IBM Cloud Pak for Data deployment with existing VPC. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template. (qs-1pek09fje)
+Description: Template for an IBM Cloud Pak for Data deployment with existing VPC.
+  **WARNING** This template creates EC2 instances and related resources. You will
+  be billed for the AWS resources used if you create a stack from this template. (qs-1pek09fje)
 Metadata:
   QuickStartDocumentation:
-    EntrypointName: "Parameters for deploying into an existing VPC"
-    Order: "2"
-  AWSAMIRegionMap:
-    Filters:
-      RHEL76HVM:
-        name: RHEL-7.6_HVM_GA-20??????-x86_64-0-Hourly2-GP2
-        owner-id: "309956199498"
-        architecture: x86_64
-        virtualization-type: hvm
+    EntrypointName: Parameters for deploying into an existing VPC
+    Order: '2'
   AWS::CloudFormation::Interface:
     ParameterGroups:
-      - Label:
-          default: Network configuration
-        Parameters:
-          - NumberOfAZs
-          - AvailabilityZones
-          - VPCID
-          - VPCCIDR
-          - PrivateSubnet1ID
-          - PrivateSubnet2ID
-          - PrivateSubnet3ID
-          - PublicSubnet1ID
-          - PublicSubnet2ID
-          - PublicSubnet3ID
-          - BootNodeAccessCIDR
-          - ClusterNetworkCIDR
-      - Label:
-          default: DNS configuration
-        Parameters:
-          - DomainName
-      - Label:
-          default: Amazon EC2 configuration
-        Parameters:
-          - KeyPairName
-      - Label:
-          default: OpenShift hosts configuration
-        Parameters:
-          - NumberOfMaster
-          - NumberOfCompute
-          - MasterInstanceType
-          - ComputeInstanceType
-          - AdminPassword
-          - ClusterName
-          - EnableFips
-          - PrivateCluster
-      - Label:
-          default: Storage Configuration    
-        Parameters:  
-          - StorageType
-          - PortworxSpec
-          - NumberOfOCS
-          - OCSInstanceType
-      - Label:
-          default: Red Hat subscription information
-        Parameters:
-          - RedhatPullSecret
-      - Label:
-          default: IBM Cloud Pak for Data configuration
-        Parameters:
-          - LicenseAgreement
-          - ICPDVersion
-          - APIUsername
-          - APIKey
-          - Namespace
-          - ICPDDeploymentLogsBucketName
-          - WKC
-          - WML
-          - DV
-          - WSL
-          - OpenScale
-          - Spark
-          - CDE
-      - Label:
-          default: AWS Quick Start configuration
-        Parameters:
-          - QSS3BucketName
-          - QSS3BucketRegion
-          - QSS3KeyPrefix
-
+    - Label:
+        default: Network configuration
+      Parameters:
+      - NumberOfAZs
+      - AvailabilityZones
+      - VPCID
+      - VPCCIDR
+      - PrivateSubnet1ID
+      - PrivateSubnet2ID
+      - PrivateSubnet3ID
+      - PublicSubnet1ID
+      - PublicSubnet2ID
+      - PublicSubnet3ID
+      - BootNodeAccessCIDR
+      - ClusterNetworkCIDR
+    - Label:
+        default: DNS configuration
+      Parameters:
+      - DomainName
+    - Label:
+        default: Amazon EC2 configuration
+      Parameters:
+      - KeyPairName
+    - Label:
+        default: OpenShift hosts configuration
+      Parameters:
+      - NumberOfMaster
+      - NumberOfCompute
+      - MasterInstanceType
+      - ComputeInstanceType
+      - ClusterName
+      - EnableFips
+      - PrivateCluster
+      - OpenshiftVersion
+      - OpenshiftUsername
+      - OpenshiftPassword
+    - Label:
+        default: Storage Configuration
+      Parameters:
+      - StorageType
+      - OCSInstanceType
+    - Label:
+        default: Red Hat subscription information
+      Parameters:
+      - RedhatPullSecret
+    - Label:
+        default: IBM Cloud Pak for Data configuration
+      Parameters:
+      - LicenseAgreement
+      - APIUsername
+      - APIKey
+      - Namespace
+      - ICPDDeploymentLogsBucketName
+      - WKC
+      - WML
+      - DV
+      - WSL
+      - OpenScale
+      - Spark
+      - CDE
     ParameterLabels:
       KeyPairName:
         default: Key pair name
@@ -96,28 +83,20 @@ Metadata:
         default: Public subnet 2 ID
       PublicSubnet3ID:
         default: Public subnet 3 ID
-      QSS3BucketName:
-        default: Quick Start S3 bucket name
-      QSS3BucketRegion:
-        default: Quick Start S3 bucket region  
-      QSS3KeyPrefix:
-        default: Quick Start S3 key prefix
       BootNodeAccessCIDR:
         default: Boot node external access CIDR
       ClusterNetworkCIDR:
-        default: Cluster network CIDR  
+        default: Cluster network CIDR
       VPCID:
         default: VPC ID
       VPCCIDR:
         default: VPC CIDR
-      AdminPassword:
-        default: Cloud Pak for Data UI password
       RedhatPullSecret:
         default: Red Hat pull secret
-      NumberOfAZs: 
+      NumberOfAZs:
         default: Number of Availability Zones
       AvailabilityZones:
-        default: Availability Zones  
+        default: Availability Zones
       MasterInstanceType:
         default: Master instance type
       OCSInstanceType:
@@ -126,8 +105,6 @@ Metadata:
         default: Compute instance type
       NumberOfMaster:
         default: Number of master nodes
-      NumberOfOCS:
-        default: Number of ocs nodes
       NumberOfCompute:
         default: Number of compute nodes
       ICPDDeploymentLogsBucketName:
@@ -138,20 +115,24 @@ Metadata:
         default: Cluster name
       StorageType:
         default: Cluster storage type
-      PortworxSpec: 
-        default: Portworx spec file
-      EnableFips: 
+      EnableFips:
         default: Enable Fips
+      OpenshiftVersion:
+        default: Choos Openshift Version
+      OpenshiftUsername:
+        default: Choose username to login to Openshift Console
+      OpenshiftPassword:
+        default: Choose password to login to Openshift Console
       PrivateCluster:
-        default: Publish the user-facing endpoints of your cluster.
+        default: Disable external endpoints of your cluster
       LicenseAgreement:
         default: License agreement
       WSL:
         default: Watson Studio service
       WML:
-        default: Watson Machine Learning service  
+        default: Watson Machine Learning service
       WKC:
-        default: Watson Knowledge Catalog service  
+        default: Watson Knowledge Catalog service
       DV:
         default: Data Virtualization service
       OpenScale:
@@ -164,143 +145,113 @@ Metadata:
         default: IBM Cloud Pak for Data API user name
       APIKey:
         default: IBM Cloud Pak for Data API key
-      ICPDVersion:
-        default: IBM Cloud Pak for Data version
       Namespace:
         default: OpenShift project
-
 Parameters:
-
   DV:
-    Description: >-
-       Choose True to install the Data Virtualization service.
+    Description: Choose yes to install the Data Virtualization service.
     Type: String
     AllowedValues:
-      - "False"
-      - "True"
-    Default: "False"
+    - 'no'
+    - 'yes'
+    Default: 'no'
   WML:
-    Description: >-
-       Choose True to install the Watson Machine Learning service.
+    Description: Choose yes to install the Watson Machine Learning service.
     Type: String
     AllowedValues:
-      - "False"
-      - "True"
-    Default: "False"
+    - 'no'
+    - 'yes'
+    Default: 'no'
   WSL:
-    Description: >-
-       Choose True to install the Watson Studio service.
+    Description: Choose yes to install the Watson Studio service.
     Type: String
     AllowedValues:
-      - "False"
-      - "True"
-    Default: "False"
+    - 'no'
+    - 'yes'
+    Default: 'no'
   WKC:
-    Description: >-
-       Choose True to install the Watson Knowledge Catalog service.
+    Description: Choose yes to install the Watson Knowledge Catalog service.
     Type: String
     AllowedValues:
-      - "False"
-      - "True"
-    Default: "False"
+    - 'no'
+    - 'yes'
+    Default: 'no'
   OpenScale:
-    Description: >-
-       Choose True to install the Watson OpenScale and Watson Machine Learning services.
+    Description: Choose yes to install the Watson OpenScale and Watson Machine Learning
+      services.
     Type: String
     AllowedValues:
-      - "False"
-      - "True"
-    Default: "False"
+    - 'no'
+    - 'yes'
+    Default: 'no'
   CDE:
-    Description: >-
-       Choose True to install the Cognos Dashboard Engine service.
+    Description: Choose yes to install the Cognos Dashboard Engine service.
     Type: String
     AllowedValues:
-      - "False"
-      - "True"
-    Default: "False"
+    - 'no'
+    - 'yes'
+    Default: 'no'
   Spark:
-    Description: >-
-       Choose True to install the Analytics Engine powered by Apache Spark service.
+    Description: Choose yes to install the Analytics Engine powered by Apache Spark
+      service.
     Type: String
     AllowedValues:
-      - "False"
-      - "True"
-    Default: "False" 
+    - 'no'
+    - 'yes'
+    Default: 'no'
   APIUsername:
-    Description: >-
-       The IBM Cloud Pak for Data user name to access IBM Container Registry.
+    Description: The IBM Cloud Pak for Data user name to access IBM Container Registry.
     Type: String
-    Default: "cp"
+    Default: cp
   APIKey:
-    Description: >-
-       The IBM Cloud Pak for Data API key to access IBM Container Registry.
-    Type: String 
+    Description: The IBM Cloud Pak for Data API key to access IBM Container Registry.
+    Type: String
     NoEcho: 'true'
   KeyPairName:
     Description: The name of an existing public/private key pair, which allows you
       to securely connect to your instance after it launches.
     Type: AWS::EC2::KeyPair::KeyName
   PrivateSubnet1ID:
-    Description: The ID of the private subnet in Availability Zone 1 for the workload (e.g., subnet-a0246dcd).
+    Description: The ID of the private subnet in Availability Zone 1 for the workload
+      (e.g., subnet-a0246dcd).
     Type: String
   PrivateSubnet2ID:
-    Description: The ID of the private subnet in Availability Zone 2 for the workload (e.g., subnet-b1f432cd).
+    Description: The ID of the private subnet in Availability Zone 2 for the workload
+      (e.g., subnet-b1f432cd).
     Type: String
   PrivateSubnet3ID:
-    Description: The ID of the private subnet in Availability Zone 3 for the workload (e.g., subnet-b1f4a2cd).
+    Description: The ID of the private subnet in Availability Zone 3 for the workload
+      (e.g., subnet-b1f4a2cd).
     Type: String
   PublicSubnet1ID:
-    Description: The ID of the public subnet in Availability Zone 1 for the ELB load balancer (e.g., subnet-9bc642ac).
+    Description: The ID of the public subnet in Availability Zone 1 for the ELB load
+      balancer (e.g., subnet-9bc642ac).
     Type: String
   PublicSubnet2ID:
-    Description: The ID of the public subnet in Availability Zone 2 for the ELB load balancer (e.g., subnet-e3246d8e).
+    Description: The ID of the public subnet in Availability Zone 2 for the ELB load
+      balancer (e.g., subnet-e3246d8e).
     Type: String
   PublicSubnet3ID:
-    Description: The ID of the public subnet in Availability Zone 3 for the ELB load balancer (e.g., subnet-e324ad8e).
-    Type: String
-  QSS3BucketName:
-    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
-      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
-      (-).
-    Default: aws-quickstart
-    Description: S3 bucket name for the Quick Start assets. This string can include
-      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
-      or end with a hyphen (-).
-    Type: String
-  QSS3BucketRegion:
-    Default: 'us-east-1'
-    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
-    Type: String     
-  QSS3KeyPrefix:
-    AllowedPattern: ^[0-9a-zA-Z-/]*$
-    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
-      uppercase letters, hyphens (-), and forward slash (/).
-    Default: quickstart-ibm-icp-for-data/
-    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
-      can include numbers, lowercase letters, uppercase letters, hyphens (-), and
-      forward slash (/).
+    Description: The ID of the public subnet in Availability Zone 3 for the ELB load
+      balancer (e.g., subnet-e324ad8e).
     Type: String
   BootNodeAccessCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The CIDR IP range that is permitted to access boot node instance. We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0` permits all IP addresses to access. Additional values can be added post-deployment from the Amazon EC2 console.
+    Description: The CIDR IP range that is permitted to access boot node instance.
+      We recommend that you set this value to a trusted IP range. The value `0.0.0.0/0`
+      permits all IP addresses to access. Additional values can be added post-deployment
+      from the Amazon EC2 console.
     Type: String
   ClusterNetworkCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: The Cluster Network CIDR IP range that is used as IP address pools for pods.  
+    Description: The Cluster Network CIDR IP range that is used as IP address pools
+      for pods.
     Type: String
-    Default: 10.128.0.0/14  
-  AdminPassword:
-    Description: The password for the Cloud Pak for Data web client. The password must contain at least 8 characters, including letters (with a minimum of one capital letter), numbers, and symbols.
-    Type: String
-    MinLength: '8'
-    AllowedPattern: ^[^ \\']+$
-    NoEcho: 'true'
+    Default: 10.128.0.0/14
   RedhatPullSecret:
-    Description: Your Red Hat Network (RHN) pull secret(e.g., s3://my-bucket/path/to/portworxspec.yaml).
+    Description: Your Red Hat Network (RHN) pull secret(e.g., s3://my-bucket/path/to/pull_secret.json).
     Type: String
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
@@ -314,410 +265,339 @@ Parameters:
   MasterInstanceType:
     Default: m5.xlarge
     AllowedValues:
-      - m5.xlarge
-      - m5.2xlarge
-      - m5d.xlarge
-      - m5d.2xlarge
+    - m5.xlarge
+    - m5.2xlarge
+    - m5d.xlarge
+    - m5d.2xlarge
     ConstraintDescription: Must contain valid instance type
     Description: The EC2 instance type for the OpenShift master instances.
     Type: String
   OCSInstanceType:
     Default: m4.4xlarge
     AllowedValues:
-      - m4.4xlarge
-      - m4.8xlarge
-      - m5.8xlarge
-      - m5.12xlarge
-      - c5.8xlarge
-      - c5.12xlarge
-      - c5.9xlarge
-      - r5.4xlarge
-      - r5.8xlarge
-      - r5.12xlarge
-      - m4.10xlarge
-      - c4.8xlarge
+    - m4.4xlarge
+    - m4.8xlarge
+    - m5.4xlarge
+    - m5.8xlarge
+    - m5.12xlarge
+    - c5.8xlarge
+    - c5.12xlarge
+    - c5.9xlarge
+    - r5.4xlarge
+    - r5.8xlarge
+    - r5.12xlarge
+    - m4.10xlarge
+    - c4.8xlarge
     ConstraintDescription: Must contain valid instance type
-    Description: Update this value if Storage type selected is OCS. The EC2 instance type for the OpenShift Container Storage instances.
+    Description: Update this value if Storage type selected is OCS. The EC2 instance
+      type for the OpenShift Container Storage instances.
     Type: String
   ComputeInstanceType:
     Default: m5.4xlarge
     AllowedValues:
-      - m5.4xlarge
-      - m5.8xlarge
-      - m5.12xlarge
-      - m5.24xlarge
-      - m5a.4xlarge
-      - m5a.8xlarge
-      - m5a.12xlarge
-      - m5a.24xlarge
-      - c5.4xlarge
-      - c5.9xlarge
-      - c5.12xlarge
-      - c5.18xlarge
-      - c5.24xlarge
-      - r5.4xlarge
-      - r5.9xlarge
-      - r5.12xlarge
-      - r5.18xlarge
-      - r5.24xlarge
+    - m5.4xlarge
+    - m5.8xlarge
+    - m5.12xlarge
+    - m5.24xlarge
+    - m5a.4xlarge
+    - m5a.8xlarge
+    - m5a.12xlarge
+    - m5a.24xlarge
+    - c5.4xlarge
+    - c5.9xlarge
+    - c5.12xlarge
+    - c5.18xlarge
+    - c5.24xlarge
+    - r5.4xlarge
+    - r5.9xlarge
+    - r5.12xlarge
+    - r5.18xlarge
+    - r5.24xlarge
     ConstraintDescription: Must contain valid instance type
     Description: The EC2 instance type for the OpenShift compute instances.
     Type: String
-  NumberOfAZs:  
+  NumberOfAZs:
     Default: 3
-    Description: >-
-      The number of Availability Zones to be used for the deployment. Keep in mind that some regions may be limited to two Availability Zones. For a single IBM Cloud Pak for Data cluster to be highly available, three Availability Zones are needed to avoid a single point of failure when using three, five, or seven master nodes. With fewer than three Availability Zones, one of the AZs will have more master nodes.
+    Description: The number of Availability Zones to be used for the deployment. Keep
+      in mind that some regions may be limited to two Availability Zones. For a single
+      IBM Cloud Pak for Data cluster to be highly available, three Availability Zones
+      are needed to avoid a single point of failure when using three, five, or seven
+      master nodes. With fewer than three Availability Zones, one of the AZs will
+      have more master nodes.
     Type: Number
     AllowedValues:
     - 1
-    - 3  
+    - 3
   AvailabilityZones:
-    Description: The list of Availability Zones to use for the subnets in the VPC. The Quick Start uses one or three Availability Zones and preserves the logical order you specify.
-    Type: List<AWS::EC2::AvailabilityZone::Name>    
+    Description: The list of Availability Zones to use for the subnets in the VPC.
+      The Template uses one or three Availability Zones and preserves the logical
+      order you specify.
+    Type: List<AWS::EC2::AvailabilityZone::Name>
   NumberOfMaster:
     Default: '3'
-    Description: The desired capacity for the OpenShift master instances. Must be an odd number.A minimum of 3 is required.
+    Description: The desired capacity for the OpenShift master instances. Must be
+      an odd number.A minimum of 3 is required.
     Type: String
-    AllowedPattern: '^[3579]$|(^[3-9]+[3579]$)'
-  NumberOfOCS:
-    Default: '3'
-    Description: TUpdate this value if Storage type selected is OCS. he desired capacity for the OpenShift container storage instances.  Minimum of 3 is required.
-    Type: String
-    AllowedPattern: '^[3579]$|(^[3-9]+[3579]$)'
+    AllowedPattern: ^[3579]$|(^[3-9]+[3579]$)
   NumberOfCompute:
     Default: '3'
-    Description: The desired capacity for the OpenShift compute instances. Minimum of 3 nodes required. If the number of compute instances exceeds your Red Hat entitlement limits or AWS instance limits, the stack will fail. Choose a number that is within your limits.
+    Description: The desired capacity for the OpenShift compute instances. Minimum
+      of 3 nodes required. If the number of compute instances exceeds your Red Hat
+      entitlement limits or AWS instance limits, the stack will fail. Choose a number
+      that is within your limits.
     Type: Number
   ICPDDeploymentLogsBucketName:
-    Description: 'The name of the S3 bucket where IBM Cloud Pak for Data deployment logs are to be exported. The deployment logs provide a record of the boot strap scripting actions and are useful for problem determination if the deployment fails in some way.'
+    Description: The name of the S3 bucket where IBM Cloud Pak for Data deployment
+      logs are to be exported. The deployment logs provide a record of the boot strap
+      scripting actions and are useful for problem determination if the deployment
+      fails in some way.
     Type: String
     Default: ''
   DomainName:
-    Description: 'Amazon Route53 base domain configured for your OpenShift Container Platform cluster. Name must consist of lower case alphanumeric characters and must start and end with an alphanumeric character.'
+    Description: Amazon Route53 base domain configured for your OpenShift Container
+      Platform cluster. Name must consist of lower case alphanumeric characters and
+      must start and end with an alphanumeric character.
     Type: String
-    Default: ""
+    Default: ''
   ClusterName:
-    Default: ""
+    Default: ''
     Description: Custom cluster name for kubernetes.io/cluster/tags.
     Type: String
     AllowedPattern: ^[0-9a-z-]*$
   StorageType:
-    Description: Select either Portworx or Openshift Container Storage as default Storage class.  
+    Description: Openshift Container Storage is currently the only supported storage
+      option.
     Type: String
     AllowedValues:
-      - "OCS"
-      - "Portworx"
-      - "EFS"
-    Default: "OCS"  
-  PortworxSpec:
-    Description: Update this value if Storage type selected is Portworx. S3 path of Portworx Spec(e.g., s3://my-bucket/path/to/portworxspec.yaml).
-    Type: String
-    Default: ""
+    - OCS
+    Default: OCS
   EnableFips:
     Description: Enable Fips for Openshift
     Type: String
     AllowedValues:
-      - "False"
-      - "True"
-    Default: "False"
-  PrivateCluster:  
-    Description: To Deploy a Private cluster select Internal and External for Public cluster
+    - 'false'
+    - 'true'
+    Default: 'false'
+  PrivateCluster:
+    Description: To Deploy a Private cluster select true and false for Public cluster
     Type: String
     AllowedValues:
-      - "Internal"
-      - "External"
-    Default: "External" 
-  ICPDVersion:
-    Description: >-
-      The version of Cloud Pak for Data to be deployed. Currently only v3.5 is supported.
+    - 'true'
+    - 'false'
+    Default: 'false'
+  OpenshiftVersion:
+    Description: Choose Openshift Version
     Type: String
-    AllowedValues:
-      - 3.5.2
-    Default: 3.5.2
+    Default: 4.8.11
+  OpenshiftUsername:
+    Description: Username to be used to login to Openshift Console.
+    Type: String
+    Default: ocsadmin
+  OpenshiftPassword:
+    Description: Password to be used to login to Openshift and Cloud Pak for Data
+      Console.
+    Type: String
+    NoEcho: 'true'
   LicenseAgreement:
-    Description: >-
-      I have read and agree to the license terms for IBM Cloud Pak for Data (https://ibm.biz/BdfEkc).
+    Description: I have read and agreed to the license terms for IBM Cloud Pak for
+      Data that were provided to me at time of purchase.
     Type: String
     Default: '-'
     AllowedValues:
-      - I agree
-      - '-'
+    - I agree
+    - '-'
     ConstraintDescription: must answer 'I agree'
   Namespace:
-    Description: >-
-      The OpenShift project that will be created for deploying Cloud Pak for Data. It can be any lowercase string.
+    Description: The OpenShift project that will be created for deploying Cloud Pak
+      for Data. It can be any lowercase string.
     Type: String
-    AllowedPattern: '^[a-z0-9_\-]+$'
-    Default: "zen"
-  
-
-  
+    AllowedPattern: ^[a-z0-9_\-]+$
+    Default: zen
 Mappings:
-
   AWSAMIRegionMap:
-    eu-central-1:
-      RHEL76HVM: ami-062dacb006c5860f9
-      COREOS: ami-0bd7175ff5b1aef0c
-    ap-southeast-2:
-      RHEL76HVM: ami-0f1ef883e90ca71c0
-      COREOS: ami-069450613262ba03c
-    eu-west-1:
-      RHEL76HVM: ami-0a0d2dc2f521ddce6
-      COREOS: ami-01b89df58b5d4d5fa
     us-east-1:
-      RHEL76HVM: ami-0916c408cb02e310b
-      COREOS: ami-04a16d506e5b0e246
-    us-east-2:
-      RHEL76HVM: ami-03cfe750d5ea278f5
-      COREOS: ami-0a1f868ad58ea59a7
-    us-west-2:
-      RHEL76HVM: ami-04b7963c90686dd4c
-      COREOS: ami-0dd9008abadc519f1
+      BootNodeAmiId: ami-026dc7dacf1b48af2
+      COREOS: ami-0453a93ae6e00f8ec
+    ap-east-1:
+      BootNodeAmiId: ami-033a51c3d5a383b63
+      COREOS: ami-00bd7f0a1cb740e0a
     ap-northeast-1:
-      RHEL76HVM: ami-0dc41c7805e171046
-      COREOS: ami-04e5b5722a55846ea
-    eu-west-2:
-      RHEL76HVM: ami-096fbd31de0375d2a
-      COREOS: ami-06f6e31ddd554f89d
-    eu-west-3:
-      RHEL76HVM: ami-025fb013ee01513b5
-      COREOS: ami-0dc82e2517ded15a1
-    ap-southeast-1:
-      RHEL76HVM: ami-07cafca3788493264
-      COREOS:  ami-0630e03f75e02eec4
-    eu-north-1:
-      RHEL76HVM: ami-75941f0b
-      COREOS: ami-06c9ec42d0a839ad2
-    ap-south-1:
-      RHEL76HVM: ami-021912f2c8d2c70c9
-      COREOS: ami-09e3deb397cc526a8
+      BootNodeAmiId: ami-06a5656ed987d2b22
+      COREOS: ami-04ff2669257d8d5d8
     ap-northeast-2:
-      RHEL76HVM: ami-0b5425629eb18a008
-      COREOS: ami-0fdc25c8a0273a742
-    sa-east-1:
-      RHEL76HVM: ami-048b2348ac2ccfc53
-      COREOS: ami-0cd44e6dd20e6c7fa
-    ca-central-1:
-      RHEL76HVM: ami-05816666b3178f208
-      COREOS: ami-012518cdbd3057dfd
-    us-west-1:
-      RHEL76HVM: ami-0388d197bb42be9be
-      COREOS: ami-0a65d76e3a6f6622f
-
-
-
-  AWSRegionS3Bucket:
-    ap-northeast-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-1
-    ap-northeast-2:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-2
-    ap-northeast-3:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-northeast-3
+      BootNodeAmiId: ami-06795735474853da8
+      COREOS: ami-00a80f453190d3ec0
     ap-south-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-south-1
+      BootNodeAmiId: ami-05bd549caf4eb9900
+      COREOS: ami-0bae2c77c246b0064
     ap-southeast-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-southeast-1
+      BootNodeAmiId: ami-011f6c626a5ddb434
+      COREOS: ami-0c6ad4ce896eac960
     ap-southeast-2:
-      ICPDArchiveBucket: ibm-cloud-private-data-ap-southeast-2
+      BootNodeAmiId: ami-0ba35bbc3611ca0ea
+      COREOS: ami-0d422b9e0b210e523
     ca-central-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-ca-central-1
+      BootNodeAmiId: ami-02c6ceb2e3db81595
+      COREOS: ami-07575d6f19a81ee9b
     eu-central-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-eu-central-1
+      BootNodeAmiId: ami-001046f99ee3b8524
+      COREOS: ami-0a6d4066422e160e0
     eu-north-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-eu-north-1
+      BootNodeAmiId: ami-0bfb6f1cc44d2f3e2
+      COREOS: ami-0ba2db1b5fb2e9938
     eu-west-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-eu-west-1
+      BootNodeAmiId: ami-05818be4b6dbfce17
+      COREOS: ami-061c8f75631efc716
     eu-west-2:
-      ICPDArchiveBucket: ibm-cloud-private-data-eu-west-2
+      BootNodeAmiId: ami-09006269a34dc4b44
+      COREOS: ami-0e1ea4456d63feb2b
     eu-west-3:
-      ICPDArchiveBucket: ibm-cloud-private-data-eu-west-3
+      BootNodeAmiId: ami-0abfb6053bce0a01c
+      COREOS: ami-0cd5a3d0291b77435
     sa-east-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-sa-east-1
-    us-east-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-us-east-1
+      BootNodeAmiId: ami-0ccfbb9b17ce9ec76
+      COREOS: ami-0a6f0c83249a39754
     us-east-2:
-      ICPDArchiveBucket: ibm-cloud-private-data-us-east-2
+      BootNodeAmiId: ami-049fc6efa3bac8291
+      COREOS: ami-08c331fe7429f135c
     us-west-1:
-      ICPDArchiveBucket: ibm-cloud-private-data-us-west-1
+      BootNodeAmiId: ami-0e55fd348212dff12
+      COREOS: ami-05fd245f821708687
     us-west-2:
-      ICPDArchiveBucket: ibm-cloud-private-data-us-west-2    
+      BootNodeAmiId: ami-0467fa111cd748558
+      COREOS: ami-01f98ae947d844724
 Rules:
- 
   LicenseAgreementRule:
     Assertions:
-    - Assert:
-        Fn::Contains:
-        - - I agree
-        - Ref: LicenseAgreement
-      AssertDescription: User must agree to the terms of the license agreement.    
-
+    - Assert: !Contains [[I agree], !Ref 'LicenseAgreement']
+      AssertDescription: User must agree to the terms of the license agreement.
   SubnetsInVPC:
     Assertions:
-      - Assert: !EachMemberIn
-          - !ValueOfAll
-            - AWS::EC2::Subnet::Id
-            - VpcId
-          - !RefAll 'AWS::EC2::VPC::Id'
-        AssertDescription: All subnets must in the VPC      
-
+    - Assert: !EachMemberIn [!ValueOfAll ['AWS::EC2::Subnet::Id', VpcId], !RefAll 'AWS::EC2::VPC::Id']
+      AssertDescription: All subnets must in the VPC
 Conditions:
-  CreateEFS: !Equals [!Ref StorageType, "EFS"]
-  3AZCondition: !Equals [!Ref NumberOfAZs, 3]
-  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
-
+  3AZCondition: !Equals [!Ref 'NumberOfAZs', 3]
+  AcceptLicense: !Equals [!Ref 'LicenseAgreement', I agree]
 Resources:
   CPDIAMUser:
-    Type: 'AWS::IAM::User'
+    Type: AWS::IAM::User
     Properties:
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/AdministratorAccess
-
+      - arn:aws:iam::aws:policy/AdministratorAccess
   CPDIAMUserAccessKey:
-    Type: 'AWS::IAM::AccessKey'
+    Type: AWS::IAM::AccessKey
     Properties:
-      UserName: !Ref CPDIAMUser
-
-
+      UserName: !Ref 'CPDIAMUser'
   CPDSecret:
-    Type: "AWS::SecretsManager::Secret"
+    Type: AWS::SecretsManager::Secret
     Properties:
-      SecretString: !Sub '{"adminPassword":"${AdminPassword}","apikey":"${APIKey}"}'
+      SecretString: !Sub '{"apikey":"${APIKey}", "password":"${OpenshiftPassword}",
+        "username":"admin"}'
   OpenshiftSecret:
-    Type: "AWS::SecretsManager::Secret"
+    Type: AWS::SecretsManager::Secret
     Properties:
-      SecretString: !Sub '{"ocpPassword":""}'
-
-
-  ClusterSharedStorage:
-    Type: AWS::CloudFormation::Stack
-    Condition: CreateEFS
-    Properties:
-      TemplateURL: !Sub 
-        - >- 
-          https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/shared-storage.template.yaml
-        - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-          S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
-      Parameters:
-        AvailabilityZoneCount: !Ref NumberOfAZs
-        PrivateSubnetIds: !If
-          - 3AZCondition
-          - !Join [',',[!Ref PrivateSubnet1ID, !Ref PrivateSubnet2ID, !Ref PrivateSubnet3ID]]
-          - !Ref PrivateSubnet1ID
-        PrivateSubnetCIDR:  !Ref 'VPCCIDR'
-        ICPDVPC: !Ref 'VPCID'
-
+      SecretString: !Sub '{"ocpUsername":"${OpenshiftUsername}", "ocpPassword":"${OpenshiftPassword}"}'
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
+        - Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+          Action: sts:AssumeRole
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
       Path: /
       Policies:
-        - PolicyName: lambda-cleanUpLambda
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ssm:SendCommand
-                  - ssm:PutParameter
-                  - ssm:GetParameter
-                  - ssm:DeleteParameter
-                Resource:
-                  - '*'
-              - Effect: Allow
-                Action:
-                  - logs:FilterLogEvents
-                Resource:
-                  - '*' 
-
+      - PolicyName: lambda-cleanUpLambda
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - ssm:SendCommand
+            - ssm:PutParameter
+            - ssm:GetParameter
+            - ssm:DeleteParameter
+            Resource:
+            - '*'
+          - Effect: Allow
+            Action:
+            - logs:FilterLogEvents
+            Resource:
+            - '*'
   BootNodeIamRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-17"
+        Version: '2012-10-17'
         Statement:
-        - Effect: "Allow"
+        - Effect: Allow
           Principal:
             Service:
-            - "ec2.amazonaws.com"
+            - ec2.amazonaws.com
           Action:
-          - "sts:AssumeRole"
-      Path: "/"
+          - sts:AssumeRole
+      Path: /
       ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
-        - arn:aws:iam::aws:policy/AWSCloudFormationReadOnlyAccess
+      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      - arn:aws:iam::aws:policy/AWSCloudFormationReadOnlyAccess
       Policies:
       - PolicyName: bootnode-policy
         PolicyDocument:
-          Version: "2012-10-17"
+          Version: '2012-10-17'
           Statement:
-          - Effect: "Allow"
-            Action: "ec2:Describe*"
-            Resource: "*"
-          - Effect: "Allow"
-            Action: "ec2:AttachVolume"
-            Resource: "*"
-          - Effect: "Allow"
-            Action: "ec2:DetachVolume"
-            Resource: "*"
-          - Effect: "Allow"
-            Action: "s3:GetObject"
-            Resource: !Sub
-              - arn:${AWS::Partition}:s3:::${S3Bucket}/${QSS3KeyPrefix}*
-              - S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
-          - Effect: "Allow"
+          - Effect: Allow
+            Action: ec2:Describe*
+            Resource: '*'
+          - Effect: Allow
+            Action: ec2:AttachVolume
+            Resource: '*'
+          - Effect: Allow
+            Action: ec2:DetachVolume
+            Resource: '*'
+          - Effect: Allow
             Action:
-            - "secretsmanager:GetSecretValue"
-            - "secretsmanager:UpdateSecret"
+            - secretsmanager:GetSecretValue
+            - secretsmanager:UpdateSecret
             Resource:
-            - !Ref CPDSecret  
-            - !Ref AWSCredentialSecret
-            - !Ref OpenshiftSecret
-          - Effect: "Allow"
-            Action: "s3:ListBucket"
-            Resource: !Sub arn:aws:s3:::${ICPDDeploymentLogsBucketName}
-          - Effect: "Allow"
-            Action: "s3:PutObject"
-            Resource: !Sub arn:aws:s3:::${ICPDDeploymentLogsBucketName}/*
+            - !Ref 'CPDSecret'
+            - !Ref 'AWSCredentialSecret'
+            - !Ref 'OpenshiftSecret'
+          - Effect: Allow
+            Action: s3:ListBucket
+            Resource: !Sub 'arn:aws:s3:::${ICPDDeploymentLogsBucketName}'
+          - Effect: Allow
+            Action: s3:PutObject
+            Resource: !Sub 'arn:aws:s3:::${ICPDDeploymentLogsBucketName}/*'
           - Effect: Allow
             Action:
             - ssm:SendCommand
             - ssm:PutParameter
             - ssm:GetParameter
             Resource:
-            - '*'  
-
-
+            - '*'
   OpenshiftURL:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "${AWS::StackName}-OpenshiftURL"
+      Name: !Sub '${AWS::StackName}-OpenshiftURL'
       Type: String
-      Value: "PlaceHolder"
-
+      Value: !Sub 'https://console-openshift-console.apps.${ClusterName}.${DomainName}'
   CPDURL:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub "${AWS::StackName}-CPDURL"
+      Name: !Sub '${AWS::StackName}-CPDURL'
       Type: String
-      Value: "PlaceHolder"
-
+      Value: !Sub 'https://cpd-${Namespace}.apps.${ClusterName}.${DomainName}'
   BootnodeInstanceProfile:
-    Type: "AWS::IAM::InstanceProfile"
+    Type: AWS::IAM::InstanceProfile
     Properties:
-      Path: "/"
+      Path: /
       Roles:
-      - Ref: "BootNodeIamRole"
-
+      - !Ref 'BootNodeIamRole'
   BootnodeSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -726,204 +606,216 @@ Resources:
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
-        CidrIp: !Ref BootNodeAccessCIDR
-      VpcId: !Ref VPCID
-
+        CidrIp: !Ref 'BootNodeAccessCIDR'
+      VpcId: !Ref 'VPCID'
   AWSCredentialSecret:
-    Type: "AWS::SecretsManager::Secret"
+    Type: AWS::SecretsManager::Secret
     Properties:
-      SecretString: !Sub 
-        - '{"aws_secret_access_key":"${CPDIAMUserAccessKey}, "aws_access_key_id":"${CPDIAMUserSecret}"}'
-        - {CPDIAMUserAccessKey: !Ref CPDIAMUserAccessKey, CPDIAMUserSecret: !GetAtt [CPDIAMUserAccessKey, SecretAccessKey]}
-
+      SecretString: !Sub ['{"aws_secret_access_key":"${CPDIAMUserAccessKey}, "aws_access_key_id":"${CPDIAMUserSecret}"}',
+        {CPDIAMUserAccessKey: !Ref 'CPDIAMUserAccessKey', CPDIAMUserSecret: !GetAtt [
+            CPDIAMUserAccessKey, SecretAccessKey]}]
   BootnodeInstance:
     Type: AWS::EC2::Instance
     Metadata:
       AWS::CloudFormation::Init:
         configSets:
           Required:
-            - StackPropertiesFile
-
+          - StackPropertiesFile
         StackPropertiesFile:
           files:
             /root/mystack.props:
-              content: !Sub |
-                AWS_REGION=${AWS::Region}
-                AWS_STACKID="${AWS::StackId}"
-                AWS_STACKNAME="${AWS::StackName}"
-         
-            /root/.aws/config:
-              content: !Sub |
-                [default]
-                region=${AWS::Region}
-                
-            /root/.aws/credentials:
-              content: 
-                !Sub 
-                - |  
-                  [default]
-                  aws_access_key_id=${CPDIAMUserAccessKey}
-                  aws_secret_access_key=${CPDIAMUserSecret}
-                - 
-                  CPDIAMUserAccessKey: !Ref CPDIAMUserAccessKey 
-                  CPDIAMUserSecret: !GetAtt [CPDIAMUserAccessKey, SecretAccessKey]
+              content: !Sub 'AWS_REGION=${AWS::Region}
 
+                AWS_STACKID="${AWS::StackId}"
+
+                AWS_STACKNAME="${AWS::StackName}"
+
+                '
+            /home/ec2-user/destroy.sh:
+              content: 'echo "$1 - Destroy"
+
+                sudo /home/ec2-user/cp4d-deployment/selfmanaged-openshift/aws/installer-files/openshift-install
+                destroy cluster --dir=/home/ec2-user/cp4d-deployment/selfmanaged-openshift/aws/installer-files
+                --log-level=info
+
+                aws ssm put-parameter --name $1"_CleanupStatus" --type "String" --value
+                "READY" --overwrite
+
+                '
+            /root/.aws/config:
+              content: !Sub '[default]
+
+                region=${AWS::Region}
+
+                '
+            /root/.aws/credentials:
+              content: !Sub ['[default]
+
+                  aws_access_key_id=${CPDIAMUserAccessKey}
+
+                  aws_secret_access_key=${CPDIAMUserSecret}
+
+                  ', {CPDIAMUserAccessKey: !Ref 'CPDIAMUserAccessKey', CPDIAMUserSecret: !GetAtt [
+                    CPDIAMUserAccessKey, SecretAccessKey]}]
     Properties:
       KeyName: !Ref 'KeyPairName'
-      ImageId: !FindInMap [AWSAMIRegionMap, !Ref "AWS::Region", RHEL76HVM]
+      ImageId: !FindInMap [AWSAMIRegionMap, !Ref 'AWS::Region', BootNodeAmiId]
       BlockDeviceMappings:
-        - DeviceName: /dev/sda1
-          Ebs:
-            VolumeSize: 500
-            VolumeType: gp2    
-      IamInstanceProfile: !Ref BootnodeInstanceProfile
+      - DeviceName: /dev/sda1
+        Ebs:
+          VolumeSize: 50
+          VolumeType: gp2
+      IamInstanceProfile: !Ref 'BootnodeInstanceProfile'
       Tags:
-        - Key: Name
-          Value: BootNode
+      - Key: Name
+        Value: !Sub ['${ClusterName}-bootnode', {ClusterName: !Ref 'ClusterName'}]
       InstanceType: i3.large
       NetworkInterfaces:
       - GroupSet:
-        - !Ref BootnodeSecurityGroup
+        - !Ref 'BootnodeSecurityGroup'
         AssociatePublicIpAddress: true
         DeviceIndex: '0'
         DeleteOnTermination: true
-        SubnetId: !Ref PublicSubnet1ID  
-      UserData:
-        Fn::Base64:
-          !Sub 
-          - |
-            #!/bin/bash -x
-            yum install -y git
-            yum install -y wget
-            yum install -y unzip
-            yum install -y python3
-            git clone https://github.com/aws-quickstart/quickstart-linux-utilities.git
-            export P=/quickstart-linux-utilities/quickstart-cfn-tools.source
-            source $P
-            
-            qs_bootstrap_pip || qs_err " pip bootstrap failed "
-            qs_aws-cfn-bootstrap || qs_err "cfn bootstrap failed"
-            pip install awscli  &> /var/log/userdata.awscli_install.log || qs_err " awscli install failed "
-            /usr/bin/cfn-init -v --stack ${AWS::StackName} --resource BootnodeInstance --configsets Required --region ${AWS::Region}
-            export CPD_QS_S3URI=s3://${QSS3BucketName}/${QSS3KeyPrefix}
-            export AWS_REGION=${AWS::Region}
-            export AWS_STACKID=${AWS::StackId}
-            export AWS_STACKNAME=${AWS::StackName}
-            export AMI_ID='${AMI_ID}'
-            export CPD_SECRET='${CPDSecret}'
-            export OCP_SECRET='${OpenshiftSecret}'
-            export ICPDArchiveBucket='${ICPDArchiveBucket}'
-            export EFSID='${EFSID}'
-            export EFSDNSName='${EFSDNSName}'
-            export ICPDInstallationCompletedURL='${ICPDInstallationCompletedHandle}'
-            mkdir -p /quickstart
-            mkdir -p /ibm
-            aws s3 cp ${!CPD_QS_S3URI}scripts/bootstrap.sh /quickstart/
-            chmod +x /quickstart/bootstrap.sh
-            ./quickstart/bootstrap.sh
-          -
-            AMI_ID: !FindInMap [AWSAMIRegionMap, !Ref "AWS::Region", COREOS]
-            ICPDArchiveBucket: !FindInMap [AWSRegionS3Bucket, !Ref "AWS::Region", ICPDArchiveBucket]
-            EFSID:  !If [CreateEFS, !GetAtt ClusterSharedStorage.Outputs.EFSFileSystemId, ""]
-            EFSDNSName: !If [CreateEFS, !GetAtt ClusterSharedStorage.Outputs.EFSDNSName,""]
-
-
-  
+        SubnetId: !Ref 'PublicSubnet1ID'
+      UserData: !Base64
+        Fn::Sub:
+        - "#!/bin/bash -x\ngit clone https://github.com/aws-quickstart/quickstart-linux-utilities.git\n\
+          sed -i \"s/aws-cfn-bootstrap-latest.tar.gz/aws-cfn-bootstrap-py3-latest.tar.gz/g\"\
+          \ /quickstart-linux-utilities/quickstart-cfn-tools.source \nexport P=/quickstart-linux-utilities/quickstart-cfn-tools.source\n\
+          source $P\n\nqs_bootstrap_pip || qs_err \" pip bootstrap failed \"\nqs_aws-cfn-bootstrap\
+          \ || qs_err \"cfn bootstrap failed\"\npip3 install awscli  &> /var/log/userdata.awscli_install.log\
+          \ || qs_err \" awscli install failed \"\n/usr/local/bin/cfn-init -v --stack\
+          \ ${AWS::StackName} --resource BootnodeInstance --configsets Required --region\
+          \ ${AWS::Region}\n\ncd /tmp\nqs_retry_command 10 wget https://s3-us-west-1.amazonaws.com/amazon-ssm-us-west-1/latest/linux_amd64/amazon-ssm-agent.rpm\n\
+          qs_retry_command 10 yum install -y ./amazon-ssm-agent.rpm\nsystemctl start\
+          \ amazon-ssm-agent\nsystemctl enable amazon-ssm-agent\nrm -f ./amazon-ssm-agent.rpm\n\
+          \nexport ICPDInstallationCompletedURL='${ICPDInstallationCompletedHandle}'\n\
+          export AWS_REGION=${AWS::Region}\nexport AWS_STACKID=${AWS::StackId}\nexport\
+          \ AWS_STACKNAME=${AWS::StackName}\n\nchmod +x /home/ec2-user/destroy.sh\n\
+          \nssh-keygen -t rsa -b 4096 -f /home/ec2-user/.ssh/id_rsa -q -N \"\"\n\n\
+          cd /home/ec2-user/cp4d-deployment/selfmanaged-openshift/aws\nexport HOME=~\n\
+          \naws s3 cp ${RedhatPullSecret} ./pull-secret\nexport TF_VAR_openshift_pull_secret_file_path='./pull-secret'\n\
+          export TF_VAR_access_key_id=${CPDIAMUserAccessKey}\nexport TF_VAR_secret_access_key=${CPDIAMUserSecret}\n\
+          export TF_VAR_region=${AWS::Region}\nexport TF_VAR_az=${AZ}\nexport TF_VAR_private_cluster=${PrivateCluster}\n\
+          export TF_VAR_public_ssh_key=`cat /home/ec2-user/.ssh/id_rsa.pub`\nexport\
+          \ TF_VAR_base_domain=${DomainName}\nexport TF_VAR_cluster_name=${ClusterName}\n\
+          export TF_VAR_openshift_version='${OpenshiftVersion}'\nexport TF_VAR_openshift_username='${OpenshiftUsername}'\n\
+          export TF_VAR_openshift_password='${OpenshiftPassword}'\nexport TF_VAR_cpd_external_username='${APIUsername}'\n\
+          export TF_VAR_cpd_api_key='${APIKey}'\nexport TF_VAR_accept_cpd_license='${LicenseAgreement}'\n\
+          \nexport TF_VAR_watson_knowledge_catalog='{enable = \"${WKC}\", version\
+          \ = \"4.0.2\", channel = \"v1.0\"}'\nexport TF_VAR_cognos_dashboard_embedded='{enable\
+          \ = \"${CDE}\",  version = \"4.0.2\", channel = \"v1.0\"}' \nexport TF_VAR_watson_ai_openscale='{enable\
+          \ = \"${OpenScale}\",  version = \"4.0.2\", channel = \"v1\"}'\nexport TF_VAR_watson_studio='{enable\
+          \ = \"${WSL}\", version = \"4.0.2\", channel = \"v2.0\"}'\nexport TF_VAR_analytics_engine='{enable\
+          \ = \"${Spark}\", version = \"4.0.2\", channel = \"stable-v1\"}'\nexport\
+          \ TF_VAR_watson_machine_learning='{enable = \"${WML}\", version = \"4.0.2\"\
+          , channel = \"v1.1\"}'\nexport TF_VAR_data_virtualization='{enable = \"\
+          ${DV}\", version = \"1.7.2\", channel = \"v1.7\"}'\n\n\nexport TF_VAR_new_or_existing_vpc_subnet=\"\
+          exist\"\nexport TF_VAR_vpc_id='${VPCID}'\nexport TF_VAR_master_subnet1_id='${PublicSubnet1ID}'\n\
+          export TF_VAR_master_subnet2_id='${PublicSubnet2ID}'\nexport TF_VAR_master_subnet3_id='${PublicSubnet3ID}'\n\
+          export TF_VAR_worker_subnet1_id='${PrivateSubnet1ID}'\nexport TF_VAR_worker_subnet2_id='${PrivateSubnet2ID}'\n\
+          export TF_VAR_worker_subnet3_id='${PrivateSubnet3ID}'\nexport TF_VAR_vpc_cidr='${VPCCIDR}'\n\
+          export TF_VAR_availability_zone1='${AvailabilityZone1}'\nexport TF_VAR_availability_zone2='${AvailabilityZone2}'\n\
+          export TF_VAR_availability_zone3='${AvailabilityZone3}'\n\nexport TF_VAR_cpd_namespace=${Namespace}\n\
+          export TF_VAR_enable_fips=${EnableFips}\nexport TF_VAR_master_instance_type=${MasterInstanceType}\n\
+          export TF_VAR_master_replica_count=${NumberOfMaster}\nexport TF_VAR_worker_instance_type=${ComputeInstanceType}\n\
+          export TF_VAR_worker_replica_count=${NumberOfCompute}\nexport TF_VAR_cluster_network_cidr=${ClusterNetworkCIDR}\n\
+          \nexport TF_VAR_ocs='{enable = \"true\", ami_id = \"${AMI_ID}\", dedicated_node_instance_type\
+          \ = \"${OCSInstanceType}\"}'\nexport TF_VAR_enable_permission_quota_check=false\n\
+          \nexport TF_LOG=DEBUG\nexport TF_LOG_PATH=/home/ec2-user/cp4d-deployment/selfmanaged-openshift/aws/.trace.log\n\
+          terraform init -input=false\nterraform plan -out=tfplan -input=false\nterraform\
+          \ apply -input=false tfplan\necode=$?\naws s3 cp /home/ec2-user/cp4d-deployment/selfmanaged-openshift/aws/.trace.log\
+          \ s3://${ICPDDeploymentLogsBucketName}/cpd-trace.log\naws s3 cp /var/log/cloud-init-output.log\
+          \ s3://${ICPDDeploymentLogsBucketName}/cpd-bootstrap.log\ncp -rf ~/.kube/\
+          \ /home/ec2-user/\nchown -R ec2-user:ec2-user /home/ec2-user/.kube\noc exec\
+          \ -it $(oc get pod -l component=usermgmt | tail -1 | cut -f1 -d\\ ) -- bash\
+          \ -c \"printf \\\"${OpenshiftPassword}\\n\\\" | /usr/src/server-src/scripts/manage-user.sh\
+          \ --enable-user admin\"\n/usr/local/bin/cfn-signal --exit-code $ecode --id\
+          \ $AWS_STACKID  --data \"See logs at ${ICPDDeploymentLogsBucketName}/cpd-bootstrap.log\"\
+          \ $ICPDInstallationCompletedURL\n"
+        - AMI_ID: !FindInMap [AWSAMIRegionMap, !Ref 'AWS::Region', COREOS]
+          CPDIAMUserAccessKey: !Ref 'CPDIAMUserAccessKey'
+          CPDIAMUserSecret: !GetAtt [CPDIAMUserAccessKey, SecretAccessKey]
+          LicenseAgreement: !If [AcceptLicense, accept, reject]
+          AZ: !If [3AZCondition, multi_zone, single_zone]
+          AvailabilityZone1: !Select [0, !Ref 'AvailabilityZones']
+          AvailabilityZone2: !If [3AZCondition, !Select [1, !Ref 'AvailabilityZones'],
+            '']
+          AvailabilityZone3: !If [3AZCondition, !Select [2, !Ref 'AvailabilityZones'],
+            '']
   CleanUpLambda:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        ZipFile: |
-          import boto3
-          import json
-          import cfnresponse
-          import os
-          import traceback
-          import time
-          def handler(event, context):
-              responseData = {}
-              try:
-                  print("event_obj:",json.dumps(event))
-                  print(event['RequestType'])
-                  if event['RequestType'] == 'Delete':
-                    print("Run unsubscribe script")
-                    ssm = boto3.client('ssm',region_name=os.environ['Region'])
-                    instanceID = os.environ['BootNode']
-                    storage = os.environ['Storage']
-                    stackname = os.environ['StackName']
-                    print(instanceID)
-                    response = ssm.send_command(Targets=[{"Key":"instanceids","Values":[instanceID]}],
-                            DocumentName="AWS-RunShellScript",
-                            Parameters={"commands":["/ibm/destroy.sh %s %s" %(storage,stackname)],
-                                        "executionTimeout":["1200"],
-                                        "workingDirectory":["/ibm"]},
-                            Comment="Execute script in uninstall openshift",
-                            TimeoutSeconds=120)
-                    print(response)
-                    current_status = "WAIT"
-                    final_status = "READY"
-                    parameterName = stackname+"_CleanupStatus"           
-                    response = ssm.put_parameter(Name=parameterName,
-                           Description="Waiting for CleanupStatus to be READY",
-                           Value=current_status,
-                           Type='String',
-                           Overwrite=True)        
-                    print(response)    
-                    while(current_status!=final_status):
-                      time.sleep(30) 
-                      response = ssm.get_parameter(Name=parameterName)
-                      parameter = response.get('Parameter')
-                      current_status = parameter.get('Value')
-                      print(current_status)
-                    ssm.delete_parameter(Name=parameterName)    
-              except Exception as e:
-                print(e)
-                traceback.print_exc()
-              cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, '')
+        ZipFile: "import boto3\nimport json\nimport cfnresponse\nimport os\nimport\
+          \ traceback\nimport time\ndef handler(event, context):\n    responseData\
+          \ = {}\n    try:\n        print(\"event_obj:\",json.dumps(event))\n    \
+          \    print(event['RequestType'])\n        if event['RequestType'] == 'Delete':\n\
+          \          print(\"Run unsubscribe script\")\n          ssm = boto3.client('ssm',region_name=os.environ['Region'])\n\
+          \          instanceID = os.environ['BootNode']\n          storage = os.environ['Storage']\n\
+          \          stackname = os.environ['StackName']\n          print(instanceID)\n\
+          \          response = ssm.send_command(Targets=[{\"Key\":\"instanceids\"\
+          ,\"Values\":[instanceID]}],\n                  DocumentName=\"AWS-RunShellScript\"\
+          ,\n                  Parameters={\"commands\":[\"/home/ec2-user/destroy.sh\
+          \ %s\" %(stackname)],\n                              \"executionTimeout\"\
+          :[\"1200\"],\n                              \"workingDirectory\":[\"/home/ec2-user\"\
+          ]},\n                  Comment=\"Execute script in uninstall openshift\"\
+          ,\n                  TimeoutSeconds=120)\n          print(response)\n  \
+          \        current_status = \"WAIT\"\n          final_status = \"READY\"\n\
+          \          parameterName = stackname+\"_CleanupStatus\"           \n   \
+          \       response = ssm.put_parameter(Name=parameterName,\n             \
+          \    Description=\"Waiting for CleanupStatus to be READY\",\n          \
+          \       Value=current_status,\n                 Type='String',\n       \
+          \          Overwrite=True)        \n          print(response)    \n    \
+          \      while(current_status!=final_status):\n            time.sleep(30)\
+          \ \n            response = ssm.get_parameter(Name=parameterName)\n     \
+          \       parameter = response.get('Parameter')\n            current_status\
+          \ = parameter.get('Value')\n            print(current_status)\n        \
+          \  ssm.delete_parameter(Name=parameterName)    \n    except Exception as\
+          \ e:\n      print(e)\n      traceback.print_exc()\n    cfnresponse.send(event,\
+          \ context, cfnresponse.SUCCESS, {}, '')\n"
       Environment:
         Variables:
-          Region: !Ref AWS::Region
-          BootNode: !Ref BootnodeInstance
-          Storage: !Ref StorageType
-          StackName: !Ref AWS::StackName
+          Region: !Ref 'AWS::Region'
+          BootNode: !Ref 'BootnodeInstance'
+          Storage: !Ref 'StorageType'
+          StackName: !Ref 'AWS::StackName'
       Handler: index.handler
       Role: !GetAtt 'LambdaExecutionRole.Arn'
       Runtime: python3.8
       Timeout: 600
-             
-  Cleanup :
+  Cleanup:
     Type: Custom::Cleanup
     Properties:
       DependsOn: BootnodeInstance
       ServiceToken: !GetAtt 'CleanUpLambda.Arn'
- 
   ICPDInstallationCompletedHandle:
-    Type: AWS::CloudFormation::WaitConditionHandle  
-
+    Type: AWS::CloudFormation::WaitConditionHandle
   ICPDInstallationCompleted:
     Type: AWS::CloudFormation::WaitCondition
     Properties:
       Count: 1
-      Handle: !Ref ICPDInstallationCompletedHandle
-      Timeout: '30000'  
-
+      Handle: !Ref 'ICPDInstallationCompletedHandle'
+      Timeout: '30000'
 Outputs:
   BootnodeInstanceId:
     Description: Bootnode Instance ID.
-    Value: !Ref BootnodeInstance
-
+    Value: !Ref 'BootnodeInstance'
   BootnodePublicIp:
     Description: The boot node public IP address.
-    Value: !GetAtt BootnodeInstance.PublicIp
-
+    Value: !GetAtt 'BootnodeInstance.PublicIp'
   OpenshiftURLValue:
     Description: The URL for the OpenShift UI.
-    Value: !GetAtt OpenshiftURL.Value  
-  
-  ICPDWebClientURL :
+    Value: !GetAtt 'OpenshiftURL.Value'
+  ICPDWebClientURL:
     Description: CloudPak for Data web client URL.
-    Value: !GetAtt CPDURL.Value
-  
+    Value: !GetAtt 'CPDURL.Value'
+  ICPDWebClientPassword:
+    Description: CloudPak for Data web client URL.
+    Value: !Ref 'CPDSecret'
+  OpenshiftUsername:
+    Description: OpenShift password secret.
+    Value: !Ref 'OpenshiftSecret'
   OpenshiftPassword:
     Description: OpenShift password secret.
-    Value: !Ref OpenshiftSecret 
+    Value: !Ref 'OpenshiftSecret'

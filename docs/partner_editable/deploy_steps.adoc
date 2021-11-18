@@ -6,16 +6,16 @@
 
 // Optional based on Marketplace listing. Not to be edited
 ifdef::marketplace_subscription[]
-=== Subscribe to the {partner-product-short-name} AMI
+=== Subscribe to {partner-product-short-name} - BYOL in AWS Marketplace
 
-This Quick Start requires a subscription to the AMI for {partner-product-short-name} in AWS Marketplace.
+This Quick Start requires a subscription to the {partner-product-short-name} - BYOL listing in AWS Marketplace.
 
 . Sign in to your AWS account.
-. {marketplace_listing_url}[Open the page for the {partner-product-short-name} AMI in AWS Marketplace], and then choose *Continue to Subscribe*.
+. {marketplace_listing_url}[Open the page for the {partner-product-short-name} - BYOL in AWS Marketplace], and then choose *Continue to Subscribe*.
 . Review the terms and conditions for software usage, and then choose *Accept Terms*. +
   A confirmation page loads, and an email confirmation is sent to the account owner. For detailed subscription instructions, see the https://aws.amazon.com/marketplace/help/200799470[AWS Marketplace documentation^].
 
-. When the subscription process is complete, exit out of AWS Marketplace without further action. *Do not* provision the software from AWS Marketplace—the Quick Start deploys the AMI for you.
+. When the subscription process is complete, exit out of AWS Marketplace without further action. *Do not* provision the software from AWS Marketplace—the Quick Start does the deployment for you.
 endif::marketplace_subscription[]
 // \Not to be edited
 
